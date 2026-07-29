@@ -3,7 +3,7 @@ export const BUSINESS = {
   short: "Ativa Pet",
   slogan: "Amor em cada patinha",
   phone: "(02) 49884-2476",
-  phoneDigits: "0249884247 6".replace(/\s/g, ""),
+  phoneDigits: "02498842476",
   whatsapp: "5502498842476",
   address: "Pr. Pres. Castelo Branco, 320 - Lot. Projetado, Areal - RJ, 25845-000",
   email: "contato@ativapet.com.br",
