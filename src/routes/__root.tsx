@@ -87,6 +87,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Ativa Saúde e Nutrição Animal" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Ativa Saúde e Nutrição Animal | Pet Shop em Areal - RJ" },
+      { name: "twitter:title", content: "Ativa Saúde e Nutrição Animal | Pet Shop em Areal - RJ" },
+      { property: "og:description", content: "Pet shop em Areal (RJ): banho e tosa, nutrição orientada, vacinas e entrega de ração." },
+      { name: "twitter:description", content: "Pet shop em Areal (RJ): banho e tosa, nutrição orientada, vacinas e entrega de ração." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/84fa2be2-4800-49c0-b3a0-820fbf8e5d7d/id-preview-fff43192--63c156bd-a92a-40c4-acf4-cc79a2e9e43d.lovable.app-1785353565467.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/84fa2be2-4800-49c0-b3a0-820fbf8e5d7d/id-preview-fff43192--63c156bd-a92a-40c4-acf4-cc79a2e9e43d.lovable.app-1785353565467.png" },
     ],
     links: [
       {
