@@ -1,10 +1,38 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/')({
-  component: () => (
-    <div className="p-8 font-sans">
-      <h1 className="text-2xl font-bold mb-4">Projeto Pronto para Conexão GitHub</h1>
-      <p className="text-gray-600">Este projeto foi limpo e está aguardando a sincronização com seu repositório externo.</p>
-    </div>
-  ),
-})
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Projeto limpo — pronto para conectar ao GitHub" },
+      {
+        name: "description",
+        content:
+          "Projeto sem conteúdo do site anterior, pronto para sincronizar com um repositório do GitHub.",
+      },
+      { property: "og:title", content: "Projeto limpo — pronto para o GitHub" },
+      {
+        property: "og:description",
+        content: "Base limpa, aguardando sincronização com o repositório.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: Home,
+});
+
+function Home() {
+  return (
+    <main className="min-h-screen flex items-center justify-center p-8">
+      <div className="max-w-md text-center space-y-3">
+        <h1 className="text-3xl font-semibold tracking-tight">
+          Projeto limpo
+        </h1>
+        <p className="text-muted-foreground">
+          Todo o conteúdo do site anterior foi removido. A base está pronta para
+          ser sincronizada com um repositório do GitHub.
+        </p>
+      </div>
+    </main>
+  );
+}
