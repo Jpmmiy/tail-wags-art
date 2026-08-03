@@ -85,7 +85,12 @@
 
 :root,
 .dark {
+  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display-sans: "Inter Tight", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono-code: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
   /* --- Marca --- */
+
   --ink: oklch(0.145 0.004 265);
   --ink-raised: oklch(0.201 0.005 265);
   --ink-sunk: oklch(0.112 0.004 265);
