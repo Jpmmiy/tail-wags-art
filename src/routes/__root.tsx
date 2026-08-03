@@ -77,13 +77,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Ativa Saúde e Nutrição Animal | Pet Shop em Areal - RJ" },
-      {
-        name: "description",
-        content:
-          "Pet shop em Areal (RJ): banho e tosa, nutrição orientada, vacinas e entrega de ração.",
-      },
-      { property: "og:site_name", content: "Ativa Saúde e Nutrição Animal" },
+      { name: "theme-color", content: "#0A0A0C" },
+      { name: "color-scheme", content: "dark" },
+      { property: "og:site_name", content: "Nexofly" },
+      { property: "og:locale", content: "pt_BR" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -96,7 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
@@ -109,17 +106,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR" className="dark h-full">
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="flex min-h-full flex-col bg-ink">
         {children}
         <Scripts />
       </body>
     </html>
   );
 }
+
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
