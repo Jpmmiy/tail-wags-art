@@ -1,5 +1,5 @@
 import { Link as RouterLink, useRouterState } from "@tanstack/react-router";
-import type { AnchorHTMLAttributes } from "react";
+import { forwardRef, type AnchorHTMLAttributes, type Ref } from "react";
 
 type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   href: string;
@@ -9,15 +9,19 @@ type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
 };
 
 /** Ponte de compatibilidade: aceita `href` e usa o roteador quando possível. */
-export function Link({ href, prefetch, scroll, replace, ...props }: LinkProps) {
+export const Link = forwardRef(function Link(
+  { href, prefetch: _p, scroll: _s, replace, ...props }: LinkProps,
+  ref: Ref<HTMLAnchorElement>,
+) {
   const interno = href.startsWith("/") && !href.startsWith("//");
 
   if (!interno) {
-    return <a href={href} {...props} />;
+    return <a ref={ref} href={href} {...props} />;
   }
 
-  return <RouterLink to={href} replace={replace} {...props} />;
-}
+  return <RouterLink ref={ref} to={href} replace={replace} {...props} />;
+});
+
 
 export default Link;
 
