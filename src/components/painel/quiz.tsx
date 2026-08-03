@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
 import {
   Check,
   Copy,
@@ -44,7 +44,7 @@ import {
   nomeRegiao,
   nomePais,
 } from "@/lib/locais";
-import type { ImovelEncontrado, Modalidade } from "@/app/api/imoveis/route";
+import type { ImovelEncontrado, Modalidade } from "@/lib/imoveis-tipos";
 import { TelaGeracao } from "./tela-geracao";
 import { cn } from "@/lib/utils";
 

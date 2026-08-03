@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/brand/logo";
 import { Cta } from "@/components/brand/cta";

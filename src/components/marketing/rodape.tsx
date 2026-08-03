@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
 import { Reveal } from "@/components/reveal";
 import { Cta } from "@/components/brand/cta";
 import { Logo } from "@/components/brand/logo";
