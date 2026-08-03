@@ -1,185 +1,687 @@
-@import "tailwindcss" source(none);
-@source "../src";
+@import "tailwindcss";
 @import "tw-animate-css";
+
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   NEXOFLY — Sistema de design
+   Base: preto quente (ink). Acento: ouro-mel (chrome) = luz de
+   janela ao entardecer, hospitalidade + credibilidade.
+   Deliberadamente oposto ao ciano/violeta frio do mercado.
+   ============================================================ */
+
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
-  --font-display: "Fredoka", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-cream: var(--cream);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-display-sans);
+  --font-mono: var(--font-mono-code);
+  --font-heading: var(--font-display-sans);
+
+  /* Paleta de marca */
   --color-ink: var(--ink);
-  --color-rose-pet: var(--rose-pet);
-  --color-sky-pet: var(--sky-pet);
-  --color-leaf-pet: var(--leaf-pet);
-  --color-sun-pet: var(--sun-pet);
-  --color-lavender-pet: var(--lavender-pet);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
+  --color-ink-raised: var(--ink-raised);
+  --color-ink-sunk: var(--ink-sunk);
+  --color-chrome: var(--chrome);
+  --color-chrome-hi: var(--chrome-hi);
+  --color-chrome-mid: var(--chrome-mid);
+  --color-jade: var(--jade);
+  --color-bone: var(--bone);
+  --color-stone: var(--stone);
+
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-3xl: calc(var(--radius) * 2.75);
+  --radius-4xl: calc(var(--radius) * 3.5);
+
+  --animate-rise: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-bloom: bloom 7s ease-in-out infinite;
+  --animate-drift: drift 34s linear infinite;
+  --animate-sheen: sheen 3.4s ease-in-out infinite;
+  --animate-pulse-ring: pulse-ring 2.6s ease-out infinite;
+  --animate-morph: morph 18s ease-in-out infinite;
+  --animate-metal-spin: metal-spin 14s linear infinite;
+  --animate-float: float 9s ease-in-out infinite;
+  --animate-aurora: aurora 22s ease-in-out infinite;
+  --animate-metal-sweep: metal-sweep 5.5s ease-in-out infinite;
+  --animate-scroll-hint: scroll-hint 2.2s ease-in-out infinite;
+  --animate-wipe-in: wipe-in 1.05s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-:root {
-  --radius: 1.25rem;
+:root,
+.dark {
+  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display-sans: "Inter Tight", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono-code: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --cream: oklch(0.983 0.014 84);
-  --ink: oklch(0.21 0.036 265);
+  /* --- Marca --- */
 
-  --background: oklch(0.983 0.014 84);
-  --foreground: oklch(0.21 0.036 265);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.036 265);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.036 265);
+  --ink: oklch(0.145 0.004 265);
+  --ink-raised: oklch(0.201 0.005 265);
+  --ink-sunk: oklch(0.112 0.004 265);
+  --chrome: oklch(0.965 0.002 250);
+  --chrome-hi: oklch(1 0 0);
+  --chrome-mid: oklch(0.735 0.005 255);
+  --jade: oklch(0.78 0.13 165);
+  --bone: oklch(0.968 0.002 250);
+  --stone: oklch(0.672 0.006 258);
 
-  --primary: oklch(0.626 0.199 43.2);
-  --primary-foreground: oklch(0.995 0.008 84);
-  --primary-deep: oklch(0.52 0.176 40);
-  --primary-soft: oklch(0.95 0.035 60);
+  /* --- Tokens shadcn mapeados na marca --- */
+  --background: var(--ink);
+  --foreground: var(--bone);
+  --card: oklch(0.186 0.005 265);
+  --card-foreground: var(--bone);
+  --popover: oklch(0.186 0.005 265);
+  --popover-foreground: var(--bone);
+  --primary: var(--chrome);
+  --primary-foreground: oklch(0.16 0.004 265);
+  --secondary: oklch(0.248 0.005 265);
+  --secondary-foreground: var(--bone);
+  --muted: oklch(0.238 0.005 265);
+  --muted-foreground: var(--stone);
+  --accent: oklch(0.265 0.006 265);
+  --accent-foreground: var(--chrome-hi);
+  --destructive: oklch(0.645 0.17 25);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: var(--chrome);
 
-  --secondary: oklch(0.21 0.036 265);
-  --secondary-foreground: oklch(0.985 0.01 84);
+  --chart-1: var(--chrome);
+  --chart-2: var(--jade);
+  --chart-3: oklch(0.62 0.005 258);
+  --chart-4: oklch(0.46 0.005 258);
+  --chart-5: oklch(0.33 0.005 258);
 
-  --muted: oklch(0.955 0.014 78);
-  --muted-foreground: oklch(0.516 0.026 60);
-  --accent: oklch(0.94 0.03 60);
-  --accent-foreground: oklch(0.35 0.12 42);
+  --radius: 0.875rem;
 
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-
-  --border: oklch(0.9 0.017 72);
-  --input: oklch(0.9 0.017 72);
-  --ring: oklch(0.626 0.199 43.2);
-
-  --rose-pet: oklch(0.72 0.15 5);
-  --sky-pet: oklch(0.68 0.12 235);
-  --leaf-pet: oklch(0.68 0.13 155);
-  --sun-pet: oklch(0.82 0.14 85);
-  --lavender-pet: oklch(0.7 0.11 300);
-
-  --gradient-warm: linear-gradient(135deg, oklch(0.68 0.19 48), oklch(0.6 0.2 30));
-  --gradient-ink: linear-gradient(140deg, oklch(0.24 0.04 265), oklch(0.16 0.03 265));
-  --gradient-soft: linear-gradient(180deg, oklch(0.99 0.012 84), oklch(0.965 0.028 70));
-
-  --shadow-soft: 0 1px 2px oklch(0.4 0.05 50 / 0.04), 0 8px 24px -12px oklch(0.4 0.08 50 / 0.16);
-  --shadow-lift: 0 2px 4px oklch(0.4 0.05 50 / 0.05), 0 24px 48px -20px oklch(0.45 0.12 45 / 0.28);
-  --shadow-glow: 0 20px 60px -24px oklch(0.626 0.199 43.2 / 0.55);
-
-  --sidebar: oklch(0.985 0.01 84);
-  --sidebar-foreground: oklch(0.21 0.036 265);
-  --sidebar-primary: oklch(0.626 0.199 43.2);
-  --sidebar-primary-foreground: oklch(0.995 0.008 84);
-  --sidebar-accent: oklch(0.94 0.03 60);
-  --sidebar-accent-foreground: oklch(0.35 0.12 42);
-  --sidebar-border: oklch(0.9 0.017 72);
-  --sidebar-ring: oklch(0.626 0.199 43.2);
+  --sidebar: oklch(0.168 0.005 265);
+  --sidebar-foreground: var(--bone);
+  --sidebar-primary: var(--chrome);
+  --sidebar-primary-foreground: oklch(0.16 0.004 265);
+  --sidebar-accent: oklch(0.248 0.005 265);
+  --sidebar-accent-foreground: var(--chrome-hi);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: var(--chrome);
 }
 
 @layer base {
   * {
-    border-color: var(--color-border);
-  }
-
-  body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  .font-display {
-    font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    @apply border-border outline-ring/60;
   }
 
   html {
+    @apply font-sans;
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* O cabeçalho é fixo. Alvo de âncora precisa parar abaixo dele — vale
+     para quem tem prefers-reduced-motion, onde o Lenis não roda e quem
+     rola é o próprio navegador. */
+  [id] {
+    scroll-margin-top: 4.5rem;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "cv01";
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Foco sempre visível — requisito de acessibilidade */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-chrome;
+    border-radius: 4px;
   }
 
   ::selection {
-    background: var(--primary);
-    color: var(--primary-foreground);
+    background: color-mix(in oklch, var(--chrome) 32%, transparent);
+    color: var(--bone);
+  }
+
+  /* Títulos grandes pedem tracking negativo forte. É o que separa
+     um display bem ajustado de texto de corpo aumentado. */
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Scrollbar discreta e no tom da marca */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--ink-sunk);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.32 0.012 66);
+    border-radius: 99px;
+    border: 2px solid var(--ink-sunk);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.42 0.03 70);
   }
 }
 
-@utility gradient-warm {
-  background-image: var(--gradient-warm);
+/* ============================================================
+   Cromo líquido — a superfície da marca
+
+   Metal polido reflete três coisas: céu (claro), horizonte (médio)
+   e chão (escuro). A rampa abaixo alterna essas bandas; é isso que
+   faz o olho ler "metal" em vez de "degradê".
+   ============================================================ */
+
+@theme {
+  --metal-ramp:
+    #FFFFFF 0%, #D6DBE2 7%, #979EA9 14%, #6A717C 20%, #C4CAD2 27%,
+    #FFFFFF 34%, #E9ECF1 40%, #8C939E 48%, #575E68 54%, #A8AFB9 61%,
+    #FFFFFF 69%, #DFE3E9 76%, #9097A2 85%, #C2C8D0 93%, #FFFFFF 100%;
 }
 
-@utility gradient-ink {
-  background-image: var(--gradient-ink);
+/* Massas grandes: cônico, porque a peça inteira gira sob a luz. */
+@utility metal-surface {
+  background: conic-gradient(from var(--metal-angle, 210deg) at 42% 38%, var(--metal-ramp));
 }
 
-@utility gradient-soft {
-  background-image: var(--gradient-soft);
+/* Peças pequenas: linear e claro. O cônico escurece demais num
+   botão de 44px e come o contraste do texto. */
+@utility metal-pill {
+  background: linear-gradient(
+    178deg,
+    #FFFFFF 0%,
+    #F6F8FA 16%,
+    #E4E8EE 34%,
+    #CFD5DD 52%,
+    #E8ECF1 70%,
+    #FBFCFD 86%,
+    #DCE1E8 100%
+  );
 }
 
-@utility shadow-soft {
-  box-shadow: var(--shadow-soft);
+@utility metal-text {
+  background: linear-gradient(
+    96deg,
+    #C9D0DA 0%,
+    #FFFFFF 12%,
+    #FFFFFF 22%,
+    #A9B1BD 33%,
+    #E6EAF0 44%,
+    #FFFFFF 58%,
+    #FFFFFF 68%,
+    #B3BAC5 80%,
+    #EDF0F4 100%
+  );
+  background-size: 240% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* Sem filter aqui: drop-shadow cria uma região de filtro que, junto
+     com background-clip:text, desenha a caixa do elemento em volta da
+     palavra em vez de acompanhar as letras. */
 }
 
-@utility shadow-lift {
-  box-shadow: var(--shadow-lift);
+/* Vidro: translúcido, com a quina de cima pegando luz. */
+@utility glass {
+  background: color-mix(in oklch, var(--bone) 5%, transparent);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid color-mix(in oklch, var(--bone) 11%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, var(--bone) 20%, transparent),
+    inset 0 -1px 0 color-mix(in oklch, var(--chrome-mid) 12%, transparent),
+    0 28px 70px -34px rgb(0 0 0 / 0.9);
 }
 
-@utility shadow-glow {
-  box-shadow: var(--shadow-glow);
+@utility glass-deep {
+  background: color-mix(in oklch, var(--ink-sunk) 62%, transparent);
+  backdrop-filter: blur(34px) saturate(170%);
+  -webkit-backdrop-filter: blur(34px) saturate(170%);
+  border: 1px solid color-mix(in oklch, var(--bone) 9%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, var(--bone) 16%, transparent),
+    0 40px 90px -40px rgb(0 0 0 / 0.95);
 }
 
-@utility text-gradient-warm {
-  background-image: var(--gradient-warm);
+/* Reflexo especular que segue o cursor. Alimentado por --mx/--my. */
+@utility specular {
+  position: relative;
+  isolation: isolate;
+}
+
+/* ============================================================
+   Utilitários de marca
+   ============================================================ */
+
+@utility text-chrome-gradient {
+  background: linear-gradient(
+    103deg,
+    var(--chrome-hi) 4%,
+    var(--chrome) 44%,
+    var(--chrome-mid) 96%
+  );
+  -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
+/* Luz de janela: o brilho ambiente da marca. Um só, ancorado. */
+@utility window-light {
+  position: absolute;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in oklch, var(--chrome) 26%, transparent) 0%,
+    color-mix(in oklch, var(--chrome-mid) 10%, transparent) 38%,
+    transparent 72%
+  );
+  filter: blur(46px);
+}
+
+/* Borda com brilho no topo, como luz batendo na quina do card */
+@utility edge-lit {
+  position: relative;
+  isolation: isolate;
+}
+
 @utility grain {
   position: relative;
-  &::after {
+}
+
+@layer components {
+  .specular::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 2;
+    opacity: var(--spec-on, 0);
+    transition: opacity 0.45s ease;
+    background: radial-gradient(
+      340px circle at var(--mx, 50%) var(--my, 0%),
+      color-mix(in oklch, var(--chrome-hi) 26%, transparent),
+      transparent 62%
+    );
+  }
+
+  .specular:hover::after {
+    opacity: 1;
+  }
+
+  /* Fio de luz correndo na borda — quina de metal polido */
+  .rim-lit {
+    position: relative;
+  }
+
+  .rim-lit::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--rim-angle, 0deg),
+      transparent 0%,
+      color-mix(in oklch, var(--chrome-hi) 85%, transparent) 8%,
+      transparent 18%,
+      transparent 52%,
+      color-mix(in oklch, var(--chrome) 55%, transparent) 60%,
+      transparent 70%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .grain::after {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.035;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.32;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+
+  .edge-lit::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      160deg,
+      color-mix(in oklch, var(--chrome-hi) 42%, transparent),
+      transparent 34%,
+      transparent 68%,
+      color-mix(in oklch, var(--chrome-mid) 16%, transparent)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Leque de cartões: o GSAP posiciona por transform, então aqui só
+     mora a caixa. Altura do palco muda por breakpoint. */
+  .fan-layout {
+    height: 22rem;
+  }
+  .fan-card {
+    position: absolute;
+    width: 9rem;
+    aspect-ratio: 4 / 7;
+    border-radius: 1.1rem;
+    overflow: hidden;
+    will-change: transform;
+    background: var(--ink-raised);
+    border: 1px solid color-mix(in oklch, var(--bone) 14%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklch, var(--bone) 22%, transparent),
+      0 30px 60px -24px rgb(0 0 0 / 0.85);
+  }
+
+  @media (min-width: 480px) {
+    .fan-layout {
+      height: 26rem;
+    }
+    .fan-card {
+      width: 11rem;
+    }
+  }
+  @media (min-width: 640px) {
+    .fan-layout {
+      height: 28rem;
+    }
+    .fan-card {
+      width: 12rem;
+      border-radius: 1.3rem;
+    }
+  }
+  @media (min-width: 768px) {
+    .fan-layout {
+      height: 34rem;
+    }
+    .fan-card {
+      width: 14rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .fan-layout {
+      height: 38rem;
+    }
+    .fan-card {
+      width: 15.5rem;
+      border-radius: 1.5rem;
+    }
+  }
+
+  /* Malha de fundo — sutil, referência a planta baixa */
+  .blueprint {
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in oklch, var(--bone) 4%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklch, var(--bone) 4%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 64px 64px;
+  }
+
+  .eyebrow {
+    @apply font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-stone;
   }
 }
 
-@utility hairline {
-  border: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent);
+/* ============================================================
+   Animação — orquestrada, não espalhada
+   ============================================================ */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+@keyframes bloom {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes sheen {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  55%,
+  100% {
+    transform: translateX(320%) skewX(-18deg);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.85);
+  }
+  75%,
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+/* Gota de metal líquido: a silhueta nunca repete no mesmo lugar */
+@keyframes morph {
+  0%,
+  100% {
+    border-radius: 62% 38% 46% 54% / 58% 44% 56% 42%;
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    border-radius: 42% 58% 66% 34% / 40% 62% 38% 60%;
+    transform: rotate(22deg) scale(1.04);
+  }
+  50% {
+    border-radius: 55% 45% 32% 68% / 68% 36% 64% 32%;
+    transform: rotate(-14deg) scale(0.97);
+  }
+  75% {
+    border-radius: 36% 64% 58% 42% / 48% 58% 42% 52%;
+    transform: rotate(12deg) scale(1.03);
+  }
+}
+
+@property --metal-angle {
+  syntax: "<angle>";
+  initial-value: 210deg;
+  inherits: false;
+}
+
+@property --rim-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes metal-spin {
+  to {
+    --metal-angle: 570deg;
+  }
+}
+
+@keyframes rim-run {
+  to {
+    --rim-angle: 360deg;
+  }
+}
+
+@keyframes metal-sweep {
+  0% {
+    background-position: 180% 50%;
+  }
+  100% {
+    background-position: -80% 50%;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0);
+  }
+}
+
+@keyframes aurora {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.7;
+  }
+  33% {
+    transform: translate3d(6%, -4%, 0) scale(1.15);
+    opacity: 1;
+  }
+  66% {
+    transform: translate3d(-5%, 3%, 0) scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+/* Revelação lateral. Usada onde o texto tem background-clip e não
+   pode ser fatiado em spans sem perder o recorte do gradiente. */
+@keyframes wipe-in {
+  from {
+    clip-path: inset(0 100% -20% 0);
+    transform: translate3d(-0.12em, 0, 0);
+  }
+  to {
+    clip-path: inset(0 -6% -20% 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes scroll-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(7px);
+    opacity: 1;
+  }
+}
+
+/* Revelação no scroll — controlada por IntersectionObserver */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+[data-reveal="shown"] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
 }

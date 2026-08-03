@@ -9,38 +9,206 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PainelRouteImport } from './routes/painel'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PainelIndexRouteImport } from './routes/painel/index'
+import { Route as PainelProjetosRouteImport } from './routes/painel/projetos'
+import { Route as PainelPresenteRouteImport } from './routes/painel/presente'
+import { Route as PainelPremiacoesRouteImport } from './routes/painel/premiacoes'
+import { Route as PainelPortfolioRouteImport } from './routes/painel/portfolio'
+import { Route as PainelMentorRouteImport } from './routes/painel/mentor'
+import { Route as PainelMembrosRouteImport } from './routes/painel/membros'
+import { Route as PainelCriarRouteImport } from './routes/painel/criar'
+import { Route as PainelCreditosRouteImport } from './routes/painel/creditos'
+import { Route as PainelContaRouteImport } from './routes/painel/conta'
+import { Route as ApiMentorRouteImport } from './routes/api/mentor'
+import { Route as ApiImoveisRouteImport } from './routes/api/imoveis'
 
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PainelIndexRoute = PainelIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelProjetosRoute = PainelProjetosRouteImport.update({
+  id: '/projetos',
+  path: '/projetos',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelPresenteRoute = PainelPresenteRouteImport.update({
+  id: '/presente',
+  path: '/presente',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelPremiacoesRoute = PainelPremiacoesRouteImport.update({
+  id: '/premiacoes',
+  path: '/premiacoes',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelPortfolioRoute = PainelPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelMentorRoute = PainelMentorRouteImport.update({
+  id: '/mentor',
+  path: '/mentor',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelMembrosRoute = PainelMembrosRouteImport.update({
+  id: '/membros',
+  path: '/membros',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelCriarRoute = PainelCriarRouteImport.update({
+  id: '/criar',
+  path: '/criar',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelCreditosRoute = PainelCreditosRouteImport.update({
+  id: '/creditos',
+  path: '/creditos',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelContaRoute = PainelContaRouteImport.update({
+  id: '/conta',
+  path: '/conta',
+  getParentRoute: () => PainelRoute,
+} as any)
+const ApiMentorRoute = ApiMentorRouteImport.update({
+  id: '/api/mentor',
+  path: '/api/mentor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiImoveisRoute = ApiImoveisRouteImport.update({
+  id: '/api/imoveis',
+  path: '/api/imoveis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/painel': typeof PainelRouteWithChildren
+  '/api/imoveis': typeof ApiImoveisRoute
+  '/api/mentor': typeof ApiMentorRoute
+  '/painel/conta': typeof PainelContaRoute
+  '/painel/creditos': typeof PainelCreditosRoute
+  '/painel/criar': typeof PainelCriarRoute
+  '/painel/membros': typeof PainelMembrosRoute
+  '/painel/mentor': typeof PainelMentorRoute
+  '/painel/portfolio': typeof PainelPortfolioRoute
+  '/painel/premiacoes': typeof PainelPremiacoesRoute
+  '/painel/presente': typeof PainelPresenteRoute
+  '/painel/projetos': typeof PainelProjetosRoute
+  '/painel/': typeof PainelIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/imoveis': typeof ApiImoveisRoute
+  '/api/mentor': typeof ApiMentorRoute
+  '/painel/conta': typeof PainelContaRoute
+  '/painel/creditos': typeof PainelCreditosRoute
+  '/painel/criar': typeof PainelCriarRoute
+  '/painel/membros': typeof PainelMembrosRoute
+  '/painel/mentor': typeof PainelMentorRoute
+  '/painel/portfolio': typeof PainelPortfolioRoute
+  '/painel/premiacoes': typeof PainelPremiacoesRoute
+  '/painel/presente': typeof PainelPresenteRoute
+  '/painel/projetos': typeof PainelProjetosRoute
+  '/painel': typeof PainelIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/painel': typeof PainelRouteWithChildren
+  '/api/imoveis': typeof ApiImoveisRoute
+  '/api/mentor': typeof ApiMentorRoute
+  '/painel/conta': typeof PainelContaRoute
+  '/painel/creditos': typeof PainelCreditosRoute
+  '/painel/criar': typeof PainelCriarRoute
+  '/painel/membros': typeof PainelMembrosRoute
+  '/painel/mentor': typeof PainelMentorRoute
+  '/painel/portfolio': typeof PainelPortfolioRoute
+  '/painel/premiacoes': typeof PainelPremiacoesRoute
+  '/painel/presente': typeof PainelPresenteRoute
+  '/painel/projetos': typeof PainelProjetosRoute
+  '/painel/': typeof PainelIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/painel'
+    | '/api/imoveis'
+    | '/api/mentor'
+    | '/painel/conta'
+    | '/painel/creditos'
+    | '/painel/criar'
+    | '/painel/membros'
+    | '/painel/mentor'
+    | '/painel/portfolio'
+    | '/painel/premiacoes'
+    | '/painel/presente'
+    | '/painel/projetos'
+    | '/painel/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/api/imoveis'
+    | '/api/mentor'
+    | '/painel/conta'
+    | '/painel/creditos'
+    | '/painel/criar'
+    | '/painel/membros'
+    | '/painel/mentor'
+    | '/painel/portfolio'
+    | '/painel/premiacoes'
+    | '/painel/presente'
+    | '/painel/projetos'
+    | '/painel'
+  id:
+    | '__root__'
+    | '/'
+    | '/painel'
+    | '/api/imoveis'
+    | '/api/mentor'
+    | '/painel/conta'
+    | '/painel/creditos'
+    | '/painel/criar'
+    | '/painel/membros'
+    | '/painel/mentor'
+    | '/painel/portfolio'
+    | '/painel/premiacoes'
+    | '/painel/presente'
+    | '/painel/projetos'
+    | '/painel/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PainelRoute: typeof PainelRouteWithChildren
+  ApiImoveisRoute: typeof ApiImoveisRoute
+  ApiMentorRoute: typeof ApiMentorRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +216,128 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/painel/': {
+      id: '/painel/'
+      path: '/'
+      fullPath: '/painel/'
+      preLoaderRoute: typeof PainelIndexRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/projetos': {
+      id: '/painel/projetos'
+      path: '/projetos'
+      fullPath: '/painel/projetos'
+      preLoaderRoute: typeof PainelProjetosRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/presente': {
+      id: '/painel/presente'
+      path: '/presente'
+      fullPath: '/painel/presente'
+      preLoaderRoute: typeof PainelPresenteRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/premiacoes': {
+      id: '/painel/premiacoes'
+      path: '/premiacoes'
+      fullPath: '/painel/premiacoes'
+      preLoaderRoute: typeof PainelPremiacoesRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/portfolio': {
+      id: '/painel/portfolio'
+      path: '/portfolio'
+      fullPath: '/painel/portfolio'
+      preLoaderRoute: typeof PainelPortfolioRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/mentor': {
+      id: '/painel/mentor'
+      path: '/mentor'
+      fullPath: '/painel/mentor'
+      preLoaderRoute: typeof PainelMentorRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/membros': {
+      id: '/painel/membros'
+      path: '/membros'
+      fullPath: '/painel/membros'
+      preLoaderRoute: typeof PainelMembrosRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/criar': {
+      id: '/painel/criar'
+      path: '/criar'
+      fullPath: '/painel/criar'
+      preLoaderRoute: typeof PainelCriarRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/creditos': {
+      id: '/painel/creditos'
+      path: '/creditos'
+      fullPath: '/painel/creditos'
+      preLoaderRoute: typeof PainelCreditosRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/conta': {
+      id: '/painel/conta'
+      path: '/conta'
+      fullPath: '/painel/conta'
+      preLoaderRoute: typeof PainelContaRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/api/mentor': {
+      id: '/api/mentor'
+      path: '/api/mentor'
+      fullPath: '/api/mentor'
+      preLoaderRoute: typeof ApiMentorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/imoveis': {
+      id: '/api/imoveis'
+      path: '/api/imoveis'
+      fullPath: '/api/imoveis'
+      preLoaderRoute: typeof ApiImoveisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface PainelRouteChildren {
+  PainelContaRoute: typeof PainelContaRoute
+  PainelCreditosRoute: typeof PainelCreditosRoute
+  PainelCriarRoute: typeof PainelCriarRoute
+  PainelMembrosRoute: typeof PainelMembrosRoute
+  PainelMentorRoute: typeof PainelMentorRoute
+  PainelPortfolioRoute: typeof PainelPortfolioRoute
+  PainelPremiacoesRoute: typeof PainelPremiacoesRoute
+  PainelPresenteRoute: typeof PainelPresenteRoute
+  PainelProjetosRoute: typeof PainelProjetosRoute
+  PainelIndexRoute: typeof PainelIndexRoute
+}
+
+const PainelRouteChildren: PainelRouteChildren = {
+  PainelContaRoute: PainelContaRoute,
+  PainelCreditosRoute: PainelCreditosRoute,
+  PainelCriarRoute: PainelCriarRoute,
+  PainelMembrosRoute: PainelMembrosRoute,
+  PainelMentorRoute: PainelMentorRoute,
+  PainelPortfolioRoute: PainelPortfolioRoute,
+  PainelPremiacoesRoute: PainelPremiacoesRoute,
+  PainelPresenteRoute: PainelPresenteRoute,
+  PainelProjetosRoute: PainelProjetosRoute,
+  PainelIndexRoute: PainelIndexRoute,
+}
+
+const PainelRouteWithChildren =
+  PainelRoute._addFileChildren(PainelRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PainelRoute: PainelRouteWithChildren,
+  ApiImoveisRoute: ApiImoveisRoute,
+  ApiMentorRoute: ApiMentorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

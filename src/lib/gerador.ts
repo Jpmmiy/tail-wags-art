@@ -1,0 +1,328 @@
+/**
+ * Monta os textos que a plataforma entrega, a partir das respostas do quiz.
+ * Em produção estes templates seriam preenchidos por modelo; aqui a estrutura
+ * é a mesma — o que muda é a origem do texto.
+ */
+
+export type Imovel = {
+  id: string;
+  nome: string;
+  cidade: string;
+  anfitriao: string;
+  tipo: string;
+  diaria: number;
+  potencial: number;
+  nota: number;
+  avaliacoes: number;
+  fotos: number;
+  problemas: string[];
+};
+
+export const IMOVEIS: Imovel[] = [
+  {
+    id: "chale-vista-serra",
+    nome: "Chalé Vista Serra",
+    cidade: "Monte Verde, MG",
+    anfitriao: "Marcelo",
+    tipo: "Chalé",
+    diaria: 280,
+    potencial: 410,
+    nota: 4.6,
+    avaliacoes: 12,
+    fotos: 6,
+    problemas: ["Fotos escuras", "Sem vídeo", "Sem site", "Título genérico"],
+  },
+  {
+    id: "loft-beira-mar",
+    nome: "Loft Beira-Mar 302",
+    cidade: "Ubatuba, SP",
+    anfitriao: "Renata",
+    tipo: "Loft",
+    diaria: 340,
+    potencial: 520,
+    nota: 4.8,
+    avaliacoes: 31,
+    fotos: 9,
+    problemas: ["Fotos tortas", "Sem vídeo", "Sem site"],
+  },
+  {
+    id: "casa-do-lago",
+    nome: "Casa do Lago",
+    cidade: "Capitólio, MG",
+    anfitriao: "Douglas",
+    tipo: "Casa",
+    diaria: 620,
+    potencial: 890,
+    nota: 4.9,
+    avaliacoes: 47,
+    fotos: 14,
+    problemas: ["Sem vídeo", "Sem site", "Fotos sem padrão"],
+  },
+  {
+    id: "studio-centro",
+    nome: "Studio Centro",
+    cidade: "Gramado, RS",
+    anfitriao: "Ana",
+    tipo: "Studio",
+    diaria: 210,
+    potencial: 305,
+    nota: 4.3,
+    avaliacoes: 8,
+    fotos: 4,
+    problemas: ["Poucas fotos", "Fotos com flash", "Sem site", "Sem vídeo"],
+  },
+];
+
+export const ESTILOS = [
+  {
+    id: "aconchegante",
+    rotulo: "Aconchegante",
+    desc: "Madeira, luz quente, tecidos",
+    luz: "sol baixo de fim de tarde entrando pela janela lateral, luz quente e direcional, sombras longas e suaves",
+    materiais:
+      "madeira aparente com textura visível, tecidos de lã e linho, cerâmica, paleta em âmbar e bege",
+  },
+  {
+    id: "moderno",
+    rotulo: "Moderno",
+    desc: "Linhas retas, contraste, neutro",
+    luz: "luz difusa de meio da tarde, janela ampla sem cortina, sombras curtas e limpas",
+    materiais:
+      "superfícies lisas, metal escovado, paleta neutra em no máximo três tons, um único ponto de cor",
+  },
+  {
+    id: "rustico",
+    rotulo: "Rústico",
+    desc: "Pedra, ferro, campo",
+    luz: "luz de manhã cedo, névoa leve na janela, temperatura de cor levemente fria contrastando com a madeira",
+    materiais:
+      "pedra e madeira bruta aparentes, ferro, algodão cru, cerâmica artesanal, tons terrosos",
+  },
+  {
+    id: "praiano",
+    rotulo: "Praiano",
+    desc: "Claro, arejado, azul",
+    luz: "luz alta de sol de praia filtrada por cortina branca, ambiente muito claro, sem sombras duras",
+    materiais:
+      "fibras naturais, madeira clara, algodão leve, paleta em branco e areia com toques de azul",
+  },
+];
+
+/** Arrumação específica de cada ambiente — o que muda de fato na foto. */
+const CENA_POR_COMODO: Record<string, string> = {
+  "Quarto principal":
+    "cama arrumada com a roupa de cama esticada e sem vincos, travesseiros alinhados, manta dobrada no pé, criado-mudo sem objetos pessoais, cortina aberta",
+  "Sala de estar":
+    "sofá com as almofadas alinhadas, manta dobrada sobre o braço, mesa de centro com no máximo dois objetos, tapete centralizado e esticado, nada de fio aparente",
+  Cozinha:
+    "bancada completamente livre, louça guardada, uma tábua ou fruteira como único objeto, panos dobrados, geladeira sem ímãs, pia seca",
+  Banheiro:
+    "toalhas brancas dobradas, bancada livre, box sem produtos à mostra, espelho sem marcas, tampa do vaso fechada",
+  "Área externa":
+    "mobiliário alinhado, almofadas limpas e secas, churrasqueira ou fogueira limpa, vegetação aparada, chão sem mangueira nem objeto solto",
+  Vista: "enquadramento a partir da janela ou varanda mostrando exatamente o que se vê do imóvel, sem obstrução, linha do horizonte reta",
+};
+
+export const PUBLICOS = [
+  { id: "casais", rotulo: "Casais", foco: "intimidade, banheira, vista e jantar a dois" },
+  { id: "familias", rotulo: "Famílias", foco: "espaço, segurança para crianças, cozinha completa" },
+  { id: "amigos", rotulo: "Grupos de amigos", foco: "área externa, churrasqueira, número de camas" },
+  { id: "trabalho", rotulo: "Viagem a trabalho", foco: "internet rápida, mesa de trabalho, silêncio, check-in autônomo" },
+];
+
+export const COMODOS = [
+  "Quarto principal",
+  "Sala de estar",
+  "Cozinha",
+  "Banheiro",
+  "Área externa",
+  "Vista",
+];
+
+export const ENTREGAVEIS = [
+  { id: "fotos", rotulo: "Fotos tratadas", desc: "Uma por ambiente" },
+  { id: "video", rotulo: "Vídeo do imóvel", desc: "Tour de 8 segundos" },
+  { id: "site", rotulo: "Site do anfitrião", desc: "Publicado e no ar" },
+  { id: "abordagem", rotulo: "Proposta", desc: "Pronta para enviar" },
+];
+
+/** Imóvel escolhido na busca, já normalizado para o gerador. */
+export type ImovelSelecionado = {
+  id: string;
+  nome: string;
+  cidade: string;
+  tipo: string;
+  anfitriao: string;
+  diaria: number;
+  potencial: number;
+  mapa?: string | null;
+  airbnb?: string | null;
+  site?: string | null;
+};
+
+export type Respostas = {
+  modalidade: "temporada" | "imobiliario";
+  imovel: ImovelSelecionado;
+  estilo: string;
+  publico: string;
+  comodos: string[];
+  entregaveis: string[];
+  /** Texto livre por seção do briefing. Vazio quando não preenchido. */
+  notas: {
+    estilo?: string;
+    publico?: string;
+    comodos?: string;
+    pacote?: string;
+  };
+};
+
+/** Bloco só aparece no material quando o usuário escreveu algo. */
+function obs(texto?: string) {
+  const t = texto?.trim();
+  return t ? `\n\nOBSERVAÇÕES DO BRIEFING\n${t}` : "";
+}
+
+const acheEstilo = (id: string) => ESTILOS.find((e) => e.id === id) ?? ESTILOS[0];
+const achePublico = (id: string) => PUBLICOS.find((p) => p.id === id) ?? PUBLICOS[0];
+
+export function promptFoto(r: Respostas, comodo: string) {
+  const e = acheEstilo(r.estilo);
+  const p = achePublico(r.publico);
+
+  return `Fotografia imobiliária realista — ${comodo.toUpperCase()}
+${r.imovel.nome}, ${r.imovel.cidade} · ${r.imovel.tipo}
+
+LUZ
+${e.luz}. Sem flash direto, sem luz chapada de teto.
+
+CENA
+${CENA_POR_COMODO[comodo] ?? "ambiente arrumado, superfícies livres, nada fora do lugar"}.
+
+MATERIAIS E PALETA
+${e.materiais}.
+
+O QUE PRECISA FICAR EVIDENTE
+Público do imóvel: ${p.rotulo.toLowerCase()}. Destacar ${p.foco}.
+
+CÂMERA
+Lente 24mm, f/4.0, ISO base. Altura de 1,40m. Linhas verticais
+corrigidas. Um ponto de fuga. Enquadramento na horizontal.
+
+TRATAMENTO
+Contraste suave, sem HDR agressivo. Brancos neutros. Verdes da
+vegetação fiéis. Sem vinheta artificial.
+
+RESTRIÇÕES (obrigatórias)
+- Não inventar móveis, portas, janelas ou cômodos que não existam
+  na foto original.
+- Não alterar o tamanho nem a proporção do ambiente.
+- Não adicionar vista que não é vista real do imóvel.
+- O hóspede precisa reconhecer o lugar na chegada.${obs(r.notas.estilo)}`;
+}
+
+export function promptVideo(r: Respostas) {
+  const e = acheEstilo(r.estilo);
+  const p = achePublico(r.publico);
+
+  return `Vídeo de 8 segundos — ${r.imovel.nome}, ${r.imovel.cidade}
+
+MOVIMENTO
+Travelling lento entrando pelo ambiente principal. Câmera na altura
+do peito (1,45m), deslocamento contínuo de 1,2m em linha reta.
+Sem tremor, sem zoom brusco, sem drone dentro do cômodo.
+
+LUZ
+${e.luz}.
+
+FOCO
+Primeiro segundo com profundidade de campo rasa no detalhe mais
+forte do imóvel. Depois abre lentamente para o ambiente inteiro.
+
+O QUE PRECISA APARECER
+${p.foco}.
+
+SOM
+Sem trilha. Ambiente natural leve (vento, pássaros, mar — conforme
+a região).
+
+NÃO INCLUIR
+Pessoas, texto na tela, logotipo, transições chamativas, filtro
+saturado.
+
+ENTREGA
+9:16 para Stories e 16:9 para o anúncio. Primeiro frame precisa
+funcionar como capa.${obs(r.notas.pacote)}`;
+}
+
+export function promptSite(r: Respostas) {
+  const p = achePublico(r.publico);
+
+  return `Crie uma landing page de reservas para "${r.imovel.nome}",
+${r.imovel.tipo.toLowerCase()} por temporada em ${r.imovel.cidade}.
+
+STACK
+React + Tailwind. Página única, responsiva, mobile-first.
+Carregamento rápido: imagens otimizadas e sem biblioteca pesada.
+
+PÚBLICO
+${p.rotulo}. A página inteira deve responder a: ${p.foco}.
+
+SEÇÕES, NESTA ORDEM
+1. Hero com foto em tela cheia, nome do imóvel, cidade e botão
+   "Consultar disponibilidade".
+2. Galeria com as fotos em grade, abrindo em lightbox.
+3. "O que tem aqui": lista de comodidades com ícone e rótulo curto.
+4. Calendário de disponibilidade com as datas ocupadas marcadas.
+5. Avaliações reais dos hóspedes, com nome e data.
+6. Como chegar: mapa e tempo de carro das capitais mais próximas.
+7. Rodapé com política de cancelamento, regras da casa e contato.
+
+CONVERSÃO
+Botão de WhatsApp fixo em todas as telas. Ao clicar, abrir conversa
+com mensagem pré-preenchida citando a data selecionada no calendário.
+
+TOM
+Acolhedor e direto. Frases curtas. Nada de linguagem de corretor,
+nada de "aconchegante refúgio". Descrever o que existe.${obs(r.notas.publico)}`;
+}
+
+export function abordagem(r: Respostas) {
+  const ganho = Math.max(0, r.imovel.potencial - r.imovel.diaria);
+
+  return `Oi, ${r.imovel.anfitriao}, tudo bem?
+
+Vi o anúncio do ${r.imovel.nome}. O lugar é muito bom, só que o
+anúncio não está mostrando isso. As fotos são a primeira coisa que
+o hóspede vê antes de decidir.
+
+Refiz três fotos pra você comparar, sem compromisso nenhum: [link]
+
+Se curtir, eu faço o pacote inteiro. Fotos tratadas de todos os
+cômodos, um vídeo curto pro Instagram e um site só do ${r.imovel.tipo.toLowerCase()},
+com reserva caindo direto no seu WhatsApp. Sem taxa de plataforma
+no meio.
+
+Imóvel parecido na sua região, com o anúncio ajustado, está saindo
+a R$ ${r.imovel.potencial} a diária. Você está em R$ ${r.imovel.diaria}.
+Dá R$ ${ganho} a mais por noite ocupada.
+
+Te mando os valores?`;
+}
+
+export function precificacao(r: Respostas) {
+  const base: Record<string, number> = {
+    fotos: 480,
+    video: 390,
+    site: 690,
+    abordagem: 0,
+  };
+  const itens = r.entregaveis
+    .filter((id) => base[id] > 0)
+    .map((id) => ({
+      id,
+      rotulo: ENTREGAVEIS.find((e) => e.id === id)!.rotulo,
+      valor: base[id],
+    }));
+  const total = itens.reduce((s, i) => s + i.valor, 0);
+  return { itens, total };
+}

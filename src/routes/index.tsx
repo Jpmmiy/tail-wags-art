@@ -1,70 +1,63 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Navbar } from "@/components/site/Navbar";
-import { Hero } from "@/components/site/Hero";
-import { Services } from "@/components/site/Services";
-import { Products } from "@/components/site/Products";
-import { Gallery } from "@/components/site/Gallery";
-import { Booking } from "@/components/site/Booking";
-import { Testimonials, CtaBand } from "@/components/site/Testimonials";
-import { Contact, Footer } from "@/components/site/Contact";
-import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 
-const title = "Ativa Saúde e Nutrição Animal | Pet Shop em Areal - RJ";
-const description =
-  "Pet shop em Areal (RJ) com banho e tosa sem estresse, consultoria de nutrição, vacinas e entrega de ração no mesmo dia. Amor em cada patinha.";
+import { SiteHeader } from "@/components/marketing/site-header";
+import { ScrollSuave } from "@/components/liquid/scroll-suave";
+import { Hero } from "@/components/marketing/hero";
+import { Ferramentas } from "@/components/marketing/ferramentas";
+import { Numeros } from "@/components/marketing/numeros";
+import { Plataforma } from "@/components/marketing/plataforma";
+import { Teia } from "@/components/marketing/teia";
+import { Galeria } from "@/components/marketing/galeria";
+import { Fluxo } from "@/components/marketing/fluxo";
+import { Planos } from "@/components/marketing/planos";
+import { Duvidas } from "@/components/marketing/duvidas";
+import { ChamadaFinal, Rodape } from "@/components/marketing/rodape";
+
+const TITULO = "Nexofly · Fotos, vídeo e site para anúncios de temporada";
+const DESCRICAO =
+  "A Nexofly organiza todo o trabalho de valorizar um anúncio de temporada. Escolha o imóvel e receba fotos, vídeo, site e abordagem prontos para entregar ao anfitrião.";
 
 export const Route = createFileRoute("/")({
-  component: Index,
   head: () => ({
     meta: [
-      { title },
-      { name: "description", content: description },
-      { property: "og:title", content: title },
-      { property: "og:description", content: description },
+      { title: TITULO },
+      { name: "description", content: DESCRICAO },
+      { property: "og:title", content: TITULO },
+      { property: "og:description", content: DESCRICAO },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/" }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "PetStore",
-          name: "Ativa Saúde e Nutrição Animal - Pet Shop",
-          slogan: "Amor em cada patinha",
-          telephone: "(02) 49884-2476",
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: "Pr. Pres. Castelo Branco, 320 - Lot. Projetado",
-            addressLocality: "Areal",
-            addressRegion: "RJ",
-            postalCode: "25845-000",
-            addressCountry: "BR",
-          },
-        }),
-      },
-    ],
   }),
+  component: Home,
 });
 
-function Index() {
+function Home() {
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main>
+    <>
+      <a
+        href="#conteudo"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-chrome focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#08090B]"
+      >
+        Pular para o conteúdo
+      </a>
+
+      <ScrollSuave />
+      <SiteHeader />
+
+      <main id="conteudo">
         <Hero />
-        <Services />
-        <Products />
-        <Gallery />
-        <Booking />
-        <Testimonials />
-        <CtaBand />
-        <Contact />
+        <Ferramentas />
+        <Numeros />
+        <Plataforma />
+        <Teia />
+        <Galeria />
+        <Fluxo />
+        <Planos />
+        <Duvidas />
+        <ChamadaFinal />
       </main>
-      <Footer />
-      <WhatsAppButton />
-    </div>
+
+      <Rodape />
+    </>
   );
 }
