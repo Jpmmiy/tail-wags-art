@@ -1,38 +1,70 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Navbar } from "@/components/site/Navbar";
+import { Hero } from "@/components/site/Hero";
+import { Services } from "@/components/site/Services";
+import { Products } from "@/components/site/Products";
+import { Gallery } from "@/components/site/Gallery";
+import { Booking } from "@/components/site/Booking";
+import { Testimonials, CtaBand } from "@/components/site/Testimonials";
+import { Contact, Footer } from "@/components/site/Contact";
+import { WhatsAppButton } from "@/components/site/WhatsAppButton";
+
+const title = "Ativa Saúde e Nutrição Animal | Pet Shop em Areal - RJ";
+const description =
+  "Pet shop em Areal (RJ) com banho e tosa sem estresse, consultoria de nutrição, vacinas e entrega de ração no mesmo dia. Amor em cada patinha.";
 
 export const Route = createFileRoute("/")({
+  component: Index,
   head: () => ({
     meta: [
-      { title: "Projeto limpo — pronto para conectar ao GitHub" },
-      {
-        name: "description",
-        content:
-          "Projeto sem conteúdo do site anterior, pronto para sincronizar com um repositório do GitHub.",
-      },
-      { property: "og:title", content: "Projeto limpo — pronto para o GitHub" },
-      {
-        property: "og:description",
-        content: "Base limpa, aguardando sincronização com o repositório.",
-      },
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:url", content: "/" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "PetStore",
+          name: "Ativa Saúde e Nutrição Animal - Pet Shop",
+          slogan: "Amor em cada patinha",
+          telephone: "(02) 49884-2476",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "Pr. Pres. Castelo Branco, 320 - Lot. Projetado",
+            addressLocality: "Areal",
+            addressRegion: "RJ",
+            postalCode: "25845-000",
+            addressCountry: "BR",
+          },
+        }),
+      },
     ],
   }),
-  component: Home,
 });
 
-function Home() {
+function Index() {
   return (
-    <main className="min-h-screen flex items-center justify-center p-8">
-      <div className="max-w-md text-center space-y-3">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Projeto limpo
-        </h1>
-        <p className="text-muted-foreground">
-          Todo o conteúdo do site anterior foi removido. A base está pronta para
-          ser sincronizada com um repositório do GitHub.
-        </p>
-      </div>
-    </main>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main>
+        <Hero />
+        <Services />
+        <Products />
+        <Gallery />
+        <Booking />
+        <Testimonials />
+        <CtaBand />
+        <Contact />
+      </main>
+      <Footer />
+      <WhatsAppButton />
+    </div>
   );
 }
