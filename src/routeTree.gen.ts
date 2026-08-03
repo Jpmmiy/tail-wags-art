@@ -21,6 +21,7 @@ import { Route as PainelMembrosRouteImport } from './routes/painel/membros'
 import { Route as PainelCriarRouteImport } from './routes/painel/criar'
 import { Route as PainelCreditosRouteImport } from './routes/painel/creditos'
 import { Route as PainelContaRouteImport } from './routes/painel/conta'
+import { Route as ApiImoveisRouteImport } from './routes/api/imoveis'
 
 const PainelRoute = PainelRouteImport.update({
   id: '/painel',
@@ -82,10 +83,16 @@ const PainelContaRoute = PainelContaRouteImport.update({
   path: '/conta',
   getParentRoute: () => PainelRoute,
 } as any)
+const ApiImoveisRoute = ApiImoveisRouteImport.update({
+  id: '/api/imoveis',
+  path: '/api/imoveis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/painel': typeof PainelRouteWithChildren
+  '/api/imoveis': typeof ApiImoveisRoute
   '/painel/conta': typeof PainelContaRoute
   '/painel/creditos': typeof PainelCreditosRoute
   '/painel/criar': typeof PainelCriarRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/imoveis': typeof ApiImoveisRoute
   '/painel/conta': typeof PainelContaRoute
   '/painel/creditos': typeof PainelCreditosRoute
   '/painel/criar': typeof PainelCriarRoute
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/painel': typeof PainelRouteWithChildren
+  '/api/imoveis': typeof ApiImoveisRoute
   '/painel/conta': typeof PainelContaRoute
   '/painel/creditos': typeof PainelCreditosRoute
   '/painel/criar': typeof PainelCriarRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/painel'
+    | '/api/imoveis'
     | '/painel/conta'
     | '/painel/creditos'
     | '/painel/criar'
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/api/imoveis'
     | '/painel/conta'
     | '/painel/creditos'
     | '/painel/criar'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/painel'
+    | '/api/imoveis'
     | '/painel/conta'
     | '/painel/creditos'
     | '/painel/criar'
@@ -172,6 +184,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PainelRoute: typeof PainelRouteWithChildren
+  ApiImoveisRoute: typeof ApiImoveisRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -260,6 +273,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PainelContaRouteImport
       parentRoute: typeof PainelRoute
     }
+    '/api/imoveis': {
+      id: '/api/imoveis'
+      path: '/api/imoveis'
+      fullPath: '/api/imoveis'
+      preLoaderRoute: typeof ApiImoveisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -295,6 +315,7 @@ const PainelRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PainelRoute: PainelRouteWithChildren,
+  ApiImoveisRoute: ApiImoveisRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
