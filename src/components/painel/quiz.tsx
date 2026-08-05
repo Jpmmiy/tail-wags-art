@@ -1,7 +1,6 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Link } from "@/components/ui/link";
-
 import {
   Check,
   Copy,
@@ -25,10 +24,15 @@ import {
   ChevronDown,
   Send,
   MessageCircle,
+  Loader2,
+  Download,
+  Filter,
+  ArrowUpDown,
 } from "lucide-react";
 import { generateVideoPrompts } from "@/config/videoPrompts";
 import { FLOW_CREDITS, getRemainingTime } from "@/config/credits";
 import { calculatePricing } from "@/config/pricing";
+import { CityAutocomplete } from "./city-autocomplete";
 
 import {
   ESTILOS,
