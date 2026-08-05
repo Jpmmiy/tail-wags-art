@@ -68,14 +68,8 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2.5">
-          <Link
-            href="/auth"
-            className="hidden rounded-full px-3.5 py-2 text-[0.86rem] font-medium text-stone transition-colors hover:text-bone sm:inline-flex"
-          >
-            Entrar
-          </Link>
-          <Cta href="/auth" className="hidden h-10 px-5 sm:inline-flex">
-            Criar Conta
+          <Cta href="/auth" className="h-10 px-5">
+            Acessar Painel
           </Cta>
 
           <button
@@ -123,14 +117,8 @@ export function SiteHeader() {
           </nav>
           <div className="mt-6 flex flex-col gap-3">
             <Cta href="/auth" size="lg">
-              Começar Agora
+              Acessar Painel
             </Cta>
-            <Link
-              href="/auth"
-              className="py-2 text-center text-sm text-stone"
-            >
-              Já tenho conta
-            </Link>
           </div>
         </div>
       )}
