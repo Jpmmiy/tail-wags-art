@@ -25,6 +25,7 @@ import { Route as PainelCreditosRouteImport } from './routes/painel/creditos'
 import { Route as PainelContaRouteImport } from './routes/painel/conta'
 import { Route as ApiMentorRouteImport } from './routes/api/mentor'
 import { Route as ApiImoveisRouteImport } from './routes/api/imoveis'
+import { Route as ApiPublicApplyfyRouteImport } from './routes/api/public/applyfy'
 
 const ProjetosRoute = ProjetosRouteImport.update({
   id: '/projetos',
@@ -106,6 +107,11 @@ const ApiImoveisRoute = ApiImoveisRouteImport.update({
   path: '/api/imoveis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicApplyfyRoute = ApiPublicApplyfyRouteImport.update({
+  id: '/api/public/applyfy',
+  path: '/api/public/applyfy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/painel/presente': typeof PainelPresenteRoute
   '/painel/projetos': typeof PainelProjetosRoute
   '/painel/': typeof PainelIndexRoute
+  '/api/public/applyfy': typeof ApiPublicApplyfyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/painel/presente': typeof PainelPresenteRoute
   '/painel/projetos': typeof PainelProjetosRoute
   '/painel': typeof PainelIndexRoute
+  '/api/public/applyfy': typeof ApiPublicApplyfyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/painel/presente': typeof PainelPresenteRoute
   '/painel/projetos': typeof PainelProjetosRoute
   '/painel/': typeof PainelIndexRoute
+  '/api/public/applyfy': typeof ApiPublicApplyfyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/painel/presente'
     | '/painel/projetos'
     | '/painel/'
+    | '/api/public/applyfy'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/painel/presente'
     | '/painel/projetos'
     | '/painel'
+    | '/api/public/applyfy'
   id:
     | '__root__'
     | '/'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/painel/presente'
     | '/painel/projetos'
     | '/painel/'
+    | '/api/public/applyfy'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -224,6 +236,7 @@ export interface RootRouteChildren {
   ProjetosRoute: typeof ProjetosRoute
   ApiImoveisRoute: typeof ApiImoveisRoute
   ApiMentorRoute: typeof ApiMentorRoute
+  ApiPublicApplyfyRoute: typeof ApiPublicApplyfyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -340,6 +353,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiImoveisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/applyfy': {
+      id: '/api/public/applyfy'
+      path: '/api/public/applyfy'
+      fullPath: '/api/public/applyfy'
+      preLoaderRoute: typeof ApiPublicApplyfyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -379,6 +399,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProjetosRoute: ProjetosRoute,
   ApiImoveisRoute: ApiImoveisRoute,
   ApiMentorRoute: ApiMentorRoute,
+  ApiPublicApplyfyRoute: ApiPublicApplyfyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
