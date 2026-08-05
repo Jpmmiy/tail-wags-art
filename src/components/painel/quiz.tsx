@@ -400,18 +400,132 @@ export function Quiz() {
       {passo === 3 && respostas && (
         <section className="space-y-6 motion-safe:animate-rise">
            <div className="flex flex-wrap gap-2">
-            {PACOTE_CONFIG.filter((p) => entregaveis.includes(p.id)).map((p) => (
+            <button onClick={() => setAba("video")} className={cn("px-4 py-2 rounded-lg text-sm transition-all", aba === "video" ? "bg-white/10 text-bone" : "text-stone hover:bg-white/5")}>
+              Plano de Vídeo
+            </button>
+            {PACOTE_CONFIG.filter((p) => p.id !== "video" && entregaveis.includes(p.id)).map((p) => (
               <button key={p.id} onClick={() => setAba(p.id)} className={cn("px-4 py-2 rounded-lg text-sm transition-all", aba === p.id ? "bg-white/10 text-bone" : "text-stone hover:bg-white/5")}>
                 {p.rotulo}
               </button>
             ))}
           </div>
 
+          {aba === "video" && (
+            <div className="space-y-6">
+              <div className="glass p-6 rounded-2xl border-chrome/20">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-bone font-medium flex items-center gap-2">
+                      <Clapperboard className="size-4 text-chrome" /> Plano de Produção Sequenciado
+                    </h3>
+                    <p className="text-stone text-[0.8rem] mt-1">No Flow, use Frames to Video e suba a foto do cômodo antes de colar o prompt.</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-stone mb-1">{gerados.length} de 4 clipes gerados</div>
+                    <div className="w-32 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-full bg-chrome transition-all" style={{ width: `${(gerados.length / 4) * 100}%` }} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-3 bg-white/5 rounded-xl border border-white/5 text-[0.75rem] text-stone">
+                  <Info className="size-4 shrink-0 text-chrome" />
+                  <p>Dica: Teste o prompt em Lite ({CREDIT_COSTS.LITE} créditos) antes de gastar Fast. Se a direção estiver certa, refaça em Fast.</p>
+                  <div className="ml-auto flex items-center gap-2 border-l border-white/10 pl-4">
+                    <span>9:16</span>
+                    <button 
+                      onClick={() => setVideoVertical(!videoVertical)}
+                      className={cn("w-8 h-4 rounded-full relative transition-colors", videoVertical ? "bg-chrome" : "bg-white/20")}
+                    >
+                      <div className={cn("absolute top-0.5 size-3 bg-white rounded-full transition-all", videoVertical ? "right-0.5" : "left-0.5")} />
+                    </button>
+                    <span>16:9</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-8">
+                {VIDEO_PLAN.map((dia, diaIdx) => (
+                  <div key={dia.dia} className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <span className="metal-pill px-3 py-0.5 rounded text-[10px] font-bold text-black uppercase">DIA {dia.dia}</span>
+                      <span className="text-stone text-xs">{dia.justificativa}</span>
+                    </div>
+                    
+                    <div className="grid gap-3">
+                      {dia.items.map((item) => {
+                        const allPrompts = generateVideoPrompts(respostas, videoVertical);
+                        const prompt = (allPrompts as any)[item.id];
+                        const estaAberto = aba === "video" && item.id === (window as any)._aberto;
+                        
+                        return (
+                          <div key={item.id} className={cn("glass rounded-2xl border border-white/5 overflow-hidden transition-all", gerados.includes(item.id) && "opacity-60")}>
+                            <button 
+                              onClick={() => { (window as any)._aberto = (window as any)._aberto === item.id ? null : item.id; setAba("video"); }}
+                              className="w-full flex items-center justify-between p-4 hover:bg-white/[0.02]"
+                            >
+                              <div className="flex items-center gap-4">
+                                <input 
+                                  type="checkbox" 
+                                  checked={gerados.includes(item.id)}
+                                  onChange={(e) => {
+                                    e.stopPropagation();
+                                    if (e.target.checked) setGerados([...gerados, item.id]);
+                                    else setGerados(gerados.filter(g => g !== item.id));
+                                  }}
+                                  className="size-5 rounded border-white/20 bg-transparent text-chrome focus:ring-chrome"
+                                />
+                                <div className="text-left">
+                                  <div className="text-[10px] text-stone font-mono uppercase">Shot {item.shot}</div>
+                                  <div className="text-sm font-medium text-bone">{item.nome}</div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <div className="text-right hidden sm:block">
+                                  <div className="text-[10px] text-stone font-mono uppercase">{item.modo}</div>
+                                  <div className="text-xs text-bone">{CREDIT_COSTS[item.modo as keyof typeof CREDIT_COSTS]} créditos</div>
+                                </div>
+                                <ChevronDown className={cn("size-4 text-stone transition-transform", (window as any)._aberto === item.id && "rotate-180")} />
+                              </div>
+                            </button>
+                            
+                            {(window as any)._aberto === item.id && (
+                              <div className="px-4 pb-4 border-t border-white/5 pt-4 space-y-4 motion-safe:animate-rise">
+                                <div className="p-4 bg-white/[0.03] rounded-xl text-[0.8rem] text-stone whitespace-pre-wrap font-mono leading-relaxed">
+                                  {prompt}
+                                </div>
+                                <div className="flex gap-3">
+                                  <button 
+                                    onClick={() => { navigator.clipboard.writeText(prompt); }}
+                                    className="flex-1 flex items-center justify-center gap-2 border border-white/10 hover:border-chrome/50 py-2 rounded-xl text-xs text-bone transition-all"
+                                  >
+                                    <Copy className="size-3" /> Copiar prompt
+                                  </button>
+                                  <a 
+                                    href="https://flow.google.com" 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="flex-1 flex items-center justify-center gap-2 bg-chrome text-black py-2 rounded-xl text-xs font-bold"
+                                  >
+                                    <ExternalLink className="size-3" /> Abrir Google Flow
+                                  </a>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div key={aba} className="space-y-4">
             {aba === "fotos" && comodos.map((c, i) => (
                 <Peca key={c} indice={i} icone={ImageIcon} titulo={c} legenda="Direção de foto" texto={promptFoto(respostas, c)} />
             ))}
-            {aba === "video" && <Peca indice={0} icone={Clapperboard} titulo="Vídeo do imóvel" legenda="Roteiro e direção" texto={promptVideo(respostas)} />}
             {aba === "site" && <Peca indice={0} icone={LayoutTemplate} titulo="Site do anfitrião" legenda="Briefing da página" texto={promptSite(respostas)} />}
             {aba === "abordagem" && <Peca indice={0} icone={MessageSquare} titulo="Proposta" legenda="Mensagem de abertura" texto={abordagem(respostas)} />}
           </div>
@@ -421,6 +535,7 @@ export function Quiz() {
           </button>
         </section>
       )}
+
     </div>
   );
 }
