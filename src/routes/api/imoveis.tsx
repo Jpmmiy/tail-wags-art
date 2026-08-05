@@ -104,7 +104,7 @@ export const Route = createFileRoute("/api/imoveis")({
             .eq("modalidade", corpo.modalidade)
             .maybeSingle();
 
-          if (cache) {
+          if (cache && cache.criado_em) {
             const dias = (Date.now() - new Date(cache.criado_em).getTime()) / (1000 * 60 * 60 * 24);
             if (dias < 7) {
               return json({ 
