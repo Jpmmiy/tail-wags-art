@@ -8,6 +8,7 @@ const CAMPOS = [
   "places.id",
   "places.displayName",
   "places.formattedAddress",
+  "places.addressComponents",
   "places.rating",
   "places.userRatingCount",
   "places.websiteUri",
@@ -94,7 +95,13 @@ export const Route = createFileRoute("/api/imoveis")({
         const uf = corpo.regiao ? nomeRegiao(corpo.pais, corpo.regiao) : paisNome;
 
         if (!chave) {
-          return json({ fonte: "exemplo" as const, imoveis: exemplos(corpo) });
+          return json(
+            {
+              erro: "Chave do Google Places não configurada.",
+              detalhe: "Configure a variável de ambiente GOOGLE_MAPS_API_KEY.",
+            },
+            500,
+          );
         }
 
         const consulta =
@@ -140,11 +147,16 @@ export const Route = createFileRoute("/api/imoveis")({
               id: string;
               displayName?: { text?: string };
               formattedAddress?: string;
+              addressComponents?: Array<{
+                longText: string;
+                shortText: string;
+                types: string[];
+              }>;
               rating?: number;
               userRatingCount?: number;
               websiteUri?: string;
               googleMapsUri?: string;
-              photos?: unknown[];
+              photos?: Array<{ name: string }>;
               reviews?: Array<{ publishTime: string }>;
               priceLevel?: string;
               editorialSummary?: { text?: string };
@@ -154,10 +166,23 @@ export const Route = createFileRoute("/api/imoveis")({
 
           const imoveis: ImovelEncontrado[] = (dados.places ?? []).map((p) => {
             const score = calculateScore(p);
+            
+            // Tentar extrair UF do addressComponents ou formattedAddress
+            let ufReal = uf;
+            const ufComponent = p.addressComponents?.find(c => c.types.includes("administrative_area_level_1"));
+            if (ufComponent) {
+              ufReal = ufComponent.shortText;
+            } else if (p.formattedAddress?.includes(", ")) {
+              const partes = p.formattedAddress.split(", ");
+              const ultimaParte = partes[partes.length - 1];
+              const penultimaParte = partes[partes.length - 2];
+              if (penultimaParte?.length === 2) ufReal = penultimaParte;
+            }
+
             return {
               id: p.id,
               nome: p.displayName?.text ?? "Sem nome",
-              endereco: p.formattedAddress ?? `${corpo.cidade}, ${uf}`,
+              endereco: p.formattedAddress ?? `${corpo.cidade}, ${ufReal}`,
               nota: p.rating ?? null,
               avaliacoes: p.userRatingCount ?? null,
               telefone: null,
@@ -165,9 +190,10 @@ export const Route = createFileRoute("/api/imoveis")({
               mapa: p.googleMapsUri ?? null,
               airbnb:
                 corpo.modalidade === "temporada"
-                  ? linkAirbnb(corpo.cidade, uf, paisNome)
+                  ? linkAirbnb(corpo.cidade, ufReal, paisNome)
                   : null,
               fotos: p.photos?.length ?? 0,
+              primeiraFoto: p.photos?.[0]?.name,
               score,
               priceLevel: p.priceLevel,
               editorialSummary: p.editorialSummary?.text,

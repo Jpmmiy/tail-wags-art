@@ -34,6 +34,10 @@ export function Hero() {
         body: JSON.stringify({ modalidade: "temporada", pais: "BR", cidade }),
       });
       const d = await r.json();
+      if (!r.ok) {
+        toast.error(d.erro || "Erro ao buscar imóveis.");
+        return;
+      }
       setResultados(d.imoveis ?? []);
       if (d.imoveis?.length > 0) {
         document.getElementById("resultados")?.scrollIntoView({ behavior: "smooth" });
@@ -41,7 +45,7 @@ export function Hero() {
         toast.error("Nenhum imóvel encontrado nesta cidade.");
       }
     } catch (err) {
-      toast.error("Erro ao buscar imóveis.");
+      toast.error("Erro inesperado ao buscar imóveis.");
     } finally {
       setBuscando(false);
     }

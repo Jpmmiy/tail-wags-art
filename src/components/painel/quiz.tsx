@@ -359,28 +359,118 @@ export function Quiz() {
              </div>
            )}
            {resultados.length > 0 && (
-              <ul className="grid gap-4 sm:grid-cols-2">
-                {resultadosFiltrados.map(im => (
-                  <li key={im.id} onClick={() => { setEscolhido(im); avancar(); }} className="glass p-5 rounded-2xl cursor-pointer hover:rim-lit transition-all">
-                     <div className="flex justify-between">
-                       <h4 className="text-bone font-medium">{im.nome}</h4>
-                       <span className="text-orange-400 font-bold">{im.score?.total} pts</span>
-                     </div>
-                     <p className="text-stone text-[0.8rem] mt-1">{im.endereco}</p>
-                  </li>
-                ))}
-              </ul>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between px-2">
+                  <span className="text-stone text-xs font-mono uppercase tracking-widest">
+                    {resultados.length} imóveis · {resultados.filter(r => r.score?.faixa === 'ALTA').length} com oportunidade alta
+                  </span>
+                  <div className="flex gap-2">
+                    {['TODOS', 'ALTA', 'MEDIA'].map(f => (
+                      <button 
+                        key={f} 
+                        onClick={() => setFiltroScore(f as any)}
+                        className={cn(
+                          "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all",
+                          filtroScore === f ? "bg-chrome border-chrome text-black" : "border-white/10 text-stone hover:border-white/20"
+                        )}
+                      >
+                        {f === 'TODOS' ? 'Todos' : f === 'ALTA' ? 'Alta' : 'Média'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <ul className="grid gap-4 sm:grid-cols-2">
+                  {resultadosFiltrados.map(im => (
+                    <li 
+                      key={im.id} 
+                      onClick={() => { setEscolhido(im); avancar(); }} 
+                      className="glass p-5 rounded-2xl cursor-pointer hover:rim-lit transition-all group relative overflow-hidden"
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h4 className="text-bone font-medium group-hover:text-chrome transition-colors">{im.nome}</h4>
+                          <p className="text-stone text-[0.75rem] mt-0.5 flex items-center gap-1">
+                            <MapPin className="size-3" />
+                            {im.endereco}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <span className={cn(
+                            "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border",
+                            im.score?.faixa === 'ALTA' ? "text-orange-400 border-orange-400/30 bg-orange-400/5" :
+                            im.score?.faixa === 'MEDIA' ? "text-amber-400 border-amber-400/30 bg-amber-400/5" :
+                            "text-stone border-white/10 bg-white/5"
+                          )}>
+                            {im.score?.total} pts
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-1.5 mb-4">
+                        {im.score?.signals.map((s, i) => (
+                          <div key={i} className="flex items-start gap-2 text-[0.7rem] text-stone/80">
+                            <Sparkles className="size-3 shrink-0 mt-0.5 text-chrome/60" />
+                            <span>{s}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="pt-3 border-t border-white/5 flex items-center justify-between">
+                        <span className="text-[10px] font-mono text-chrome/80 italic">{im.score?.angulo}</span>
+                        <ChevronRight className="size-4 text-stone group-hover:text-chrome transition-all group-hover:translate-x-1" />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <button 
+                  onClick={() => {
+                    const demo = {
+                      id: "exemplo-1",
+                      nome: "Exemplo: Pousada Villa do Sol",
+                      endereco: "Botucatu, SP",
+                      nota: 4.2,
+                      avaliacoes: 156,
+                      fotos: 4,
+                      site: null,
+                      score: { total: 88, faixa: 'ALTA' as const, signals: ["Apenas 4 fotos — gargalo visual claro", "Sem site próprio — depende 100% da plataforma"], angulo: "Ângulo: qualidade visual" }
+                    };
+                    setEscolhido(demo as any);
+                    avancar();
+                  }}
+                  className="w-full py-4 border border-dashed border-white/10 rounded-2xl text-stone text-sm hover:border-chrome/40 hover:text-chrome transition-all flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="size-4" />
+                  Usar imóvel de exemplo
+                </button>
+              </div>
            )}
         </section>
       )}
 
       {passo === 1 && escolhido && (
         <section className="space-y-6 motion-safe:animate-rise">
-           <div className="glass p-6 rounded-2xl flex items-center gap-6">
-              <div className="size-24 bg-white/5 rounded-xl flex items-center justify-center"><ImageIcon className="text-stone" /></div>
-              <div>
+           <div className="glass p-6 rounded-2xl flex items-center gap-6 relative overflow-hidden">
+              <div className="size-24 bg-white/5 rounded-xl flex items-center justify-center overflow-hidden border border-white/10">
+                {escolhido.primeiraFoto ? (
+                  <img 
+                    src={`https://places.googleapis.com/v1/${escolhido.primeiraFoto}/media?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&maxWidthPx=400`} 
+                    alt={escolhido.nome}
+                    className="size-full object-cover"
+                    onError={(e) => {
+                      (e.target as any).src = "";
+                      (e.target as any).parentElement.innerHTML = '<div class="text-stone"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>';
+                    }}
+                  />
+                ) : (
+                  <ImageIcon className="text-stone" />
+                )}
+              </div>
+              <div className="relative z-10">
                 <h2 className="text-xl font-semibold text-bone">{escolhido.nome}</h2>
-                <p className="text-stone text-sm">{escolhido.endereco}</p>
+                <p className="text-stone text-sm flex items-center gap-1 mt-1">
+                  <MapPin className="size-3" />
+                  {escolhido.endereco}
+                </p>
               </div>
            </div>
            <div className="glass p-6 rounded-2xl">

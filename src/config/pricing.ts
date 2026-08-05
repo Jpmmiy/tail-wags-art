@@ -5,33 +5,50 @@ export const PRICING_BASE = {
   recorrencia: 250, // Valor mensal sugerido
 };
 
-export function calculatePricing(diaria: number, modalidade: "temporada" | "imobiliario") {
-  // Ajuste de preço baseado no valor do imóvel ou diária
-  // Se for imobiliário, o valor é muito maior, então usamos uma base diferente ou fator de escala
+export function calculatePricing(diaria: number, modalidade: "temporada" | "imobiliario", entregaveis: string[] = ["fotos", "video", "site", "abordagem"]) {
   const multiplicador = modalidade === "temporada" 
     ? Math.max(1, diaria / 300) 
     : Math.max(1, diaria / 500000);
 
-  const fotos = Math.round(PRICING_BASE.fotos * multiplicador);
-  const video = Math.round(PRICING_BASE.video * multiplicador);
-  const site = Math.round(PRICING_BASE.site * multiplicador);
+  const precos = {
+    fotos: Math.round(PRICING_BASE.fotos * multiplicador),
+    video: Math.round(PRICING_BASE.video * multiplicador),
+    site: Math.round(PRICING_BASE.site * multiplicador),
+    abordagem: 0 // Proposta geralmente inclusa ou brinde no essencial
+  };
+
+  const tem = (id: string) => entregaveis.includes(id);
+
+  const itensEssencial = [];
+  if (tem("fotos")) itensEssencial.push("Fotos tratadas");
+  if (tem("video")) itensEssencial.push("Vídeo curto (4 shots)");
+  
+  const valorEssencial = (tem("fotos") ? precos.fotos : 0) + (tem("video") ? precos.video : 0);
+
+  const itensCompleto = [...itensEssencial];
+  if (tem("site")) itensCompleto.push("Site com reserva direta");
+  const valorCompleto = valorEssencial + (tem("site") ? precos.site : 0);
+
   const recorrencia = Math.round(PRICING_BASE.recorrencia * multiplicador);
 
   return {
     essencial: {
       titulo: "Essencial",
-      valor: fotos + video,
-      inclui: ["Fotos tratadas", "Vídeo curto (4 shots)"],
+      valor: valorEssencial,
+      inclui: itensEssencial,
+      visivel: itensEssencial.length > 0
     },
     completo: {
       titulo: "Completo",
-      valor: fotos + video + site,
-      inclui: ["Fotos tratadas", "Vídeo curto (4 shots)", "Site com reserva direta"],
+      valor: valorCompleto,
+      inclui: itensCompleto,
+      visivel: itensCompleto.length > 0
     },
     premium: {
       titulo: "Premium",
-      valor: fotos + video + site + (recorrencia * 3), // 3 meses de recorrência inclusos
-      inclui: ["Fotos tratadas", "Vídeo curto (4 shots)", "Site com reserva direta", "3 meses de suporte/recorrência"],
+      valor: valorCompleto + (recorrencia * 3),
+      inclui: [...itensCompleto, "3 meses de suporte/recorrência"],
+      visivel: itensCompleto.length > 0
     }
   };
 }

@@ -78,7 +78,7 @@ export function calculateScore(place: any) {
   score += demandaScore;
   if (count > 0) {
     signals.push({ 
-      text: `${count} avaliações com ${rating}★ — tem demanda comprovada`, 
+      text: `${count} avaliações com ${rating.toFixed(1)}★ — demanda comprovada`, 
       type: 'demanda', 
       value: demandaScore 
     });
