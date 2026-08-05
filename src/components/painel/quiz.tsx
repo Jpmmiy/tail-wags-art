@@ -92,6 +92,8 @@ export function Quiz() {
   const [passo, setPasso] = useState(0);
   const [modalidade, setModalidade] = useState<Modalidade | null>(null);
   const [escolhido, setEscolhido] = useState<ImovelEncontrado | null>(null);
+  const [manualNome, setManualNome] = useState("");
+  const [manualLink, setManualLink] = useState("");
   const [paisId, setPaisId] = useState("BR");
   const [regiaoId, setRegiaoId] = useState("");
   const [cidade, setCidade] = useState("");
@@ -322,11 +324,11 @@ export function Quiz() {
                 ))}
             </div>
 
-            {/* Radar Header */}
+            {/* Radar Header -> Fluxo Manual Sem API */}
             {modalidade && (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div className="glass p-6 rounded-2xl border-white/5">
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-6">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="space-y-1.5">
                           <label className="text-[10px] uppercase font-bold text-stone px-1">País</label>
@@ -379,180 +381,111 @@ export function Quiz() {
                         </div>
                       </div>
 
-                      <button 
-                        disabled={buscando || !cidade}
-                        onClick={() => ativarRadar()} 
-                        className={cn(
-                          "metal-pill w-full py-4 rounded-2xl text-black font-bold hover:scale-[1.02] active:scale-95 transition-all text-lg shadow-xl shadow-chrome/10 flex items-center justify-center gap-2",
-                          (buscando || !cidade) && "opacity-50 cursor-not-allowed"
-                        )}
-                      >
-                        {buscando ? (
-                          <>
-                            <Loader2 className="size-5 animate-spin" />
-                            {progressoTexto}
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="size-5" />
-                            Ativar Radar em {cidade || '...'}
-                          </>
-                        )}
-                      </button>
+                      {cidade && (
+                        <div className="space-y-6 pt-4 border-t border-white/5 motion-safe:animate-rise">
+                          <div className="text-center space-y-2">
+                            <h4 className="text-bone font-medium">1. Encontre o imóvel</h4>
+                            <p className="text-xs text-stone">Clique abaixo para buscar imóveis nesta região:</p>
+                            
+                            {modalidade === 'temporada' ? (
+                              <a 
+                                href={`https://www.airbnb.com.br/s/${cidade.replace(/ /g, '-')}/homes`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-2 bg-[#FF385C] text-white px-6 py-3 rounded-xl font-bold hover:scale-105 transition-all"
+                              >
+                                <ExternalLink className="size-4" /> Buscar no Airbnb
+                              </a>
+                            ) : (
+                              <a 
+                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cidade)}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-2 bg-chrome text-black px-6 py-3 rounded-xl font-bold hover:scale-105 transition-all"
+                              >
+                                <ExternalLink className="size-4" /> Buscar no Google Maps
+                              </a>
+                            )}
+                          </div>
+
+                          <div className="space-y-4">
+                            <div className="text-center">
+                              <h4 className="text-bone font-medium">2. Identifique o imóvel</h4>
+                              <p className="text-xs text-stone">Cole os dados do imóvel que você escolheu:</p>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              <input 
+                                type="text"
+                                placeholder="Nome ou endereço do imóvel..."
+                                value={manualNome}
+                                onChange={(e) => setManualNome(e.target.value)}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50 text-sm"
+                              />
+                              <input 
+                                type="text"
+                                placeholder="Link do anúncio/local (opcional)..."
+                                value={manualLink}
+                                onChange={(e) => setManualLink(e.target.value)}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50 text-sm"
+                              />
+                            </div>
+
+                            <button 
+                              disabled={!manualNome}
+                              onClick={() => {
+                                const manualImovel: ImovelEncontrado = {
+                                  id: `manual-${Date.now()}`,
+                                  nome: manualNome,
+                                  endereco: cidade,
+                                  nota: null,
+                                  avaliacoes: null,
+                                  site: manualLink || null,
+                                  mapa: modalidade === 'imobiliario' ? manualLink : null,
+                                  airbnb: modalidade === 'temporada' ? manualLink : null,
+                                  fotos: 0,
+                                  score: { total: 0, faixa: 'MEDIA', signals: ["Inserção manual"], angulo: "Proposta personalizada" }
+                                };
+                                setEscolhido(manualImovel);
+                                avancar();
+                              }} 
+                              className={cn(
+                                "metal-pill w-full py-4 rounded-2xl text-black font-bold hover:scale-[1.02] active:scale-95 transition-all text-lg shadow-xl shadow-chrome/10 flex items-center justify-center gap-2",
+                                !manualNome && "opacity-50 cursor-not-allowed"
+                              )}
+                            >
+                              <ArrowRight className="size-5" /> Usar este imóvel
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
+                  </div>
+
+                  {/* Imóvel de Exemplo */}
+                  <div className="text-center py-4">
+                    <button 
+                      onClick={() => {
+                        const exemplo: ImovelEncontrado = {
+                          id: "exemplo-1",
+                          nome: "Casa de Praia Luxo (Exemplo)",
+                          endereco: "Bertioga, SP",
+                          nota: 4.8,
+                          avaliacoes: 120,
+                          fotos: 15,
+                          score: { total: 85, faixa: 'ALTA', signals: ["Alta demanda", "Fotos antigas"], angulo: "Maximização de Valor" }
+                        };
+                        setEscolhido(exemplo);
+                        avancar();
+                      }}
+                      className="text-stone text-xs hover:text-chrome transition-colors underline decoration-stone/30 underline-offset-4"
+                    >
+                      Ou usar um imóvel de exemplo
+                    </button>
                   </div>
                 </div>
             )}
 
-            {/* Resultados do Radar */}
-            {resultados.length > 0 && !buscando && (
-              <div className="space-y-6">
-                {/* Sumário e Cache */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass p-4 rounded-xl border-chrome/20">
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-bone">
-                      {stats.varridos} imóveis varridos · <span className="text-orange">{stats.alta} com oportunidade alta</span> · {stats.semSite} sem site próprio
-                    </p>
-                    {atualizadoHa !== null && (
-                      <p className="text-[10px] text-stone">
-                        Atualizado há {atualizadoHa} dias. 
-                        <button onClick={() => ativarRadar(true)} className="ml-2 text-chrome hover:underline">Atualizar agora</button>
-                      </p>
-                    )}
-                  </div>
-                  <button 
-                    onClick={exportarCSV}
-                    className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-chrome border border-chrome/30 px-3 py-1.5 rounded-lg hover:bg-chrome/5"
-                  >
-                    <Download className="size-3" /> Exportar lista (CSV)
-                  </button>
-                </div>
-
-                {/* Filtros e Ordenação */}
-                <div className="flex flex-wrap gap-2 items-center">
-                  <div className="flex gap-1 bg-white/5 p-1 rounded-lg">
-                    {[
-                      { id: 'todos', label: 'Todos' },
-                      { id: 'alta', label: 'Alta' },
-                      { id: 'media', label: 'Média' },
-                      { id: 'sem_site', label: 'Sem site' },
-                      { id: 'poucas_fotos', label: 'Poucas fotos' },
-                    ].map(f => (
-                      <button
-                        key={f.id}
-                        onClick={() => setFiltro(f.id as any)}
-                        className={cn(
-                          "px-3 py-1 text-[10px] font-bold rounded-md transition-all",
-                          filtro === f.id ? "bg-white/10 text-bone shadow-sm" : "text-stone hover:text-bone"
-                        )}
-                      >
-                        {f.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="flex gap-1 bg-white/5 p-1 rounded-lg ml-auto">
-                    {[
-                      { id: 'score', label: 'Score', icone: Sparkles },
-                      { id: 'avaliacoes', label: 'Avaliações', icone: Star },
-                      { id: 'sem_site', label: 'Sem site', icone: LayoutTemplate },
-                    ].map(o => (
-                      <button
-                        key={o.id}
-                        onClick={() => setOrdenacao(o.id as any)}
-                        title={`Ordenar por ${o.label}`}
-                        className={cn(
-                          "p-1.5 rounded-md transition-all",
-                          ordenacao === o.id ? "bg-white/10 text-chrome shadow-sm" : "text-stone hover:text-bone"
-                        )}
-                      >
-                        <o.icone className="size-3.5" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Lista de Imóveis (Loading Skeleton) */}
-                {buscando && (
-                  <div className="grid gap-4">
-                    {[1, 2, 3, 4].map(i => (
-                      <div key={i} className="glass p-5 rounded-2xl animate-pulse flex gap-4">
-                        <div className="size-16 rounded-lg bg-white/5 shrink-0" />
-                        <div className="flex-1 space-y-2">
-                          <div className="h-4 bg-white/5 rounded w-1/3" />
-                          <div className="h-3 bg-white/5 rounded w-1/2" />
-                          <div className="flex gap-2">
-                            <div className="h-4 bg-white/5 rounded w-16" />
-                            <div className="h-4 bg-white/5 rounded w-16" />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Lista de Imóveis */}
-                {!buscando && (
-                  <div className="grid gap-4">
-                    {resultadosFiltrados.map(im => (
-                        <div 
-                          key={im.id} 
-                          onClick={(e) => { e.preventDefault(); setEscolhido(im); avancar(); }} 
-                          className="glass p-5 rounded-2xl cursor-pointer hover:bg-white/5 transition-all group relative overflow-hidden"
-                        >
-                            {/* Badge de Score */}
-                            <div className="absolute top-0 right-0 p-2">
-                               <div className={cn(
-                                 "text-[10px] font-bold px-2 py-0.5 rounded-bl-lg uppercase",
-                                 im.score?.faixa === 'ALTA' ? "bg-orange text-black" : 
-                                 im.score?.faixa === 'MEDIA' ? "bg-amber text-black" : "bg-white/10 text-stone"
-                               )}>
-                                 {im.score?.total} pts
-                               </div>
-                            </div>
-
-                            <div className="flex gap-4">
-                                {im.primeiraFoto ? (
-                                  <img 
-                                    src={`https://places.googleapis.com/v1/${im.primeiraFoto}/media?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&maxWidthPx=200`} 
-                                    className="size-16 rounded-lg object-cover bg-white/5 shrink-0" 
-                                    alt={im.nome}
-                                  />
-                                ) : (
-                                  <div className="size-16 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
-                                    <Home className="size-6 text-stone" />
-                                  </div>
-                                )}
-                                <div className="space-y-1 pr-12">
-                                    <h4 className="text-bone font-medium leading-tight group-hover:text-chrome transition-colors">{im.nome}</h4>
-                                    <p className="text-[10px] text-stone line-clamp-1 flex items-center gap-1">
-                                      <MapPin className="size-2.5" /> {im.endereco}
-                                    </p>
-                                    <div className="flex items-center gap-2 pt-1">
-                                      {im.score?.signals.slice(0, 2).map((s, i) => (
-                                        <span key={i} className="text-[9px] text-stone bg-white/5 px-1.5 py-0.5 rounded border border-white/5 flex items-center gap-1">
-                                          <div className="size-1 rounded-full bg-chrome/50" /> {s}
-                                        </span>
-                                      ))}
-                                    </div>
-                                    <p className="text-[10px] font-mono text-chrome pt-1 italic">{im.score?.angulo}</p>
-                                </div>
-                            </div>
-                            
-                            <div className="absolute bottom-2 right-4 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
-                              <ChevronRight className="size-4 text-chrome" />
-                            </div>
-                        </div>
-                    ))}
-                    
-                    {resultadosFiltrados.length === 0 && (
-                      <div className="py-12 text-center space-y-2 glass rounded-2xl">
-                        <Info className="size-8 text-stone mx-auto" />
-                        <p className="text-stone text-sm">Nenhum imóvel encontrado com estes filtros.</p>
-                      </div>
-                    )}
-                </div>
-              )}
             </div>
           )}
         </div>
