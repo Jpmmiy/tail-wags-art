@@ -173,7 +173,11 @@ export function Quiz() {
 
 
 
+      <div className="bg-red-500 p-4 text-white font-bold" onClick={() => alert('CLIQUE NO BODY FUNCIONA')}>
+        TESTE DE CLIQUE AQUI
+      </div>
       {passo === 0 && (
+
         <div className="space-y-6 motion-safe:animate-rise">
             <div className="grid gap-4 sm:grid-cols-2">
                 <button 
