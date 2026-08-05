@@ -55,7 +55,7 @@ import { cn } from "@/lib/utils";
 import { saveProjectStep, loadProject, setCurrentProjectId, getCurrentProjectId } from "@/lib/persistence";
 import { toast } from "sonner";
 
-const TITULOS = ["Alvo", "Briefing", "Fechamento", "Produção"];
+const TITULOS = ["Radar de Oportunidades", "Briefing", "Fechamento", "Produção"];
 
 const MODALIDADES = [
   { id: "temporada" as const, icone: Home, titulo: "Airbnb e temporada", desc: "Pousadas, chalés e casas anunciadas por diária." },
