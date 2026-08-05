@@ -1,7 +1,7 @@
 "use client";
-
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "@/components/ui/link";
+
 import {
   Check,
   Copy,
@@ -103,6 +103,8 @@ export function Quiz() {
   const [concluido, setConcluido] = useState(false);
 
 
+
+
   useEffect(() => {
     const resumeProject = async () => {
       const pid = getCurrentProjectId();
@@ -121,6 +123,8 @@ export function Quiz() {
 
     resumeProject();
   }, []);
+
+
 
   const autosave = async (step: number, status: any = 'rascunho') => {
     return await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical }, status);
@@ -149,6 +153,8 @@ export function Quiz() {
     return `Oi! Vi o anúncio do ${escolhido.nome} — ${dadoReal} é resultado de gente que trabalha bem.\nReparei que as fotos não acompanham esse nível, e isso costuma segurar o clique antes da descrição.\nFiz um vídeo curto do imóvel pra te mostrar como ficaria. Sem compromisso.\nPosso te mandar aqui?`;
   }, [escolhido]);
 
+
+
   const precos = useMemo(() => {
     return calculatePricing(
       Number(modalidade === 'temporada' ? diaria : valorImobiliario), 
@@ -156,6 +162,8 @@ export function Quiz() {
       entregaveis
     );
   }, [modalidade, diaria, valorImobiliario, entregaveis]);
+
+
 
   return (
     <div className="space-y-8">
@@ -165,28 +173,85 @@ export function Quiz() {
       </header>
       <Progresso passo={passo} />
 
+
+
+
+      
       {passo === 0 && (
-        <div className="space-y-6">
+
+
+        <div className="space-y-6 motion-safe:animate-rise">
             <div className="grid gap-4 sm:grid-cols-2">
-                {MODALIDADES.map(m => (
-                    <button key={m.id} onClick={() => setModalidade(m.id)} className={cn("glass p-6 rounded-2xl", modalidade === m.id && "rim-lit")}>
-                        <h3 className="text-bone font-medium">{m.titulo}</h3>
-                    </button>
-                ))}
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log('Selecionando temporada');
+                    setModalidade('temporada');
+                  }} 
+
+                  className={cn(
+                    "glass p-6 rounded-2xl text-left transition-all hover:bg-white/5", 
+                    modalidade === 'temporada' && "rim-lit border-chrome/50"
+                  )}
+                >
+                    <div className="flex items-center gap-3 mb-2">
+                      <Home className={cn("size-5", modalidade === 'temporada' ? "text-chrome" : "text-stone")} />
+                      <h3 className="text-bone font-medium">Airbnb e temporada</h3>
+                    </div>
+                    <p className="text-xs text-stone">Pousadas, chalés e casas anunciadas por diária.</p>
+                </button>
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log('Selecionando imobiliario');
+                    setModalidade('imobiliario');
+                  }} 
+
+                  className={cn(
+                    "glass p-6 rounded-2xl text-left transition-all hover:bg-white/5", 
+                    modalidade === 'imobiliario' && "rim-lit border-chrome/50"
+                  )}
+                >
+                    <div className="flex items-center gap-3 mb-2">
+                      <Building2 className={cn("size-5", modalidade === 'imobiliario' ? "text-chrome" : "text-stone")} />
+                      <h3 className="text-bone font-medium">Mercado imobiliário</h3>
+                    </div>
+                    <p className="text-xs text-stone">Imobiliárias e imóveis para alugar ou vender.</p>
+                </button>
             </div>
+
+
             {modalidade && (
-                <div className="flex gap-4">
-                    <input value={cidade} onChange={e => setCidade(e.target.value)} className="flex-1 bg-white/5 rounded-xl px-4 py-3" placeholder="Cidade..." />
-                    <button onClick={async () => {
-                        const r = await fetch("/api/imoveis", { method: "POST", body: JSON.stringify({ modalidade, cidade }), headers:{"Content-Type":"application/json"} });
-                        const d = await r.json();
-                        setResultados(d.imoveis ?? []);
-                    }} className="metal-pill px-6 py-2 rounded-xl text-black font-bold">Buscar</button>
+                <div className="flex gap-4 p-4 bg-white/5 rounded-2xl rim-lit">
+                    <input 
+                      value={cidade} 
+                      onChange={e => setCidade(e.target.value)} 
+                      className="flex-1 bg-white/5 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50" 
+                      placeholder="Cidade..." 
+                    />
+                    <button onClick={async (e) => {
+                        e.preventDefault();
+                        console.log('Botão Buscar clicado!', { modalidade, cidade });
+                        try {
+                          const r = await fetch("/api/imoveis", { 
+                            method: "POST", 
+                            body: JSON.stringify({ modalidade, cidade, pais: 'BR' }), // Adicionado pais default
+                            headers:{"Content-Type":"application/json"} 
+                          });
+                          const d = await r.json();
+                          console.log('Resposta busca:', d);
+                          setResultados(d.imoveis ?? []);
+                        } catch (err) {
+                          console.error('Erro na busca:', err);
+                          toast.error("Erro ao buscar imóveis.");
+                        }
+                    }} className="metal-pill px-6 py-2 rounded-xl text-black font-bold hover:scale-105 active:scale-95 transition-all">Buscar</button>
                 </div>
             )}
+
             <div className="grid gap-4">
                 {resultados.map(im => (
-                    <div key={im.id} onClick={() => { setEscolhido(im); avancar(); }} className="glass p-5 rounded-2xl cursor-pointer">
+                    <div key={im.id} onClick={(e) => { e.preventDefault(); setEscolhido(im); avancar(); }} className="glass p-5 rounded-2xl cursor-pointer">
                         <h4>{im.nome}</h4>
                     </div>
                 ))}
