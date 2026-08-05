@@ -16,3 +16,14 @@ export function getRemainingTime(lastGeneratedAt: Date) {
   
   return `${hours}h ${minutes}m`;
 }
+
+// Para manter compatibilidade temporária enquanto refatoro o quiz
+export const VIDEO_PLAN = {
+  daily_limit: FLOW_CREDITS.DAILY_LIMIT,
+  cost_per_shot: FLOW_CREDITS.COST_PER_SHOT
+};
+
+export const CREDIT_COSTS = {
+  SHOT: FLOW_CREDITS.COST_PER_SHOT
+};
+
