@@ -149,7 +149,7 @@ export const PLANOS = [
   {
     id: "mensal",
     nome: "Mensal",
-    preco: "169,90",
+    preco: "247,00",
     periodo: "/mês",
     chamada: "Para começar a atender agora.",
     destaque: false,
@@ -167,7 +167,7 @@ export const PLANOS = [
   {
     id: "vitalicio",
     nome: "Vitalício",
-    preco: "249,90",
+    preco: "497,00",
     periodo: "pagamento único",
     chamada: "Paga uma vez. É seu para sempre.",
     destaque: true,
