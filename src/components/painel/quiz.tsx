@@ -183,10 +183,12 @@ export function Quiz() {
         <div className="space-y-6 motion-safe:animate-rise">
             <div className="grid gap-4 sm:grid-cols-2">
                 <button 
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
                     console.log('Selecionando temporada');
                     setModalidade('temporada');
                   }} 
+
                   className={cn(
                     "glass p-6 rounded-2xl text-left transition-all hover:bg-white/5", 
                     modalidade === 'temporada' && "rim-lit border-chrome/50"
@@ -199,10 +201,12 @@ export function Quiz() {
                     <p className="text-xs text-stone">Pousadas, chalés e casas anunciadas por diária.</p>
                 </button>
                 <button 
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
                     console.log('Selecionando imobiliario');
                     setModalidade('imobiliario');
                   }} 
+
                   className={cn(
                     "glass p-6 rounded-2xl text-left transition-all hover:bg-white/5", 
                     modalidade === 'imobiliario' && "rim-lit border-chrome/50"
@@ -247,7 +251,7 @@ export function Quiz() {
 
             <div className="grid gap-4">
                 {resultados.map(im => (
-                    <div key={im.id} onClick={() => { setEscolhido(im); avancar(); }} className="glass p-5 rounded-2xl cursor-pointer">
+                    <div key={im.id} onClick={(e) => { e.preventDefault(); setEscolhido(im); avancar(); }} className="glass p-5 rounded-2xl cursor-pointer">
                         <h4>{im.nome}</h4>
                     </div>
                 ))}
