@@ -21,15 +21,8 @@ import {
   MessageSquare,
   PenLine,
   Info,
-  Eye,
-  EyeOff,
-  Flame,
-  AlertCircle,
   ChevronRight,
   ChevronDown,
-  Calendar,
-  Zap,
-  DollarSign,
   Send,
 } from "lucide-react";
 import { generateVideoPrompts } from "@/config/videoPrompts";
@@ -43,43 +36,20 @@ import {
   promptVideo,
   promptSite,
   abordagem,
-  precificacao,
   type Respostas,
   type ImovelSelecionado,
 } from "@/lib/gerador";
-import {
-  PAISES,
-  achaPais,
-  regioesDe,
-  cidadesDe,
-  nomeRegiao,
-  nomePais,
-} from "@/lib/locais";
 import type { ImovelEncontrado, Modalidade } from "@/lib/imoveis-tipos";
 import { TelaGeracao } from "./tela-geracao";
 import { cn } from "@/lib/utils";
 import { saveProjectStep, loadProject, setCurrentProjectId, getCurrentProjectId } from "@/lib/persistence";
 import { toast } from "sonner";
 
-
-const TITULOS = ["Alvo", "Diagnóstico", "Briefing", "Plano", "Fechamento"];
-
+const TITULOS = ["Alvo", "Briefing", "Fechamento", "Produção"];
 
 const MODALIDADES = [
-  {
-    id: "temporada" as const,
-    icone: Home,
-    titulo: "Airbnb e temporada",
-    desc: "Pousadas, chalés e casas anunciadas por diária.",
-    exemplos: ["Airbnb", "Booking", "Pousadas"],
-  },
-  {
-    id: "imobiliario" as const,
-    icone: Building2,
-    titulo: "Mercado imobiliário",
-    desc: "Imobiliárias e imóveis para alugar ou vender.",
-    exemplos: ["Imobiliárias", "Corretores", "Construtoras"],
-  },
+  { id: "temporada" as const, icone: Home, titulo: "Airbnb e temporada", desc: "Pousadas, chalés e casas anunciadas por diária." },
+  { id: "imobiliario" as const, icone: Building2, titulo: "Mercado imobiliário", desc: "Imobiliárias e imóveis para alugar ou vender." },
 ];
 
 const PACOTE_CONFIG = [
@@ -97,39 +67,10 @@ function Progresso({ passo }: { passo: number }) {
         const atual = i === passo;
         return (
           <li key={t} className="flex flex-1 items-center gap-3">
-            <div className="flex min-w-0 items-center gap-2.5">
-              <span
-                className={cn(
-                  "grid size-6 shrink-0 place-items-center rounded-full text-[10.5px] font-semibold transition-all duration-500",
-                  feito && "metal-pill text-[#08090B]",
-                  atual && "border border-chrome bg-chrome/10 text-chrome",
-                  !feito && !atual && "border border-white/14 text-stone",
-                )}
-              >
-                {feito ? <Check className="size-3" strokeWidth={3} /> : i + 1}
-              </span>
-              <span
-                className={cn(
-                  "hidden truncate text-[0.85rem] transition-colors sm:block",
-                  atual ? "font-medium text-bone" : "text-stone",
-                )}
-              >
-                {t}
-              </span>
-            </div>
-            {i < TITULOS.length - 1 && (
-              <span
-                aria-hidden
-                className="h-px flex-1 overflow-hidden rounded-full bg-white/10"
-              >
-                <span
-                  className={cn(
-                    "block h-full origin-left bg-chrome transition-transform duration-700 ease-out",
-                    feito ? "scale-x-100" : "scale-x-0",
-                  )}
-                />
-              </span>
-            )}
+            <span className={cn("grid size-6 shrink-0 place-items-center rounded-full text-[10px] font-semibold transition-all", feito ? "bg-chrome text-black" : atual ? "border border-chrome text-chrome" : "border border-white/10 text-stone")}>
+              {feito ? <Check className="size-3" /> : i + 1}
+            </span>
+            <span className={cn("hidden sm:block text-[0.8rem]", atual ? "text-bone" : "text-stone")}>{t}</span>
           </li>
         );
       })}
@@ -137,59 +78,12 @@ function Progresso({ passo }: { passo: number }) {
   );
 }
 
-function Seletor({ rotulo, valor, onChange, children, desabilitado }: any) {
-  return (
-    <label className="block">
-      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone">
-        {rotulo}
-      </span>
-      <select
-        value={valor}
-        disabled={desabilitado}
-        onChange={(e) => onChange(e.target.value)}
-        className="mt-2 h-11 w-full rounded-xl border border-white/12 bg-white/[0.03] px-3.5 text-[0.9rem] text-bone outline-none transition-colors focus-visible:border-chrome disabled:opacity-40"
-      >
-        {children}
-      </select>
-    </label>
-  );
-}
-
-function Peca({ icone: Icone, titulo, legenda, texto, indice }: any) {
-  return (
-    <article
-      style={{ animationDelay: `${indice * 90}ms` }}
-      className="glass overflow-hidden rounded-2xl motion-safe:animate-rise"
-    >
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/8 px-5 py-4 sm:px-6">
-        <div className="flex items-center gap-3">
-          <span className="metal-pill grid size-9 shrink-0 place-items-center rounded-lg text-[#08090B]">
-            <Icone className="size-4" strokeWidth={2} />
-          </span>
-          <div>
-            <h3 className="text-[0.95rem] font-medium text-bone">{titulo}</h3>
-            <p className="text-[0.76rem] text-stone">{legenda}</p>
-          </div>
-        </div>
-        <button className="text-[10px] uppercase tracking-wider text-stone border border-white/10 px-2 py-1 rounded">Copiar</button>
-      </header>
-      <div className="px-5 py-5 text-[0.85rem] text-stone whitespace-pre-wrap">{texto}</div>
-    </article>
-  );
-}
-
 export function Quiz() {
   const [passo, setPasso] = useState(0);
   const [modalidade, setModalidade] = useState<Modalidade | null>(null);
   const [escolhido, setEscolhido] = useState<ImovelEncontrado | null>(null);
-
-  const [pais, setPais] = useState("BR");
-  const [regiao, setRegiao] = useState("MG");
   const [cidade, setCidade] = useState("");
-  const [buscando, setBuscando] = useState(false);
   const [resultados, setResultados] = useState<ImovelEncontrado[]>([]);
-  const [filtroScore, setFiltroScore] = useState<"TODOS" | "ALTA" | "MEDIA">("TODOS");
-
   const [estilo, setEstilo] = useState("aconchegante");
   const [publico, setPublico] = useState("casais");
   const [comodos, setComodos] = useState<string[]>(["Sala", "Quarto principal"]);
@@ -201,19 +95,6 @@ export function Quiz() {
   const [videoVertical, setVideoVertical] = useState(true);
   const [gerados, setGerados] = useState<string[]>([]);
 
-
-  const inferirEstilo = (p: string) => {
-    const mapa: Record<string, string> = {
-      casais: "aconchegante",
-      familias: "claro",
-      trabalho: "limpo",
-      amigos: "vibrante",
-      "alto-padrao": "sóbrio",
-      investidor: "sóbrio",
-    };
-    if (mapa[p]) setEstilo(mapa[p]);
-  };
-
   useEffect(() => {
     const resumeProject = async () => {
       const pid = getCurrentProjectId();
@@ -221,584 +102,106 @@ export function Quiz() {
         try {
           const p = await loadProject(pid);
           if (p) {
-            setModalidade(p.modalidade as Modalidade);
             setPasso(p.current_step || 0);
-            if (p.properties && p.properties.length > 0) {
-              const prop = p.properties[0];
-              setEscolhido({
-                id: prop.place_id || "",
-                nome: prop.nome,
-                endereco: prop.endereco || "",
-                nota: prop.rating || 0,
-                avaliacoes: prop.user_rating_count || 0,
-                fotos: prop.photos_count || 0,
-                site: prop.website_uri || "",
-                mapa: null,
-                airbnb: null,
-                telefone: null,
-                location: prop.lat && prop.lng ? { latitude: prop.lat, longitude: prop.lng } : undefined,
-                score: {
-                  total: prop.opportunity_score || 0,
-                  faixa: prop.opportunity_band as any,
-                  signals: (prop.signals as string[]) || [],
-                  angulo: prop.angulo_abordagem || ""
-                }
-              });
-            }
-            if (p.briefings && p.briefings.length > 0) {
-              const b = p.briefings[0];
-              setPublico(b.publico || "casais");
-              setComodos((b.comodos as string[]) || []);
-              setEstilo(b.estilo_inferido || "aconchegante");
-              setVideoVertical(b.formato_video === '9:16');
-              if (p.modalidade === 'temporada') setDiaria(String(b.diaria || 250));
-              else setValorImobiliario(String(b.diaria || 450000));
-            }
+            setModalidade(p.modalidade as Modalidade);
           }
-        } catch (err) {
-          console.error("Failed to resume project", err);
-        }
+        } catch (err) { console.error(err); }
       }
     };
     resumeProject();
   }, []);
 
-
-
-  const autosave = async (step: number) => {
-    await saveProjectStep(step, {
-      modalidade,
-      escolhido,
-      publico,
-      comodos,
-      diaria,
-      valorImobiliario,
-      estilo,
-      videoVertical
-    });
+  const autosave = async (step: number, status: any = 'rascunho') => {
+    await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical }, status);
   };
 
-  const resultadosFiltrados = useMemo(() => {
-    if (filtroScore === "TODOS") return resultados;
-    return resultados.filter((r) => r.score?.faixa === filtroScore);
-  }, [resultados, filtroScore]);
-
-  const buscar = async () => {
-    if (!cidade || !modalidade) return;
-    setBuscando(true);
-    try {
-      const r = await fetch("/api/imoveis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ modalidade, pais, regiao, cidade }),
-      });
-      const d = await r.json();
-      setResultados(d.imoveis ?? []);
-    } finally {
-      setBuscando(false);
-    }
-  };
-
-  const avancar = async () => {
+  const avancar = async (s: any = 'rascunho') => {
     const proximo = passo + 1;
-    if (passo === 0 && escolhido) {
-      const novos = ["video", "abordagem"];
-      if (!escolhido.site) novos.push("site");
-      if (escolhido.fotos < 10) novos.push("fotos");
-      setEntregaveis(novos);
-    }
     setPasso(proximo);
-    await autosave(proximo);
+    await autosave(proximo, s);
   };
-
-
-  const imovel: ImovelSelecionado | null = escolhido ? {
-    id: escolhido.id,
-    nome: escolhido.nome,
-    cidade: escolhido.endereco,
-    tipo: modalidade === "temporada" ? "Hospedagem" : "Imóvel",
-    anfitriao: "anfitrião",
-    diaria: modalidade === "temporada" ? Number(diaria) : Number(valorImobiliario),
-    potencial: modalidade === "temporada" ? Number(diaria) * 1.5 : Number(valorImobiliario) * 1.1,
-    nota: escolhido.nota || 0,
-    avaliacoes: escolhido.avaliacoes || 0,
-    fotos: escolhido.fotos || 0,
-    problemas: escolhido.score?.signals || [],
-  } : null;
-
-  const respostas: Respostas | null = imovel && modalidade ? {
-    modalidade, imovel, estilo, publico, comodos, entregaveis,
-    notas: {}
-  } : null;
 
   return (
     <div className="space-y-8">
       {gerando && <TelaGeracao aoTerminar={() => { setGerando(false); setPasso(3); }} />}
-
       <header>
-        <p className="eyebrow">Nova entrega</p>
-        <h1 className="mt-2 font-display text-3xl font-semibold text-bone">{TITULOS[passo]}</h1>
+        <h1 className="font-display text-3xl font-semibold text-bone">{TITULOS[passo]}</h1>
       </header>
-
       <Progresso passo={passo} />
 
       {passo === 0 && (
-        <section className="space-y-6">
-           <div className="grid gap-4 sm:grid-cols-2">
-             {MODALIDADES.map(m => (
-               <button key={m.id} onClick={() => setModalidade(m.id)} className={cn("glass p-6 text-left rounded-2xl", modalidade === m.id && "rim-lit")}>
-                 <h3 className="text-bone font-medium">{m.titulo}</h3>
-                 <p className="text-stone text-sm">{m.desc}</p>
-               </button>
-             ))}
-           </div>
-           {modalidade && (
-             <div className="glass p-6 rounded-2xl flex gap-4">
-                <input value={cidade} onChange={e => setCidade(e.target.value)} placeholder="Qual cidade?" className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-bone" />
-                <button onClick={buscar} className="metal-pill px-6 py-2 rounded-xl font-bold text-black">Buscar</button>
-             </div>
-           )}
-           {resultados.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between px-2">
-                  <span className="text-stone text-xs font-mono uppercase tracking-widest">
-                    {resultados.length} imóveis · {resultados.filter(r => r.score?.faixa === 'ALTA').length} com oportunidade alta
-                  </span>
-                  <div className="flex gap-2">
-                    {['TODOS', 'ALTA', 'MEDIA'].map(f => (
-                      <button 
-                        key={f} 
-                        onClick={() => setFiltroScore(f as any)}
-                        className={cn(
-                          "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all",
-                          filtroScore === f ? "bg-chrome border-chrome text-black" : "border-white/10 text-stone hover:border-white/20"
-                        )}
-                      >
-                        {f === 'TODOS' ? 'Todos' : f === 'ALTA' ? 'Alta' : 'Média'}
-                      </button>
-                    ))}
-                  </div>
+        <div className="space-y-6">
+            <div className="grid gap-4 sm:grid-cols-2">
+                {MODALIDADES.map(m => (
+                    <button key={m.id} onClick={() => setModalidade(m.id)} className={cn("glass p-6 rounded-2xl", modalidade === m.id && "rim-lit")}>
+                        <h3 className="text-bone font-medium">{m.titulo}</h3>
+                    </button>
+                ))}
+            </div>
+            {modalidade && (
+                <div className="flex gap-4">
+                    <input value={cidade} onChange={e => setCidade(e.target.value)} className="flex-1 bg-white/5 rounded-xl px-4 py-3" placeholder="Cidade..." />
+                    <button onClick={async () => {
+                        const r = await fetch("/api/imoveis", { method: "POST", body: JSON.stringify({ modalidade, cidade }), headers:{"Content-Type":"application/json"} });
+                        const d = await r.json();
+                        setResultados(d.imoveis ?? []);
+                    }} className="metal-pill px-6 py-2 rounded-xl text-black font-bold">Buscar</button>
                 </div>
-                <ul className="grid gap-4 sm:grid-cols-2">
-                  {resultadosFiltrados.map(im => (
-                    <li 
-                      key={im.id} 
-                      onClick={() => { setEscolhido(im); avancar(); }} 
-                      className="glass p-5 rounded-2xl cursor-pointer hover:rim-lit transition-all group relative overflow-hidden"
-                    >
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h4 className="text-bone font-medium group-hover:text-chrome transition-colors">{im.nome}</h4>
-                          <p className="text-stone text-[0.75rem] mt-0.5 flex items-center gap-1">
-                            <MapPin className="size-3" />
-                            {im.endereco}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <span className={cn(
-                            "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border",
-                            im.score?.faixa === 'ALTA' ? "text-orange-400 border-orange-400/30 bg-orange-400/5" :
-                            im.score?.faixa === 'MEDIA' ? "text-amber-400 border-amber-400/30 bg-amber-400/5" :
-                            "text-stone border-white/10 bg-white/5"
-                          )}>
-                            {im.score?.total} pts
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-1.5 mb-4">
-                        {im.score?.signals.map((s, i) => (
-                          <div key={i} className="flex items-start gap-2 text-[0.7rem] text-stone/80">
-                            <Sparkles className="size-3 shrink-0 mt-0.5 text-chrome/60" />
-                            <span>{s}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="pt-3 border-t border-white/5 flex items-center justify-between">
-                        <span className="text-[10px] font-mono text-chrome/80 italic">{im.score?.angulo}</span>
-                        <ChevronRight className="size-4 text-stone group-hover:text-chrome transition-all group-hover:translate-x-1" />
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <button 
-                  onClick={() => {
-                    const demo = {
-                      id: "exemplo-1",
-                      nome: "Exemplo: Pousada Villa do Sol",
-                      endereco: "Botucatu, SP",
-                      nota: 4.2,
-                      avaliacoes: 156,
-                      fotos: 4,
-                      site: null,
-                      score: { total: 88, faixa: 'ALTA' as const, signals: ["Apenas 4 fotos — gargalo visual claro", "Sem site próprio — depende 100% da plataforma"], angulo: "Ângulo: qualidade visual" }
-                    };
-                    setEscolhido(demo as any);
-                    avancar();
-                  }}
-                  className="w-full py-4 border border-dashed border-white/10 rounded-2xl text-stone text-sm hover:border-chrome/40 hover:text-chrome transition-all flex items-center justify-center gap-2"
-                >
-                  <Sparkles className="size-4" />
-                  Usar imóvel de exemplo
-                </button>
-              </div>
-           )}
-        </section>
+            )}
+            <div className="grid gap-4">
+                {resultados.map(im => (
+                    <div key={im.id} onClick={() => { setEscolhido(im); avancar(); }} className="glass p-5 rounded-2xl cursor-pointer">
+                        <h4>{im.nome}</h4>
+                    </div>
+                ))}
+            </div>
+        </div>
       )}
 
       {passo === 1 && escolhido && (
-        <section className="space-y-6 motion-safe:animate-rise">
-           <div className="glass p-6 rounded-2xl flex items-center gap-6 relative overflow-hidden">
-              <div className="size-24 bg-white/5 rounded-xl flex items-center justify-center overflow-hidden border border-white/10">
-                {escolhido.primeiraFoto ? (
-                  <img 
-                    src={`https://places.googleapis.com/v1/${escolhido.primeiraFoto}/media?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&maxWidthPx=400`} 
-                    alt={escolhido.nome}
-                    className="size-full object-cover"
-                    onError={(e) => {
-                      (e.target as any).src = "";
-                      (e.target as any).parentElement.innerHTML = '<div class="text-stone"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>';
-                    }}
-                  />
-                ) : (
-                  <ImageIcon className="text-stone" />
-                )}
-              </div>
-              <div className="relative z-10">
+        <div className="space-y-6">
+          <div className="glass p-6 rounded-2xl flex gap-6">
+            {escolhido.primeiraFoto && <img src={`https://places.googleapis.com/v1/${escolhido.primeiraFoto}/media?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&maxWidthPx=200`} className="size-24 rounded-lg object-cover" />}
+            <div>
                 <h2 className="text-xl font-semibold text-bone">{escolhido.nome}</h2>
-                <p className="text-stone text-sm flex items-center gap-1 mt-1">
-                  <MapPin className="size-3" />
-                  {escolhido.endereco}
-                </p>
-              </div>
-           </div>
-           <div className="glass p-6 rounded-2xl">
-              <h3 className="text-bone font-medium mb-4">Diagnóstico do imóvel</h3>
-              <div className="space-y-3">
-                 {escolhido.score?.signals.map((s, i) => (
-                   <p key={i} className="text-stone text-sm flex gap-2">
-                     <ChevronRight className="size-4 text-chrome" />
-                     {s.split(' — ')[0]} → {s.split(' — ')[1] || "afeta conversão"}
-                   </p>
-                 ))}
-              </div>
-           </div>
-           <div className="glass p-6 rounded-2xl">
-              <h3 className="text-bone font-medium mb-4">O que a Nexofly vai resolver</h3>
-              <div className="grid gap-3 sm:grid-cols-2">
-                 {PACOTE_CONFIG.map(p => (
-                   <div key={p.id} className={cn("p-4 rounded-xl border flex items-center justify-between", entregaveis.includes(p.id) ? "border-chrome/40 bg-chrome/5" : "border-white/5 opacity-50")}>
-                      <div className="flex items-center gap-3">
-                         <p.icone className="size-4 text-bone" />
-                         <span className="text-sm text-bone">{p.rotulo}</span>
-                      </div>
-                      {entregaveis.includes(p.id) && <Check className="size-4 text-chrome" />}
-                   </div>
-                 ))}
-              </div>
-              <button onClick={() => {}} className="text-xs text-stone mt-4 hover:text-bone underline underline-offset-4">ajustar entregáveis</button>
-           </div>
-           <button onClick={avancar} className="metal-pill w-full py-4 rounded-2xl font-bold text-black text-lg">Confirmar e continuar</button>
-        </section>
+                <div className="space-y-1 mt-2">
+                    {escolhido.score?.signals.map((s,i) => <p key={i} className="text-sm text-stone">{s}</p>)}
+                </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            {PACOTE_CONFIG.map(p => (
+                <div key={p.id} onClick={() => entregaveis.includes(p.id) ? setEntregaveis(entregaveis.filter(x => x !== p.id)) : setEntregaveis([...entregaveis, p.id])} className={cn("p-4 rounded-xl border cursor-pointer", entregaveis.includes(p.id) ? "border-chrome bg-chrome/10" : "border-white/5")}>
+                    {p.rotulo}
+                </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {['Casais', 'Famílias', 'Trabalho'].map(p => (
+                <button key={p} onClick={() => setPublico(p.toLowerCase())} className={cn("p-3 rounded-xl border", publico === p.toLowerCase() ? "border-chrome" : "border-white/10")}>{p}</button>
+            ))}
+          </div>
+
+          <button onClick={() => avancar()} className="metal-pill w-full py-4 rounded-2xl text-black font-bold">Gerar proposta</button>
+        </div>
       )}
 
       {passo === 2 && (
-        <section className="space-y-8 motion-safe:animate-rise">
-           <div className="glass p-6 rounded-2xl">
-              <h3 className="text-bone font-medium mb-4">1. Público alvo</h3>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                 {(modalidade === 'temporada' ? ['Casais', 'Famílias', 'Trabalho', 'Amigos'] : ['Família', 'Investidor', 'Alto padrão', 'Primeiro imóvel']).map(p => (
-                   <button key={p} onClick={() => { setPublico(p.toLowerCase()); inferirEstilo(p.toLowerCase()); }} className={cn("p-3 rounded-xl border text-sm transition-all", publico === p.toLowerCase() ? "border-chrome bg-chrome/10 text-bone" : "border-white/10 text-stone hover:border-white/20")}>
-                     {p}
-                   </button>
-                 ))}
-              </div>
-           </div>
-
-           <div className="glass p-6 rounded-2xl">
-              <h3 className="text-bone font-medium mb-4">2. Ambientes de destaque (máx 4)</h3>
-              <div className="flex flex-wrap gap-2">
-                 {['Sala', 'Quarto principal', 'Cozinha', 'Varanda/Vista', 'Lazer', 'Banheiro', 'Fachada'].map(c => (
-                   <button key={c} onClick={() => {
-                      if (comodos.includes(c)) setComodos(comodos.filter(x => x !== c));
-                      else if (comodos.length < 4) setComodos([...comodos, c]);
-                   }} className={cn("px-4 py-2 rounded-full border text-xs transition-all", comodos.includes(c) ? "border-chrome bg-chrome text-black font-bold" : "border-white/10 text-stone")}>
-                     {c}
-                   </button>
-                 ))}
-              </div>
-           </div>
-
-           <div className="glass p-6 rounded-2xl">
-              <h3 className="text-bone font-medium mb-2">3. {modalidade === 'temporada' ? 'Diária de referência' : 'Valor do imóvel'}</h3>
-              <input 
-                type="range" 
-                min={modalidade === 'temporada' ? 80 : 150000} 
-                max={modalidade === 'temporada' ? 1500 : 3000000} 
-                step={modalidade === 'temporada' ? 10 : 10000} 
-                value={modalidade === 'temporada' ? diaria : valorImobiliario}
-                onChange={e => modalidade === 'temporada' ? setDiaria(e.target.value) : setValorImobiliario(e.target.value)}
-                className="w-full accent-chrome my-4"
-              />
-              <div className="flex justify-between text-stone text-xs font-mono">
-                 <span>{modalidade === 'temporada' ? 'R$ 80' : 'R$ 150k'}</span>
-                 <span className="text-bone text-lg font-bold">R$ {Number(modalidade === 'temporada' ? diaria : valorImobiliario).toLocaleString('pt-BR')}</span>
-                 <span>{modalidade === 'temporada' ? 'R$ 1.500' : 'R$ 3M'}</span>
-              </div>
-           </div>
-
-           <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-stone text-xs">
-                <span>Estilo: <b className="text-bone">{estilo}</b></span>
-                <button className="text-chrome hover:underline">trocar</button>
-              </div>
-              <button onClick={async () => {
-                setGerando(true);
-                await autosave(3); // Mark we generated
-              }} className="metal-pill px-8 py-3 rounded-xl font-bold text-black flex items-center gap-2">
-                 Gerar material <Sparkles className="size-4" />
-              </button>
-
-           </div>
-        </section>
+        <div className="space-y-6">
+            <h3 className="text-bone">Proposta pronta</h3>
+            <button onClick={() => avancar('em_producao')} className="metal-pill px-8 py-3 rounded-xl font-bold text-black">Já fechei — ir para produção</button>
+            <button onClick={() => { autosave(passo, 'aguardando_resposta'); window.location.href='/projetos'; }} className="border border-white/10 px-8 py-3 rounded-xl">Salvar e voltar depois</button>
+        </div>
       )}
 
-      {passo === 3 && respostas && (
-        <section className="space-y-6 motion-safe:animate-rise">
-           <div className="flex flex-wrap gap-2">
-            <button onClick={() => setAba("video")} className={cn("px-4 py-2 rounded-lg text-sm transition-all", aba === "video" ? "bg-white/10 text-bone" : "text-stone hover:bg-white/5")}>
-              Plano de Vídeo
-            </button>
-            {PACOTE_CONFIG.filter((p) => p.id !== "video" && entregaveis.includes(p.id)).map((p) => (
-              <button key={p.id} onClick={() => setAba(p.id)} className={cn("px-4 py-2 rounded-lg text-sm transition-all", aba === p.id ? "bg-white/10 text-bone" : "text-stone hover:bg-white/5")}>
-                {p.rotulo}
-              </button>
-            ))}
-          </div>
-
-          {aba === "video" && (
-            <div className="space-y-6">
-              <div className="glass p-6 rounded-2xl border-chrome/20">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-bone font-medium flex items-center gap-2">
-                      <Clapperboard className="size-4 text-chrome" /> Plano de Produção Sequenciado
-                    </h3>
-                    <p className="text-stone text-[0.8rem] mt-1">No Flow, use Frames to Video e suba a foto do cômodo antes de colar o prompt.</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-stone mb-1">{gerados.length} de 4 clipes gerados</div>
-                    <div className="w-32 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                      <div className="h-full bg-chrome transition-all" style={{ width: `${(gerados.length / 4) * 100}%` }} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 p-3 bg-white/5 rounded-xl border border-white/5 text-[0.75rem] text-stone">
-                  <Info className="size-4 shrink-0 text-chrome" />
-                  <p>Dica: Teste o prompt em Lite ({CREDIT_COSTS.LITE} créditos) antes de gastar Fast. Se a direção estiver certa, refaça em Fast.</p>
-                  <div className="ml-auto flex items-center gap-2 border-l border-white/10 pl-4">
-                    <span>9:16</span>
-                    <button 
-                      onClick={() => setVideoVertical(!videoVertical)}
-                      className={cn("w-8 h-4 rounded-full relative transition-colors", videoVertical ? "bg-chrome" : "bg-white/20")}
-                    >
-                      <div className={cn("absolute top-0.5 size-3 bg-white rounded-full transition-all", videoVertical ? "right-0.5" : "left-0.5")} />
-                    </button>
-                    <span>16:9</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-8">
-                {VIDEO_PLAN.map((dia, diaIdx) => (
-                  <div key={dia.dia} className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <span className="metal-pill px-3 py-0.5 rounded text-[10px] font-bold text-black uppercase">DIA {dia.dia}</span>
-                      <span className="text-stone text-xs">{dia.justificativa}</span>
-                    </div>
-                    
-                    <div className="grid gap-3">
-                      {dia.items.map((item) => {
-                        const allPrompts = generateVideoPrompts(respostas, videoVertical);
-                        const prompt = (allPrompts as any)[item.id];
-                        const estaAberto = aba === "video" && item.id === (window as any)._aberto;
-                        
-                        return (
-                          <div key={item.id} className={cn("glass rounded-2xl border border-white/5 overflow-hidden transition-all", gerados.includes(item.id) && "opacity-60")}>
-                            <button 
-                              onClick={() => { (window as any)._aberto = (window as any)._aberto === item.id ? null : item.id; setAba("video"); }}
-                              className="w-full flex items-center justify-between p-4 hover:bg-white/[0.02]"
-                            >
-                              <div className="flex items-center gap-4">
-                                <input 
-                                  type="checkbox" 
-                                  checked={gerados.includes(item.id)}
-                                  onChange={(e) => {
-                                    e.stopPropagation();
-                                    if (e.target.checked) setGerados([...gerados, item.id]);
-                                    else setGerados(gerados.filter(g => g !== item.id));
-                                  }}
-                                  className="size-5 rounded border-white/20 bg-transparent text-chrome focus:ring-chrome"
-                                />
-                                <div className="text-left">
-                                  <div className="text-[10px] text-stone font-mono uppercase">Shot {item.shot}</div>
-                                  <div className="text-sm font-medium text-bone">{item.nome}</div>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-4">
-                                <div className="text-right hidden sm:block">
-                                  <div className="text-[10px] text-stone font-mono uppercase">{item.modo}</div>
-                                  <div className="text-xs text-bone">{CREDIT_COSTS[item.modo as keyof typeof CREDIT_COSTS]} créditos</div>
-                                </div>
-                                <ChevronDown className={cn("size-4 text-stone transition-transform", (window as any)._aberto === item.id && "rotate-180")} />
-                              </div>
-                            </button>
-                            
-                            {(window as any)._aberto === item.id && (
-                              <div className="px-4 pb-4 border-t border-white/5 pt-4 space-y-4 motion-safe:animate-rise">
-                                <div className="p-4 bg-white/[0.03] rounded-xl text-[0.8rem] text-stone whitespace-pre-wrap font-mono leading-relaxed">
-                                  {prompt}
-                                </div>
-                                <div className="flex gap-3">
-                                  <button 
-                                    onClick={() => { navigator.clipboard.writeText(prompt); }}
-                                    className="flex-1 flex items-center justify-center gap-2 border border-white/10 hover:border-chrome/50 py-2 rounded-xl text-xs text-bone transition-all"
-                                  >
-                                    <Copy className="size-3" /> Copiar prompt
-                                  </button>
-                                  <a 
-                                    href="https://flow.google.com" 
-                                    target="_blank" 
-                                    rel="noreferrer"
-                                    className="flex-1 flex items-center justify-center gap-2 bg-chrome text-black py-2 rounded-xl text-xs font-bold"
-                                  >
-                                    <ExternalLink className="size-3" /> Abrir Google Flow
-                                  </a>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div key={aba} className="space-y-4">
-            {aba === "fotos" && comodos.map((c, i) => (
-                <Peca key={c} indice={i} icone={ImageIcon} titulo={c} legenda="Direção de foto" texto={promptFoto(respostas, c)} />
-            ))}
-            {aba === "site" && <Peca indice={0} icone={LayoutTemplate} titulo="Site do anfitrião" legenda="Briefing da página" texto={promptSite(respostas)} />}
-            {aba === "abordagem" && <Peca indice={0} icone={MessageSquare} titulo="Proposta" legenda="Mensagem de abertura" texto={abordagem(respostas)} />}
-          </div>
-          
-          <div className="flex items-center justify-between mt-8 border-t border-white/5 pt-6">
-            <button onClick={() => setPasso(0)} className="text-stone hover:text-bone text-sm flex items-center gap-2">
-               <RotateCcw className="size-4" /> Novo projeto
-            </button>
-            <button onClick={() => setPasso(4)} className="metal-pill px-8 py-3 rounded-xl font-bold text-black flex items-center gap-2">
-              Ir para Fechamento <ArrowRight className="size-4" />
-            </button>
-          </div>
-        </section>
+      {passo === 3 && (
+        <div className="space-y-6">
+            <h3 className="text-bone">Sala de produção</h3>
+            <p className="text-stone">Use os prompts abaixo no Google Flow.</p>
+        </div>
       )}
-
-      {passo === 4 && respostas && (
-        <section className="space-y-8 motion-safe:animate-rise pb-12">
-          {/* BLOCO 1 — PROPOSTA COMERCIAL */}
-          <div className="glass p-6 rounded-2xl border-chrome/20">
-            <h3 className="text-bone font-medium flex items-center gap-2 mb-4">
-              <PenLine className="size-4 text-chrome" /> Proposta Comercial
-            </h3>
-            <div className="p-5 bg-white/[0.03] rounded-xl text-[0.85rem] text-stone whitespace-pre-wrap font-sans leading-relaxed">
-              {(() => {
-                const dadoReal = escolhido?.nota ? `${escolhido.nota}★ no Google` : escolhido?.avaliacoes ? `${escolhido.avaliacoes} avaliações` : "ausência de site próprio";
-                const listaEntregaveis = PACOTE_CONFIG.filter(p => entregaveis.includes(p.id)).map(p => p.rotulo).join(", ");
-                const preco = calculatePricing(Number(modalidade === 'temporada' ? diaria : valorImobiliario), modalidade || 'temporada').completo.valor;
-                return `Oi, vi que o ${escolhido?.nome} tem ${dadoReal}.\n\nO imóvel é excelente, mas o anúncio atual não reflete todo o seu potencial visual, o que pode estar afastando hóspedes qualificados.\n\nPara resolver isso, entrego:\n- ${listaEntregaveis}\n\nPrazo: 5 dias úteis após a captação.\n\nInvestimento: A partir de R$ ${preco.toLocaleString('pt-BR')}`;
-              })()}
-            </div>
-            <button 
-              onClick={() => {
-                const dadoReal = escolhido?.nota ? `${escolhido.nota}★ no Google` : escolhido?.avaliacoes ? `${escolhido.avaliacoes} avaliações` : "ausência de site próprio";
-                const listaEntregaveis = PACOTE_CONFIG.filter(p => entregaveis.includes(p.id)).map(p => p.rotulo).join(", ");
-                const preco = calculatePricing(Number(modalidade === 'temporada' ? diaria : valorImobiliario), modalidade || 'temporada').completo.valor;
-                const texto = `Oi, vi que o ${escolhido?.nome} tem ${dadoReal}.\n\nO imóvel é excelente, mas o anúncio atual não reflete todo o seu potencial visual, o que pode estar afastando hóspedes qualificados.\n\nPara resolver isso, entrego:\n- ${listaEntregaveis}\n\nPrazo: 5 dias úteis após a captação.\n\nInvestimento: A partir de R$ ${preco.toLocaleString('pt-BR')}`;
-                navigator.clipboard.writeText(texto);
-              }}
-              className="w-full mt-4 flex items-center justify-center gap-2 border border-white/10 hover:border-chrome/50 py-3 rounded-xl text-sm text-bone transition-all"
-            >
-              <Copy className="size-4" /> Copiar proposta completa
-            </button>
-          </div>
-
-          {/* BLOCO 2 — PREÇO SUGERIDO */}
-          <div className="space-y-4">
-            <h3 className="text-bone font-medium flex items-center gap-2">
-              <DollarSign className="size-4 text-chrome" /> Investimento Sugerido
-            </h3>
-            <div className="grid gap-4 md:grid-cols-3">
-              {Object.entries(calculatePricing(Number(modalidade === 'temporada' ? diaria : valorImobiliario), modalidade || 'temporada')).map(([key, plano]) => (
-                <div key={key} className={cn("glass p-5 rounded-2xl border transition-all", key === 'completo' ? "border-chrome/40 rim-lit" : "border-white/5")}>
-
-                  <div className="text-[10px] text-stone font-mono uppercase mb-1">{plano.titulo}</div>
-                  <div className="text-2xl font-bold text-bone mb-4">R$ {plano.valor.toLocaleString('pt-BR')}</div>
-                  <ul className="space-y-2 mb-6">
-                    {plano.inclui.map((item, i) => (
-                      <li key={i} className="text-[0.75rem] text-stone flex items-start gap-2">
-                        <Check className="size-3 text-chrome mt-0.5 shrink-0" /> {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* BLOCO 3 — MENSAGEM DE WHATSAPP */}
-          <div className="glass p-6 rounded-2xl border-chrome/20">
-            <h3 className="text-bone font-medium flex items-center gap-2 mb-4">
-              <MessageSquare className="size-4 text-chrome" /> Contato Rápido
-            </h3>
-            <div className="p-4 bg-white/[0.03] rounded-xl text-[0.9rem] text-bone italic border-l-2 border-chrome">
-              {(() => {
-                const dadoReal = escolhido?.nota ? `${escolhido.nota}★ no Google` : "o potencial do anúncio";
-                return `Oi, tudo bem? Vi o ${escolhido?.nome} e notei ${dadoReal}. Tenho uma proposta visual que pode aumentar seus cliques e ocupação. Podemos falar? 🚀`;
-              })()}
-            </div>
-            <div className="grid grid-cols-2 gap-3 mt-4">
-              <button 
-                onClick={() => {
-                  const dadoReal = escolhido?.nota ? `${escolhido.nota}★ no Google` : "o potencial do anúncio";
-                  navigator.clipboard.writeText(`Oi, tudo bem? Vi o ${escolhido?.nome} e notei ${dadoReal}. Tenho uma proposta visual que pode aumentar seus cliques e ocupação. Podemos falar? 🚀`);
-                }}
-                className="flex items-center justify-center gap-2 border border-white/10 hover:border-chrome/50 py-3 rounded-xl text-sm text-bone transition-all"
-              >
-                <Copy className="size-4" /> Copiar mensagem
-              </button>
-              <a 
-                href={`https://wa.me/?text=${encodeURIComponent(`Oi, tudo bem? Vi o ${escolhido?.nome} e notei ${escolhido?.nota ? `${escolhido.nota}★ no Google` : "o potencial do anúncio"}. Tenho uma proposta visual que pode aumentar seus cliques e ocupação. Podemos falar? 🚀`)}`}
-                target="_blank" 
-                rel="noreferrer"
-                className="flex items-center justify-center gap-2 bg-[#25D366] text-white py-3 rounded-xl text-sm font-bold"
-              >
-                <Send className="size-4" /> Abrir WhatsApp
-              </a>
-            </div>
-          </div>
-
-          <button onClick={() => setPasso(0)} className="text-stone hover:text-bone text-sm flex items-center gap-2 mx-auto">
-             <RotateCcw className="size-4" /> Iniciar novo atendimento
-          </button>
-        </section>
-      )}
-
-
     </div>
   );
 }
