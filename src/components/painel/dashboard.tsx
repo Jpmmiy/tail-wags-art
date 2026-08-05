@@ -507,12 +507,13 @@ export function Dashboard() {
         </div>
 
         <Link
-          href="/painel/criar"
+          to="/painel/criar"
           className="metal-pill inline-flex h-11 items-center gap-2 rounded-xl px-5 text-[0.88rem] font-semibold text-[#08090B] shadow-[0_10px_26px_-12px_rgba(255,255,255,0.32)] transition-transform hover:-translate-y-0.5"
         >
           <Wand2 className="size-4" strokeWidth={2} />
           Nova entrega
         </Link>
+
       </header>
 
       <Faturamento d={d} />
