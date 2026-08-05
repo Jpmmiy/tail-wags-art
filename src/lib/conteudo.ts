@@ -187,26 +187,22 @@ export const PLANOS = [
 export const DUVIDAS = [
   {
     p: "Preciso saber design, edição de vídeo ou programação?",
-    r: "Não precisa de nenhum dos três. A Nexofly é conectada às ferramentas de geração e cuida da parte técnica sozinha. Você responde o briefing e recebe o material pronto.",
-  },
-  {
-    p: "As imagens não enganam o hóspede?",
-    r: "Isso é regra dura aqui dentro. A plataforma não inventa cômodo, móvel ou espaço que não existe. O que muda é luz, arrumação e enquadramento. O hóspede chega e reconhece o lugar.",
+    r: "Não. A Nexofly entrega o plano de produção e os prompts exatos. Você só precisa colar os prompts no Google Flow e as fotos no editor. O 'cérebro' do trabalho é nosso.",
   },
   {
     p: "Quanto eu posso cobrar do anfitrião?",
-    r: "A plataforma sugere o preço olhando o tipo de imóvel, a diária dele e o que entra no pacote. Costuma ficar entre duas e três diárias. O dinheiro é todo seu, a Nexofly não pega comissão.",
+    r: "A plataforma sugere o preço baseando-se no padrão do imóvel. Geralmente, um pacote completo custa entre 2 a 3 diárias do imóvel. O lucro é 100% seu.",
   },
   {
-    p: "De onde vêm os imóveis da busca?",
-    r: "De anúncios públicos de temporada e de bases de estabelecimentos, filtrados pela região que você escolher. Vem a lista com o diagnóstico de cada anúncio junto.",
+    p: "Os vídeos são gerados pela Nexofly?",
+    r: "Não. Nós geramos o plano e os prompts otimizados para você usar no Google Flow (usando seus créditos gratuitos diários). Isso garante custo zero de produção para você.",
   },
   {
-    p: "Qual a diferença entre o mensal e o vitalício?",
-    r: "Nas funcionalidades, nenhuma. O mensal é R$ 247,00 por mês enquanto você usar. O vitalício é R$ 497,00 uma vez só, nunca renova e já inclui o que for lançado depois.",
+    p: "Como funciona o Score de Oportunidade?",
+    r: "Analisamos dados reais do Google Places: quantidade de fotos, nota, frequência de avaliações e presença digital. Se o imóvel tem demanda mas o marketing é ruim, o score sobe.",
   },
   {
-    p: "Funciona na minha cidade?",
-    r: "Funciona em qualquer cidade que tenha imóvel anunciado pra temporada. Praia, serra e interior costumam ser os melhores: muito anfitrião com anúncio ruim e quase ninguém oferecendo esse serviço.",
+    p: "O e-mail é obrigatório para ver os imóveis?",
+    r: "Não. Você pode buscar qualquer cidade e ver o ranking de oportunidades livremente. Só pedimos o e-mail quando você decide gerar os materiais de um imóvel específico.",
   },
 ];
