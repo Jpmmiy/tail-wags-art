@@ -180,7 +180,7 @@ export const PLANOS = [
     ],
     fora: [],
     acao: "Garantir vitalício",
-    href: "https://checkout.applyfy.com.br/checkout/cms0w2pbd05j301n26c9xwryz?offer=NIYOXHU",
+    href: "https://checkout.applyfy.com.br/checkout/cms0w2pbd05j301n26c9xwryz?offer=B742TVS",
   },
 ];
 
