@@ -174,7 +174,7 @@ export const Route = createFileRoute("/api/imoveis")({
         });
 
         if (successCount === 0 && results.length > 0) {
-          return json({ erro: "Todas as buscas no Google Places falharam. Verifique sua chave API." }, 502);
+          return json({ erro: "DA ERRO AO BUSCAR" }, 502);
         }
 
         // Step 4: Deduplicate
