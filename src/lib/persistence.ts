@@ -26,7 +26,7 @@ export const setCurrentProjectId = (id: string | null) => {
   else localStorage.removeItem(PROJECT_KEY);
 };
 
-export const saveProjectStep = async (step: number, data: any) => {
+export const saveProjectStep = async (step: number, data: any, status: 'rascunho' | 'aguardando_resposta' | 'em_producao' | 'concluido' = 'rascunho') => {
   const sessionId = getSessionId();
   const projectId = getCurrentProjectId();
   const { data: { session } } = await supabase.auth.getSession();
@@ -42,6 +42,7 @@ export const saveProjectStep = async (step: number, data: any) => {
         session_id: sessionId,
         modalidade: data.modalidade,
         current_step: step,
+        status: status,
         updated_at: new Date().toISOString(),
       };
 
@@ -76,14 +77,15 @@ export const saveProjectStep = async (step: number, data: any) => {
       });
 
     } else if (currentProjectId) {
-      // Update step
+      // Update step and status
       await supabase.from("projects").update({ 
         current_step: step,
+        status: status,
         updated_at: new Date().toISOString()
       }).eq("id", currentProjectId);
 
-      if (step === 3) {
-        // Save briefing
+      if (step === 2) {
+        // Save briefing (now in step 2)
         await supabase.from("briefings").upsert({
           project_id: currentProjectId,
           publico: data.publico,
