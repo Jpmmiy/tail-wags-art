@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/api/public/applyfy')({
+export const Route = createFileRoute('/api/public/webhook')({
   server: {
     handlers: {
       POST: async ({ request }) => {
