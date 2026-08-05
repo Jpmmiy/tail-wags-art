@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { nomePais, nomeRegiao } from "@/lib/locais";
 import type { CorpoBusca, ImovelEncontrado } from "@/lib/imoveis-tipos";
+import { calculateScore } from "@/config/scoring";
 
 const CAMPOS = [
   "places.id",
@@ -9,10 +10,13 @@ const CAMPOS = [
   "places.formattedAddress",
   "places.rating",
   "places.userRatingCount",
-  "places.nationalPhoneNumber",
   "places.websiteUri",
   "places.googleMapsUri",
   "places.photos",
+  "places.reviews",
+  "places.priceLevel",
+  "places.editorialSummary",
+  "places.location",
 ].join(",");
 
 function linkAirbnb(cidade: string, estado: string, pais: string) {
@@ -24,28 +28,43 @@ function linkAirbnb(cidade: string, estado: string, pais: string) {
 function exemplos(c: CorpoBusca): ImovelEncontrado[] {
   const uf = c.regiao ? nomeRegiao(c.pais, c.regiao) : nomePais(c.pais);
   const base = [
-    { nome: "Pousada Recanto da Serra", nota: 4.6, av: 128, fotos: 8 },
-    { nome: "Chalés Vista Panorâmica", nota: 4.8, av: 64, fotos: 6 },
-    { nome: "Casa Jardim Central", nota: 4.3, av: 41, fotos: 5 },
-    { nome: "Residencial Alto do Mirante", nota: 4.9, av: 212, fotos: 12 },
-    { nome: "Loft Centro Histórico", nota: 4.4, av: 87, fotos: 7 },
-    { nome: "Villa das Araucárias", nota: 4.7, av: 33, fotos: 9 },
+    { nome: "Pousada Recanto da Serra", nota: 4.6, av: 128, fotos: 4, site: null, reviews: [{ publishTime: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000).toISOString() }] },
+    { nome: "Chalés Vista Panorâmica", nota: 4.8, av: 64, fotos: 6, site: "https://exemplo.com", reviews: [{ publishTime: new Date().toISOString() }] },
+    { nome: "Casa Jardim Central", nota: 3.8, av: 12, fotos: 3, site: null, reviews: [{ publishTime: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000).toISOString() }] },
+    { nome: "Residencial Alto do Mirante", nota: 4.9, av: 212, fotos: 15, site: "https://exemplo.com", reviews: [{ publishTime: new Date().toISOString() }] },
+    { nome: "Loft Centro Histórico", nota: 4.4, av: 87, fotos: 7, site: null, reviews: [{ publishTime: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString() }] },
+    { nome: "Villa das Araucárias", nota: 4.7, av: 33, fotos: 22, site: "https://exemplo.com", reviews: [{ publishTime: new Date().toISOString() }] },
   ];
 
-  return base.map((b, i) => ({
-    id: `demo-${i}`,
-    nome: b.nome,
-    endereco: `${c.cidade}, ${uf}`,
-    nota: b.nota,
-    avaliacoes: b.av,
-    telefone: null,
-    site: null,
-    mapa: `https://www.google.com/maps/search/${encodeURIComponent(
-      `${b.nome} ${c.cidade} ${uf}`,
-    )}`,
-    airbnb: linkAirbnb(c.cidade, uf, nomePais(c.pais)),
-    fotos: b.fotos,
-  }));
+  return base.map((b, i) => {
+    const p = {
+      id: `demo-${i}`,
+      displayName: { text: b.nome },
+      formattedAddress: `${c.cidade}, ${uf}`,
+      rating: b.nota,
+      userRatingCount: b.av,
+      websiteUri: b.site,
+      photos: Array(b.fotos).fill({}),
+      reviews: b.reviews,
+      googleMapsUri: "#",
+    };
+    
+    const score = calculateScore(p);
+
+    return {
+      id: p.id,
+      nome: b.nome,
+      endereco: p.formattedAddress,
+      nota: b.nota,
+      avaliacoes: b.av,
+      telefone: null,
+      site: b.site,
+      mapa: p.googleMapsUri,
+      airbnb: linkAirbnb(c.cidade, uf, nomePais(c.pais)),
+      fotos: b.fotos,
+      score,
+    } as ImovelEncontrado;
+  }).sort((a, b) => (b.score?.total || 0) - (a.score?.total || 0));
 }
 
 function json(dados: unknown, status = 200) {
@@ -123,28 +142,39 @@ export const Route = createFileRoute("/api/imoveis")({
               formattedAddress?: string;
               rating?: number;
               userRatingCount?: number;
-              nationalPhoneNumber?: string;
               websiteUri?: string;
               googleMapsUri?: string;
               photos?: unknown[];
+              reviews?: Array<{ publishTime: string }>;
+              priceLevel?: string;
+              editorialSummary?: { text?: string };
+              location?: { latitude: number; longitude: number };
             }>;
           };
 
-          const imoveis: ImovelEncontrado[] = (dados.places ?? []).map((p) => ({
-            id: p.id,
-            nome: p.displayName?.text ?? "Sem nome",
-            endereco: p.formattedAddress ?? `${corpo.cidade}, ${uf}`,
-            nota: p.rating ?? null,
-            avaliacoes: p.userRatingCount ?? null,
-            telefone: p.nationalPhoneNumber ?? null,
-            site: p.websiteUri ?? null,
-            mapa: p.googleMapsUri ?? null,
-            airbnb:
-              corpo.modalidade === "temporada"
-                ? linkAirbnb(corpo.cidade, uf, paisNome)
-                : null,
-            fotos: p.photos?.length ?? 0,
-          }));
+          const imoveis: ImovelEncontrado[] = (dados.places ?? []).map((p) => {
+            const score = calculateScore(p);
+            return {
+              id: p.id,
+              nome: p.displayName?.text ?? "Sem nome",
+              endereco: p.formattedAddress ?? `${corpo.cidade}, ${uf}`,
+              nota: p.rating ?? null,
+              avaliacoes: p.userRatingCount ?? null,
+              telefone: null,
+              site: p.websiteUri ?? null,
+              mapa: p.googleMapsUri ?? null,
+              airbnb:
+                corpo.modalidade === "temporada"
+                  ? linkAirbnb(corpo.cidade, uf, paisNome)
+                  : null,
+              fotos: p.photos?.length ?? 0,
+              score,
+              priceLevel: p.priceLevel,
+              editorialSummary: p.editorialSummary?.text,
+              reviews: p.reviews,
+              location: p.location,
+            } as ImovelEncontrado;
+          }).sort((a, b) => (b.score?.total || 0) - (a.score?.total || 0));
 
           return json({ fonte: "google" as const, imoveis });
         } catch (e) {
