@@ -104,6 +104,7 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
 };
 
 export const saveDeliverable = async (projectId: string, shotData: any) => {
+  // @ts-ignore - Temporary bypass until types are regenerated
   const { error } = await supabase.from("deliverables").upsert({
     project_id: projectId,
     shot_number: shotData.shot_number,
@@ -137,6 +138,7 @@ export const loadProject = async (id: string) => {
   if (error) return null;
   return project as any;
 };
+
 
 
 
