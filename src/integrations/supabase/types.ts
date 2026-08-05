@@ -123,13 +123,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "mentor_messages_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "mentor_messages_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -173,44 +166,36 @@ export type Database = {
       }
       projects: {
         Row: {
-          config: Json | null
-          created_at: string | null
-          description: string | null
+          created_at: string
+          current_step: number | null
           id: string
-          owner_id: string
-          status: Database["public"]["Enums"]["project_status"] | null
-          title: string
-          updated_at: string | null
+          modalidade: string | null
+          session_id: string
+          status: string | null
+          updated_at: string
+          user_id: string | null
         }
         Insert: {
-          config?: Json | null
-          created_at?: string | null
-          description?: string | null
+          created_at?: string
+          current_step?: number | null
           id?: string
-          owner_id: string
-          status?: Database["public"]["Enums"]["project_status"] | null
-          title: string
-          updated_at?: string | null
+          modalidade?: string | null
+          session_id: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
         Update: {
-          config?: Json | null
-          created_at?: string | null
-          description?: string | null
+          created_at?: string
+          current_step?: number | null
           id?: string
-          owner_id?: string
-          status?: Database["public"]["Enums"]["project_status"] | null
-          title?: string
-          updated_at?: string | null
+          modalidade?: string | null
+          session_id?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "projects_owner_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       properties: {
         Row: {
