@@ -160,6 +160,10 @@ export type ImovelSelecionado = {
   anfitriao: string;
   diaria: number;
   potencial: number;
+  nota: number;
+  avaliacoes: number;
+  fotos: number;
+  problemas: string[];
   mapa?: string | null;
   airbnb?: string | null;
   site?: string | null;
