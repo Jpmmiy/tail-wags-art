@@ -1,9 +1,7 @@
 "use client";
-import * as React from "react";
-
-
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "@/components/ui/link";
+
 import {
   Check,
   Copy,
@@ -178,7 +176,9 @@ export function Quiz() {
 
 
 
+      <button onClick={() => setPasso(1)} className="bg-red-500 p-2">FORCAR</button>
       {passo === 0 && (
+
 
         <div className="space-y-6 motion-safe:animate-rise">
             <div className="grid gap-4 sm:grid-cols-2">
