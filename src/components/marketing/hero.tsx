@@ -1,20 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Search, MapPin, Sparkles, Building2, Flame, ArrowRight, User, Check, X } from "lucide-react";
+import { Search, MapPin, Sparkles, Building2, Flame, ArrowRight, User, Check, X, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LiquidBackdrop, MetalBlob } from "@/components/liquid/backdrop";
 import { PointerLight } from "@/components/liquid/pointer";
 import { Wordmark } from "./wordmark";
 import { Reveal } from "@/components/reveal";
 import { Cta } from "@/components/brand/cta";
+import { PAISES, cidadesDe, regioesDe } from "@/lib/locais";
 import type { ImovelEncontrado } from "@/lib/imoveis-tipos";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 
 export function Hero() {
+  const [paisId, setPaisId] = useState("BR");
+  const [regiaoId, setRegiaoId] = useState("");
   const [cidade, setCidade] = useState("");
+
   const [buscando, setBuscando] = useState(false);
   const [resultados, setResultados] = useState<ImovelEncontrado[]>([]);
   const [emailGateOpen, setEmailGateOpen] = useState(false);
@@ -31,7 +36,7 @@ export function Hero() {
       const r = await fetch("/api/imoveis", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ modalidade: "temporada", pais: "BR", cidade }),
+        body: JSON.stringify({ modalidade: "temporada", pais: paisId, regiao: regiaoId, cidade }),
       });
       const d = await r.json();
       if (!r.ok) {
@@ -67,7 +72,7 @@ export function Hero() {
       localStorage.setItem("nexofly_temp_email", email);
       
       // Salva o imóvel no localStorage para o Quiz recuperar
-      localStorage.setItem("nexofly_temp_imovel", JSON.stringify(selectedImovel));
+      localStorage.setItem("nexofly_temp_imovel", JSON.stringify({ ...selectedImovel, paisId, regiaoId, cidade }));
       
       navigate({ to: "/painel/criar" });
     } catch (err) {
@@ -101,31 +106,92 @@ export function Hero() {
           </Reveal>
 
           <Reveal delay={200} className="mt-10 w-full max-w-2xl">
-            <form onSubmit={buscar} className="glass group relative flex flex-col gap-2 rounded-2xl p-2 sm:flex-row sm:items-center sm:rounded-full">
-              <div className="relative flex flex-1 items-center px-4 py-2 sm:py-0">
-                <MapPin className="mr-3 size-5 text-stone/60" />
-                <input
-                  type="text"
-                  value={cidade}
-                  onChange={(e) => setCidade(e.target.value)}
-                  placeholder="Em qual cidade você quer prospectar?"
-                  className="w-full bg-transparent text-[1.05rem] text-bone outline-none placeholder:text-stone/50"
-                />
+            <div className="glass group relative flex flex-col gap-4 rounded-3xl p-6 shadow-2xl">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* País */}
+                <div className="space-y-1.5 text-left">
+                  <label className="flex items-center gap-2 text-[10px] uppercase font-bold text-stone px-1">
+                    <Globe className="size-3" /> País
+                  </label>
+                  <select 
+                    value={paisId}
+                    onChange={(e) => {
+                      setPaisId(e.target.value);
+                      setRegiaoId("");
+                      setCidade("");
+                    }}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50 appearance-none cursor-pointer"
+                  >
+                    {PAISES.map(p => (
+                      <option key={p.id} value={p.id} className="bg-ink">{p.bandeira} {p.nome}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Estado */}
+                {regioesDe(paisId).length > 0 && (
+                  <div className="space-y-1.5 text-left">
+                    <label className="flex items-center gap-2 text-[10px] uppercase font-bold text-stone px-1">
+                      <MapPin className="size-3" /> Estado
+                    </label>
+                    <select 
+                      value={regiaoId}
+                      onChange={(e) => {
+                        setRegiaoId(e.target.value);
+                        setCidade("");
+                      }}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50 appearance-none cursor-pointer"
+                    >
+                      <option value="" className="bg-ink">Selecione...</option>
+                      {regioesDe(paisId).map(r => (
+                        <option key={r.id} value={r.id} className="bg-ink">{r.nome}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Cidade */}
+                <div className="space-y-1.5 text-left">
+                  <label className="flex items-center gap-2 text-[10px] uppercase font-bold text-stone px-1">
+                    <Building2 className="size-3" /> Cidade
+                  </label>
+                  {cidadesDe(paisId, regiaoId).length > 0 ? (
+                    <select 
+                      value={cidade}
+                      onChange={(e) => setCidade(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50 appearance-none cursor-pointer"
+                    >
+                      <option value="" className="bg-ink">Selecione...</option>
+                      {cidadesDe(paisId, regiaoId).map(c => (
+                        <option key={c} value={c} className="bg-ink">{c}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input 
+                      value={cidade} 
+                      onChange={e => setCidade(e.target.value)} 
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50" 
+                      placeholder="Nome da cidade..." 
+                    />
+                  )}
+                </div>
               </div>
+
               <button
-                type="submit"
-                disabled={buscando}
-                className="metal-pill flex h-12 items-center justify-center gap-2 rounded-xl px-8 font-bold text-black transition-all hover:scale-[1.02] sm:rounded-full"
+                onClick={buscar}
+                disabled={buscando || !cidade}
+                className="metal-pill flex h-14 items-center justify-center gap-2 rounded-2xl px-8 font-bold text-black transition-all hover:scale-[1.01] active:scale-95 shadow-xl shadow-chrome/10"
               >
                 {buscando ? (
                   <Sparkles className="size-4 animate-spin" />
                 ) : (
                   <>
-                    Buscar imóveis <ArrowRight className="size-4" />
+                    Buscar imóveis em {cidade || '...'} <ArrowRight className="size-4" />
                   </>
                 )}
               </button>
-            </form>
+            </div>
+
           </Reveal>
         </div>
 
