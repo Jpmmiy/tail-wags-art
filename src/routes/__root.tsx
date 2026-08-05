@@ -113,6 +113,11 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="pt-BR" className="dark h-full">
       <head>
         <HeadContent />
+        <script 
+          src={`https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`}
+          async
+          defer
+        ></script>
       </head>
       <body className="flex min-h-full flex-col bg-ink">
         {children}

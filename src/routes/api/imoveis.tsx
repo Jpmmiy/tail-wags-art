@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-
 import { nomePais, nomeRegiao } from "@/lib/locais";
 import type { CorpoBusca, ImovelEncontrado } from "@/lib/imoveis-tipos";
 import { calculateScore } from "@/config/scoring";
+import { supabase } from "@/integrations/supabase/client";
 
 const CAMPOS = [
   "places.id",
@@ -20,52 +20,17 @@ const CAMPOS = [
   "places.location",
 ].join(",");
 
+const TYPES_TEMPORADA = [
+  "bed_and_breakfast", "guest_house", "cottage", "hostel", "inn", 
+  "lodging", "farmstay", "private_guest_room", "resort_hotel", 
+  "extended_stay_hotel", "motel"
+];
+
+const TYPES_IMOBILIARIO = ["real_estate_agency"];
+
 function linkAirbnb(cidade: string, estado: string, pais: string) {
   const termo = encodeURIComponent(`${cidade}, ${estado}, ${pais}`);
   return `https://www.airbnb.com.br/s/${termo}/homes`;
-}
-
-/** Resultados de demonstração, usados quando não há chave configurada. */
-function exemplos(c: CorpoBusca): ImovelEncontrado[] {
-  const uf = c.regiao ? nomeRegiao(c.pais, c.regiao) : nomePais(c.pais);
-  const base = [
-    { nome: "Pousada Recanto da Serra", nota: 4.6, av: 128, fotos: 4, site: null, reviews: [{ publishTime: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000).toISOString() }] },
-    { nome: "Chalés Vista Panorâmica", nota: 4.8, av: 64, fotos: 6, site: "https://exemplo.com", reviews: [{ publishTime: new Date().toISOString() }] },
-    { nome: "Casa Jardim Central", nota: 3.8, av: 12, fotos: 3, site: null, reviews: [{ publishTime: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000).toISOString() }] },
-    { nome: "Residencial Alto do Mirante", nota: 4.9, av: 212, fotos: 15, site: "https://exemplo.com", reviews: [{ publishTime: new Date().toISOString() }] },
-    { nome: "Loft Centro Histórico", nota: 4.4, av: 87, fotos: 7, site: null, reviews: [{ publishTime: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString() }] },
-    { nome: "Villa das Araucárias", nota: 4.7, av: 33, fotos: 22, site: "https://exemplo.com", reviews: [{ publishTime: new Date().toISOString() }] },
-  ];
-
-  return base.map((b, i) => {
-    const p = {
-      id: `demo-${i}`,
-      displayName: { text: b.nome },
-      formattedAddress: `${c.cidade}, ${uf}`,
-      rating: b.nota,
-      userRatingCount: b.av,
-      websiteUri: b.site,
-      photos: Array(b.fotos).fill({}),
-      reviews: b.reviews,
-      googleMapsUri: "#",
-    };
-    
-    const score = calculateScore(p);
-
-    return {
-      id: p.id,
-      nome: b.nome,
-      endereco: p.formattedAddress,
-      nota: b.nota,
-      avaliacoes: b.av,
-      telefone: null,
-      site: b.site,
-      mapa: p.googleMapsUri,
-      airbnb: linkAirbnb(c.cidade, uf, nomePais(c.pais)),
-      fotos: b.fotos,
-      score,
-    } as ImovelEncontrado;
-  }).sort((a, b) => (b.score?.total || 0) - (a.score?.total || 0));
 }
 
 function json(dados: unknown, status = 200) {
@@ -75,13 +40,30 @@ function json(dados: unknown, status = 200) {
   });
 }
 
+async function fetchPlaces(url: string, body: any, key: string) {
+  const r = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": key,
+      "X-Goog-FieldMask": CAMPOS,
+    },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) {
+    const err = await r.text();
+    throw new Error(err);
+  }
+  return await r.json();
+}
+
 export const Route = createFileRoute("/api/imoveis")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        let corpo: CorpoBusca;
+        let corpo: CorpoBusca & { forceRefresh?: boolean };
         try {
-          corpo = (await request.json()) as CorpoBusca;
+          corpo = (await request.json()) as any;
         } catch {
           return json({ erro: "Corpo inválido." }, 400);
         }
@@ -91,127 +73,158 @@ export const Route = createFileRoute("/api/imoveis")({
         }
 
         const chave = process.env["GOOGLE_MAPS_API_KEY"];
+        if (!chave) return json({ erro: "Chave não configurada." }, 500);
+
         const paisNome = nomePais(corpo.pais);
         const uf = corpo.regiao ? nomeRegiao(corpo.pais, corpo.regiao) : paisNome;
 
-        if (!chave) {
-          return json(
-            {
-              erro: "Chave do Google Places não configurada.",
-              detalhe: "Configure a variável de ambiente GOOGLE_MAPS_API_KEY.",
-            },
-            500,
-          );
-        }
+        // 1. RESOLVER CIDADE
+        const citySearch = await fetchPlaces(
+          "https://places.googleapis.com/v1/places:searchText",
+          {
+            textQuery: `${corpo.cidade}, ${uf}, ${paisNome}`,
+            maxResultCount: 1,
+            languageCode: "pt-BR",
+          },
+          chave
+        );
 
-        const consulta =
-          corpo.modalidade === "temporada"
-            ? `pousadas, chalés e casas de temporada em ${corpo.cidade}, ${uf}, ${paisNome}`
-            : `imobiliárias e imóveis para alugar em ${corpo.cidade}, ${uf}, ${paisNome}`;
+        const cityPlace = citySearch.places?.[0];
+        if (!cityPlace) return json({ erro: "Cidade não encontrada." }, 404);
 
-        try {
-          const r = await fetch(
-            "https://places.googleapis.com/v1/places:searchText",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Goog-Api-Key": chave,
-                "X-Goog-FieldMask": CAMPOS,
-              },
-              body: JSON.stringify({
-                textQuery: consulta,
-                languageCode: corpo.pais === "PT" ? "pt-PT" : "pt-BR",
-                regionCode: corpo.pais,
-                maxResultCount: 12,
-                ...(corpo.modalidade === "temporada"
-                  ? { includedType: "lodging" }
-                  : {}),
-              }),
-            },
-          );
+        const cityPlaceId = cityPlace.id;
+        const cityLocation = cityPlace.location;
 
-          if (!r.ok) {
-            const detalhe = await r.text();
-            return json(
-              {
-                erro: "A busca falhou no Google Places.",
-                detalhe: detalhe.slice(0, 300),
-              },
-              502,
-            );
-          }
+        // 2. CHECK CACHE
+        if (!corpo.forceRefresh) {
+          const { data: cache } = await supabase
+            .from("radar_cache")
+            .select("*")
+            .eq("cidade_place_id", cityPlaceId)
+            .eq("modalidade", corpo.modalidade)
+            .maybeSingle();
 
-          const dados = (await r.json()) as {
-            places?: Array<{
-              id: string;
-              displayName?: { text?: string };
-              formattedAddress?: string;
-              addressComponents?: Array<{
-                longText: string;
-                shortText: string;
-                types: string[];
-              }>;
-              rating?: number;
-              userRatingCount?: number;
-              websiteUri?: string;
-              googleMapsUri?: string;
-              photos?: Array<{ name: string }>;
-              reviews?: Array<{ publishTime: string }>;
-              priceLevel?: string;
-              editorialSummary?: { text?: string };
-              location?: { latitude: number; longitude: number };
-            }>;
-          };
-
-          const imoveis: ImovelEncontrado[] = (dados.places ?? []).map((p) => {
-            const score = calculateScore(p);
-            
-            // Tentar extrair UF do addressComponents ou formattedAddress
-            let ufReal = uf;
-            const ufComponent = p.addressComponents?.find(c => c.types.includes("administrative_area_level_1"));
-            if (ufComponent) {
-              ufReal = ufComponent.shortText;
-            } else if (p.formattedAddress?.includes(", ")) {
-              const partes = p.formattedAddress.split(", ");
-              const ultimaParte = partes[partes.length - 1];
-              const penultimaParte = partes[partes.length - 2];
-              if (penultimaParte?.length === 2) ufReal = penultimaParte;
+          if (cache && cache.criado_em) {
+            const dias = (Date.now() - new Date(cache.criado_em).getTime()) / (1000 * 60 * 60 * 24);
+            if (dias < 7) {
+              return json({ 
+                fonte: "cache", 
+                imoveis: cache.resultados, 
+                atualizado_ha: Math.floor(dias),
+                total: cache.total_encontrados 
+              });
             }
-
-            return {
-              id: p.id,
-              nome: p.displayName?.text ?? "Sem nome",
-              endereco: p.formattedAddress ?? `${corpo.cidade}, ${ufReal}`,
-              nota: p.rating ?? null,
-              avaliacoes: p.userRatingCount ?? null,
-              telefone: null,
-              site: p.websiteUri ?? null,
-              mapa: p.googleMapsUri ?? null,
-              airbnb:
-                corpo.modalidade === "temporada"
-                  ? linkAirbnb(corpo.cidade, ufReal, paisNome)
-                  : null,
-              fotos: p.photos?.length ?? 0,
-              primeiraFoto: p.photos?.[0]?.name,
-              score,
-              priceLevel: p.priceLevel,
-              editorialSummary: p.editorialSummary?.text,
-              reviews: p.reviews,
-              location: p.location,
-            } as ImovelEncontrado;
-          }).sort((a, b) => (b.score?.total || 0) - (a.score?.total || 0));
-
-          return json({ fonte: "google" as const, imoveis });
-        } catch (e) {
-          return json(
-            {
-              erro: "Não consegui falar com o Google Places.",
-              detalhe: String(e),
-            },
-            502,
-          );
+          }
         }
+
+        // 3. BUSCAS EM PARALELO
+        const promises: Promise<any>[] = [];
+        const isTemporada = corpo.modalidade === "temporada";
+
+        // Step 2: Nearby Search (3 radii)
+        const types = isTemporada ? TYPES_TEMPORADA : TYPES_IMOBILIARIO;
+        [5000, 15000, 30000].forEach(radius => {
+          promises.push(
+            fetchPlaces("https://places.googleapis.com/v1/places:searchNearby", {
+              locationRestriction: { circle: { center: cityLocation, radius } },
+              includedTypes: types,
+              maxResultCount: 20,
+              languageCode: "pt-BR",
+            }, chave)
+          );
+        });
+
+        // Step 3: Text Search (specific keywords)
+        const queries = isTemporada 
+          ? [
+              `pousada em ${corpo.cidade}`, 
+              `chalé em ${corpo.cidade}`, 
+              `casa de temporada ${corpo.cidade}`, 
+              `flat ${corpo.cidade}`, 
+              `apart hotel ${corpo.cidade}`, 
+              `aluguel por temporada ${corpo.cidade}`
+            ]
+          : [
+              `imobiliária ${corpo.cidade}`, 
+              `corretor de imóveis ${corpo.cidade}`, 
+              `administradora de imóveis ${corpo.cidade}`, 
+              `construtora ${corpo.cidade}`
+            ];
+
+        queries.forEach(q => {
+          promises.push(
+            fetchPlaces("https://places.googleapis.com/v1/places:searchText", {
+              textQuery: q,
+              maxResultCount: 10,
+              languageCode: "pt-BR",
+              regionCode: corpo.pais,
+            }, chave)
+          );
+        });
+
+        const results = await Promise.allSettled(promises);
+        const allPlaces: any[] = [];
+        let successCount = 0;
+        
+        results.forEach(res => {
+          if (res.status === "fulfilled") {
+            successCount++;
+            if (res.value.places) allPlaces.push(...res.value.places);
+          }
+        });
+
+        if (successCount === 0 && results.length > 0) {
+          return json({ erro: "Todas as buscas no Google Places falharam. Verifique sua chave API." }, 502);
+        }
+
+        // Step 4: Deduplicate
+        const uniquePlaces = Array.from(new Map(allPlaces.map(p => [p.id, p])).values());
+
+        // Step 5: Score and Map
+        const imoveis: ImovelEncontrado[] = uniquePlaces.map(p => {
+          const score = calculateScore(p);
+          
+          let ufReal = uf;
+          const ufComponent = p.addressComponents?.find((c: any) => c.types.includes("administrative_area_level_1"));
+          if (ufComponent) ufReal = ufComponent.shortText;
+
+          return {
+            id: p.id,
+            nome: p.displayName?.text ?? "Sem nome",
+            endereco: p.formattedAddress ?? `${corpo.cidade}, ${ufReal}`,
+            nota: p.rating ?? null,
+            avaliacoes: p.userRatingCount ?? null,
+            telefone: null,
+            site: p.websiteUri ?? null,
+            mapa: p.googleMapsUri ?? null,
+            airbnb: isTemporada ? linkAirbnb(corpo.cidade, ufReal, paisNome) : null,
+            fotos: p.photos?.length ?? 0,
+            primeiraFoto: p.photos?.[0]?.name,
+            score,
+            priceLevel: p.priceLevel,
+            editorialSummary: p.editorialSummary?.text,
+            reviews: p.reviews,
+            location: p.location,
+          } as ImovelEncontrado;
+        }).sort((a, b) => (b.score?.total || 0) - (a.score?.total || 0));
+
+        // 4. SAVE CACHE
+        try {
+          await supabase
+            .from("radar_cache")
+            .upsert({
+              cidade_place_id: cityPlaceId,
+              cidade_nome: corpo.cidade,
+              modalidade: corpo.modalidade,
+              resultados: imoveis,
+              total_encontrados: imoveis.length,
+              criado_em: new Date().toISOString()
+            }, { onConflict: "cidade_place_id, modalidade" });
+        } catch (e) {
+          console.error("Cache save error:", e);
+        }
+
+        return json({ fonte: "google", imoveis, total: imoveis.length });
       },
     },
   },
