@@ -298,151 +298,199 @@ export function Quiz() {
 
       
       {passo === 0 && (
-
-
-        <div className="space-y-6 motion-safe:animate-rise">
+        <div className="space-y-6 motion-safe:animate-rise pb-20">
+            {/* Modalidade */}
             <div className="grid gap-4 sm:grid-cols-2">
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    console.log('Selecionando temporada');
-                    setModalidade('temporada');
-                  }} 
-
-                  className={cn(
-                    "glass p-6 rounded-2xl text-left transition-all hover:bg-white/5", 
-                    modalidade === 'temporada' && "rim-lit border-chrome/50"
-                  )}
-                >
-                    <div className="flex items-center gap-3 mb-2">
-                      <Home className={cn("size-5", modalidade === 'temporada' ? "text-chrome" : "text-stone")} />
-                      <h3 className="text-bone font-medium">Airbnb e temporada</h3>
-                    </div>
-                    <p className="text-xs text-stone">Pousadas, chalés e casas anunciadas por diária.</p>
-                </button>
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    console.log('Selecionando imobiliario');
-                    setModalidade('imobiliario');
-                  }} 
-
-                  className={cn(
-                    "glass p-6 rounded-2xl text-left transition-all hover:bg-white/5", 
-                    modalidade === 'imobiliario' && "rim-lit border-chrome/50"
-                  )}
-                >
-                    <div className="flex items-center gap-3 mb-2">
-                      <Building2 className={cn("size-5", modalidade === 'imobiliario' ? "text-chrome" : "text-stone")} />
-                      <h3 className="text-bone font-medium">Mercado imobiliário</h3>
-                    </div>
-                    <p className="text-xs text-stone">Imobiliárias e imóveis para alugar ou vender.</p>
-                </button>
+                {MODALIDADES.map((m) => (
+                  <button 
+                    key={m.id}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setModalidade(m.id);
+                    }} 
+                    className={cn(
+                      "glass p-6 rounded-2xl text-left transition-all hover:bg-white/5", 
+                      modalidade === m.id && "rim-lit border-chrome/50"
+                    )}
+                  >
+                      <div className="flex items-center gap-3 mb-2">
+                        <m.icone className={cn("size-5", modalidade === m.id ? "text-chrome" : "text-stone")} />
+                        <h3 className="text-bone font-medium">{m.titulo}</h3>
+                      </div>
+                      <p className="text-xs text-stone">{m.desc}</p>
+                  </button>
+                ))}
             </div>
 
-
+            {/* Radar Header */}
             {modalidade && (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {/* País */}
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase font-bold text-stone px-1">País</label>
-                      <select 
-                        value={paisId}
-                        onChange={(e) => {
-                          setPaisId(e.target.value);
-                          setRegiaoId("");
-                          setCidade("");
-                        }}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50"
-                      >
-                        {PAISES.map(p => (
-                          <option key={p.id} value={p.id} className="bg-ink">{p.bandeira} {p.nome}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Estado / Região (se houver) */}
-                    {regioesDe(paisId).length > 0 && (
+                  <div className="glass p-6 rounded-2xl border-white/5">
+                    <div className="flex flex-col gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] uppercase font-bold text-stone px-1">Estado</label>
-                        <select 
-                          value={regiaoId}
-                          onChange={(e) => {
-                            setRegiaoId(e.target.value);
-                            setCidade("");
-                          }}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50"
-                        >
-                          <option value="" className="bg-ink">Selecione...</option>
-                          {regioesDe(paisId).map(r => (
-                            <option key={r.id} value={r.id} className="bg-ink">{r.nome}</option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-
-                    {/* Cidade */}
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase font-bold text-stone px-1">Cidade</label>
-                      {cidadesDe(paisId, regiaoId).length > 0 ? (
-                        <select 
-                          value={cidade}
-                          onChange={(e) => setCidade(e.target.value)}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50"
-                        >
-                          <option value="" className="bg-ink">Selecione...</option>
-                          {cidadesDe(paisId, regiaoId).map(c => (
-                            <option key={c} value={c} className="bg-ink">{c}</option>
-                          ))}
-                        </select>
-                      ) : (
-                        <input 
+                        <label className="text-[10px] uppercase font-bold text-stone px-1">Localização Alvo</label>
+                        <CityAutocomplete 
                           value={cidade} 
-                          onChange={e => setCidade(e.target.value)} 
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50" 
-                          placeholder="Digite a cidade..." 
+                          onChange={(val) => setCidade(val)}
+                          className="py-4"
                         />
-                      )}
+                      </div>
+
+                      <button 
+                        disabled={buscando || !cidade}
+                        onClick={() => ativarRadar()} 
+                        className={cn(
+                          "metal-pill w-full py-4 rounded-2xl text-black font-bold hover:scale-[1.02] active:scale-95 transition-all text-lg shadow-xl shadow-chrome/10 flex items-center justify-center gap-2",
+                          (buscando || !cidade) && "opacity-50 cursor-not-allowed"
+                        )}
+                      >
+                        {buscando ? (
+                          <>
+                            <Loader2 className="size-5 animate-spin" />
+                            {progressoTexto}
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="size-5" />
+                            Ativar Radar em {cidade || '...'}
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
-
-                  <button 
-                    onClick={async (e) => {
-                      e.preventDefault();
-                      if (!cidade) {
-                        toast.error("Por favor, selecione ou digite uma cidade.");
-                        return;
-                      }
-                      console.log('Buscando imóveis:', { modalidade, paisId, regiaoId, cidade });
-                      try {
-                        const r = await fetch("/api/imoveis", { 
-                          method: "POST", 
-                          body: JSON.stringify({ modalidade, cidade, pais: paisId, regiao: regiaoId }),
-                          headers:{"Content-Type":"application/json"} 
-                        });
-                        const d = await r.json();
-                        setResultados(d.imoveis ?? []);
-                      } catch (err) {
-                        console.error('Erro na busca:', err);
-                        toast.error("Erro ao buscar imóveis.");
-                      }
-                    }} 
-                    className="metal-pill w-full py-4 rounded-2xl text-black font-bold hover:scale-[1.02] active:scale-95 transition-all text-lg shadow-xl shadow-chrome/10"
-                  >
-                    Buscar imóveis em {cidade || '...'}
-                  </button>
                 </div>
             )}
 
+            {/* Resultados do Radar */}
+            {resultados.length > 0 && !buscando && (
+              <div className="space-y-6">
+                {/* Sumário e Cache */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass p-4 rounded-xl border-chrome/20">
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-bone">
+                      {stats.varridos} imóveis varridos · <span className="text-orange">{stats.alta} com oportunidade alta</span> · {stats.semSite} sem site próprio
+                    </p>
+                    {atualizadoHa !== null && (
+                      <p className="text-[10px] text-stone">
+                        Atualizado há {atualizadoHa} dias. 
+                        <button onClick={() => ativarRadar(true)} className="ml-2 text-chrome hover:underline">Atualizar agora</button>
+                      </p>
+                    )}
+                  </div>
+                  <button 
+                    onClick={exportarCSV}
+                    className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-chrome border border-chrome/30 px-3 py-1.5 rounded-lg hover:bg-chrome/5"
+                  >
+                    <Download className="size-3" /> Exportar lista (CSV)
+                  </button>
+                </div>
 
-            <div className="grid gap-4">
-                {resultados.map(im => (
-                    <div key={im.id} onClick={(e) => { e.preventDefault(); setEscolhido(im); avancar(); }} className="glass p-5 rounded-2xl cursor-pointer">
-                        <h4>{im.nome}</h4>
-                    </div>
-                ))}
-            </div>
+                {/* Filtros e Ordenação */}
+                <div className="flex flex-wrap gap-2 items-center">
+                  <div className="flex gap-1 bg-white/5 p-1 rounded-lg">
+                    {[
+                      { id: 'todos', label: 'Todos' },
+                      { id: 'alta', label: 'Alta' },
+                      { id: 'media', label: 'Média' },
+                      { id: 'sem_site', label: 'Sem site' },
+                      { id: 'poucas_fotos', label: 'Poucas fotos' },
+                    ].map(f => (
+                      <button
+                        key={f.id}
+                        onClick={() => setFiltro(f.id as any)}
+                        className={cn(
+                          "px-3 py-1 text-[10px] font-bold rounded-md transition-all",
+                          filtro === f.id ? "bg-white/10 text-bone shadow-sm" : "text-stone hover:text-bone"
+                        )}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-1 bg-white/5 p-1 rounded-lg ml-auto">
+                    {[
+                      { id: 'score', label: 'Score', icone: Sparkles },
+                      { id: 'avaliacoes', label: 'Avaliações', icone: Star },
+                      { id: 'sem_site', label: 'Sem site', icone: LayoutTemplate },
+                    ].map(o => (
+                      <button
+                        key={o.id}
+                        onClick={() => setOrdenacao(o.id as any)}
+                        title={`Ordenar por ${o.label}`}
+                        className={cn(
+                          "p-1.5 rounded-md transition-all",
+                          ordenacao === o.id ? "bg-white/10 text-chrome shadow-sm" : "text-stone hover:text-bone"
+                        )}
+                      >
+                        <o.icone className="size-3.5" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Lista de Imóveis */}
+                <div className="grid gap-4">
+                    {resultadosFiltrados.map(im => (
+                        <div 
+                          key={im.id} 
+                          onClick={(e) => { e.preventDefault(); setEscolhido(im); avancar(); }} 
+                          className="glass p-5 rounded-2xl cursor-pointer hover:bg-white/5 transition-all group relative overflow-hidden"
+                        >
+                            {/* Badge de Score */}
+                            <div className="absolute top-0 right-0 p-2">
+                               <div className={cn(
+                                 "text-[10px] font-bold px-2 py-0.5 rounded-bl-lg uppercase",
+                                 im.score?.faixa === 'ALTA' ? "bg-orange text-black" : 
+                                 im.score?.faixa === 'MEDIA' ? "bg-amber text-black" : "bg-white/10 text-stone"
+                               )}>
+                                 {im.score?.total} pts
+                               </div>
+                            </div>
+
+                            <div className="flex gap-4">
+                                {im.primeiraFoto ? (
+                                  <img 
+                                    src={`https://places.googleapis.com/v1/${im.primeiraFoto}/media?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&maxWidthPx=200`} 
+                                    className="size-16 rounded-lg object-cover bg-white/5 shrink-0" 
+                                    alt={im.nome}
+                                  />
+                                ) : (
+                                  <div className="size-16 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                                    <Home className="size-6 text-stone" />
+                                  </div>
+                                )}
+                                <div className="space-y-1 pr-12">
+                                    <h4 className="text-bone font-medium leading-tight group-hover:text-chrome transition-colors">{im.nome}</h4>
+                                    <p className="text-[10px] text-stone line-clamp-1 flex items-center gap-1">
+                                      <MapPin className="size-2.5" /> {im.endereco}
+                                    </p>
+                                    <div className="flex items-center gap-2 pt-1">
+                                      {im.score?.signals.slice(0, 2).map((s, i) => (
+                                        <span key={i} className="text-[9px] text-stone bg-white/5 px-1.5 py-0.5 rounded border border-white/5 flex items-center gap-1">
+                                          <div className="size-1 rounded-full bg-chrome/50" /> {s}
+                                        </span>
+                                      ))}
+                                    </div>
+                                    <p className="text-[10px] font-mono text-chrome pt-1 italic">{im.score?.angulo}</p>
+                                </div>
+                            </div>
+                            
+                            <div className="absolute bottom-2 right-4 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                              <ChevronRight className="size-4 text-chrome" />
+                            </div>
+                        </div>
+                    ))}
+                    
+                    {resultadosFiltrados.length === 0 && (
+                      <div className="py-12 text-center space-y-2 glass rounded-2xl">
+                        <Info className="size-8 text-stone mx-auto" />
+                        <p className="text-stone text-sm">Nenhum imóvel encontrado com estes filtros.</p>
+                      </div>
+                    )}
+                </div>
+              </div>
+            )}
         </div>
       )}
 
