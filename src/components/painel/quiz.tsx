@@ -264,16 +264,23 @@ export function Quiz() {
   };
 
 
+  const nomeExibicao = useMemo(() => {
+    const n = escolhido?.nome?.trim() || "";
+    // Se o nome for muito curto ou genérico, usamos um fallback
+    if (n.length <= 3) return modalidade === 'temporada' ? "este anúncio" : "este imóvel";
+    return n;
+  }, [escolhido, modalidade]);
+
   const whatsMessage = useMemo(() => {
     if (!escolhido) return "";
     const dadoReal = escolhido.nota 
       ? `${escolhido.nota} com ${escolhido.avaliacoes} avaliações` 
       : escolhido.avaliacoes 
         ? `${escolhido.avaliacoes} avaliações`
-        : "o potencial do anúncio";
+        : "o potencial de mercado";
     
-    return `Oi! Vi o anúncio do ${escolhido.nome} — ${dadoReal} é resultado de gente que trabalha bem.\nReparei que as fotos não acompanham esse nível, e isso costuma segurar o clique antes da descrição.\nFiz um vídeo curto do imóvel pra te mostrar como ficaria. Sem compromisso.\nPosso te mandar aqui?`;
-  }, [escolhido]);
+    return `Oi! Vi o anúncio do ${nomeExibicao} — ${dadoReal} mostra que é um excelente produto.\nReparei que o material visual ainda não acompanha esse nível, o que acaba segurando o clique de muitos interessados.\nMontei uma estratégia de renovação visual e um roteiro de vídeo curto para valorizar o imóvel. Sem compromisso.\nPosso te mandar os detalhes aqui?`;
+  }, [escolhido, nomeExibicao]);
 
 
 
