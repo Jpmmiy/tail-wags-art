@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProjetosRouteImport } from './routes/projetos'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
@@ -25,6 +26,11 @@ import { Route as PainelContaRouteImport } from './routes/painel/conta'
 import { Route as ApiMentorRouteImport } from './routes/api/mentor'
 import { Route as ApiImoveisRouteImport } from './routes/api/imoveis'
 
+const ProjetosRoute = ProjetosRouteImport.update({
+  id: '/projetos',
+  path: '/projetos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PainelRoute = PainelRouteImport.update({
   id: '/painel',
   path: '/painel',
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/painel': typeof PainelRouteWithChildren
+  '/projetos': typeof ProjetosRoute
   '/api/imoveis': typeof ApiImoveisRoute
   '/api/mentor': typeof ApiMentorRoute
   '/painel/conta': typeof PainelContaRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/projetos': typeof ProjetosRoute
   '/api/imoveis': typeof ApiImoveisRoute
   '/api/mentor': typeof ApiMentorRoute
   '/painel/conta': typeof PainelContaRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/painel': typeof PainelRouteWithChildren
+  '/projetos': typeof ProjetosRoute
   '/api/imoveis': typeof ApiImoveisRoute
   '/api/mentor': typeof ApiMentorRoute
   '/painel/conta': typeof PainelContaRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/painel'
+    | '/projetos'
     | '/api/imoveis'
     | '/api/mentor'
     | '/painel/conta'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/projetos'
     | '/api/imoveis'
     | '/api/mentor'
     | '/painel/conta'
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/painel'
+    | '/projetos'
     | '/api/imoveis'
     | '/api/mentor'
     | '/painel/conta'
@@ -209,12 +221,20 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   PainelRoute: typeof PainelRouteWithChildren
+  ProjetosRoute: typeof ProjetosRoute
   ApiImoveisRoute: typeof ApiImoveisRoute
   ApiMentorRoute: typeof ApiMentorRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/projetos': {
+      id: '/projetos'
+      path: '/projetos'
+      fullPath: '/projetos'
+      preLoaderRoute: typeof ProjetosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/painel': {
       id: '/painel'
       path: '/painel'
@@ -356,6 +376,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   PainelRoute: PainelRouteWithChildren,
+  ProjetosRoute: ProjetosRoute,
   ApiImoveisRoute: ApiImoveisRoute,
   ApiMentorRoute: ApiMentorRoute,
 }
