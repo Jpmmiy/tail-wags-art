@@ -29,8 +29,13 @@ export function Planos() {
   const [codigo, setCodigo] = useState("");
   const [aplicado, setAplicado] = useState<string | null>(null);
 
+  const isCupomValido = aplicado === "PAIS2026";
+
   const mensal = PLANOS.find((p) => p.id === "mensal")!;
   const vitalicio = PLANOS.find((p) => p.id === "vitalicio")!;
+
+  const precoMensal = isCupomValido ? "169,00" : mensal.preco;
+  const precoVitalicio = isCupomValido ? "249,00" : vitalicio.preco;
 
   return (
     <section
@@ -93,9 +98,15 @@ export function Planos() {
           </form>
 
           {aplicado && (
-            <p className="mt-3 text-center text-[0.82rem] text-jade motion-safe:animate-rise">
-              Cupom <span className="font-semibold">{aplicado}</span> guardado.
-              O desconto aparece no pagamento.
+            <p className={cn(
+              "mt-3 text-center text-[0.82rem] motion-safe:animate-rise",
+              isCupomValido ? "text-jade" : "text-amber-400"
+            )}>
+              {isCupomValido ? (
+                <>Cupom <span className="font-semibold">{aplicado}</span> aplicado com sucesso!</>
+              ) : (
+                <>Cupom <span className="font-semibold">{aplicado}</span> é inválido.</>
+              )}
             </p>
           )}
         </Reveal>
@@ -112,8 +123,11 @@ export function Planos() {
 
               <p className="mt-6 flex items-baseline gap-1.5">
                 <span className="font-display text-[1.2rem] text-stone">R$</span>
-                <span className="font-display text-[2.7rem] font-semibold leading-none tracking-[-0.035em] text-bone">
-                  {mensal.preco}
+                <span className={cn(
+                  "font-display text-[2.7rem] font-semibold leading-none tracking-[-0.035em] transition-all duration-300",
+                  isCupomValido ? "text-jade" : "text-bone"
+                )}>
+                  {precoMensal}
                 </span>
                 <span className="ml-1 text-[0.8rem] text-stone">
                   {mensal.periodo}
@@ -166,8 +180,11 @@ export function Planos() {
                   <span className="font-display text-[1.5rem] text-stone">
                     R$
                   </span>
-                  <span className="metal-text font-display text-[4.2rem] font-semibold leading-none tracking-[-0.04em] sm:text-[4.8rem]">
-                    {vitalicio.preco}
+                  <span className={cn(
+                    "font-display text-[4.2rem] font-semibold leading-none tracking-[-0.04em] transition-all duration-300 sm:text-[4.8rem]",
+                    isCupomValido ? "text-jade" : "metal-text"
+                  )}>
+                    {precoVitalicio}
                   </span>
                 </p>
                 <div className="pb-1.5">
@@ -175,7 +192,7 @@ export function Planos() {
                     {vitalicio.periodo}
                   </p>
                   <p className="mt-1 text-[0.82rem] font-medium text-jade">
-                    Economiza R$ 1.789 no primeiro ano
+                    Economiza mais de 80% comparado ao mensal
                   </p>
                 </div>
               </div>
