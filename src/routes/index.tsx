@@ -41,22 +41,6 @@ function Home() {
         Pular para o conteúdo
       </a>
 
-      <div className="fixed inset-x-0 bottom-8 z-[100] flex justify-center px-4">
-        <div className="glass-deep flex items-center gap-4 rounded-2xl border border-white/10 p-4 shadow-2xl animate-rise">
-          <div className="flex flex-col gap-1">
-            <p className="text-sm font-medium text-bone">Logo Nexofly HD pronta</p>
-            <p className="text-xs text-stone">Clique no botão para baixar o arquivo SVG</p>
-          </div>
-          <a 
-            href="/nexofly-logo-hd.svg" 
-            download="nexofly-logo.svg"
-            className="metal-pill flex h-10 items-center justify-center rounded-xl px-4 text-xs font-bold text-[#08090B]"
-          >
-            Baixar Logo
-          </a>
-        </div>
-      </div>
-
       <ScrollSuave />
       <SiteHeader />
 
