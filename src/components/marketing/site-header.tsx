@@ -7,10 +7,11 @@ import { Cta } from "@/components/brand/cta";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
+  { href: "#plataforma", label: "Plataforma" },
+  { href: "#capacidades", label: "Recursos" },
+  { href: "#padrao", label: "Galeria" },
   { href: "#processo", label: "Como funciona" },
-  { href: "#plataforma", label: "Entregáveis" },
-  { href: "#planos", label: "Preço" },
-  { href: "#duvidas", label: "FAQ" },
+  { href: "#planos", label: "Planos" },
 ];
 
 export function SiteHeader() {
