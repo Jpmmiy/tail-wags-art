@@ -165,6 +165,19 @@ export function Quiz() {
       </header>
       <Progresso passo={passo} />
 
+      <div className="flex gap-4 p-4 bg-red-900/20 border border-red-500 rounded-lg text-bone text-sm">
+        <Info className="size-4 shrink-0" />
+        <div>
+          <p className="font-bold">DEBUG INFO:</p>
+          <p>Passo: {passo}</p>
+          <p>Modalidade: {modalidade || 'null'}</p>
+          <p>Cidade: {cidade}</p>
+          <p>Resultados: {resultados.length}</p>
+          <p>Projeto Carregado: {projetoCarregado ? 'Sim' : 'Não'}</p>
+        </div>
+      </div>
+
+
       {passo === 0 && (
         <div className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-2">
