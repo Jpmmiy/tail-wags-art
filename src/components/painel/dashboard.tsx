@@ -513,6 +513,8 @@ export function Dashboard() {
           <Wand2 className="size-4" strokeWidth={2} />
           Nova entrega
         </Link>
+
+
       </header>
 
       <Faturamento d={d} />
