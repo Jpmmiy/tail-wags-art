@@ -173,15 +173,6 @@ export function Quiz() {
 
 
 
-      <button 
-        className="bg-red-500 p-4 text-white font-bold w-full mb-4" 
-        onClick={() => {
-          console.log('CLIQUE NO BOTAO DE TESTE');
-          setPasso(1);
-        }}
-      >
-        FORÇAR PASSO 1
-      </button>
 
       {passo === 0 && (
 
