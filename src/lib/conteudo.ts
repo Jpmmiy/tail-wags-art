@@ -203,7 +203,7 @@ export const DUVIDAS = [
   },
   {
     p: "Qual a diferença entre o mensal e o vitalício?",
-    r: "Nas funcionalidades, nenhuma. O mensal é R$ 169,90 por mês enquanto você usar. O vitalício é R$ 249,90 uma vez só, nunca renova e já inclui o que for lançado depois.",
+    r: "Nas funcionalidades, nenhuma. O mensal é R$ 247,00 por mês enquanto você usar. O vitalício é R$ 497,00 uma vez só, nunca renova e já inclui o que for lançado depois.",
   },
   {
     p: "Funciona na minha cidade?",

@@ -192,7 +192,7 @@ export function Planos() {
                     {vitalicio.periodo}
                   </p>
                   <p className="mt-1 text-[0.82rem] font-medium text-jade">
-                    Economiza R$ 1.789 no primeiro ano
+                    Economiza mais de 80% comparado ao mensal
                   </p>
                 </div>
               </div>
