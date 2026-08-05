@@ -262,6 +262,36 @@ export type Database = {
           },
         ]
       }
+      radar_cache: {
+        Row: {
+          cidade_nome: string
+          cidade_place_id: string
+          criado_em: string | null
+          id: string
+          modalidade: string
+          resultados: Json
+          total_encontrados: number
+        }
+        Insert: {
+          cidade_nome: string
+          cidade_place_id: string
+          criado_em?: string | null
+          id?: string
+          modalidade: string
+          resultados: Json
+          total_encontrados: number
+        }
+        Update: {
+          cidade_nome?: string
+          cidade_place_id?: string
+          criado_em?: string | null
+          id?: string
+          modalidade?: string
+          resultados?: Json
+          total_encontrados?: number
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
