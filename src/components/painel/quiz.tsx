@@ -180,12 +180,15 @@ export function Quiz() {
 
   const [estilo, setEstilo] = useState("aconchegante");
   const [publico, setPublico] = useState("casais");
-  const [comodos, setComodos] = useState<string[]>(["Quarto principal", "Sala de estar"]);
+  const [comodos, setComodos] = useState<string[]>(["Sala", "Quarto principal"]);
   const [entregaveis, setEntregaveis] = useState<string[]>(["video", "abordagem"]);
   const [diaria, setDiaria] = useState("250");
   const [valorImobiliario, setValorImobiliario] = useState("450000");
   const [gerando, setGerando] = useState(false);
   const [aba, setAba] = useState("video");
+  const [videoVertical, setVideoVertical] = useState(true);
+  const [gerados, setGerados] = useState<string[]>([]);
+
 
   const inferirEstilo = (p: string) => {
     const mapa: Record<string, string> = {
