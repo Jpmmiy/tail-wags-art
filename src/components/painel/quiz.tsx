@@ -327,13 +327,56 @@ export function Quiz() {
                 <div className="space-y-4">
                   <div className="glass p-6 rounded-2xl border-white/5">
                     <div className="flex flex-col gap-4">
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] uppercase font-bold text-stone px-1">Localização Alvo</label>
-                        <CityAutocomplete 
-                          value={cidade} 
-                          onChange={(val) => setCidade(val)}
-                          className="py-4"
-                        />
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] uppercase font-bold text-stone px-1">País</label>
+                          <select 
+                            value={paisId}
+                            onChange={(e) => {
+                              setPaisId(e.target.value);
+                              setRegiaoId("");
+                              setCidade("");
+                            }}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50 text-sm appearance-none"
+                          >
+                            {PAISES.map(p => (
+                              <option key={p.id} value={p.id} className="bg-ink">{p.bandeira} {p.nome}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] uppercase font-bold text-stone px-1">Estado/Região</label>
+                          <select 
+                            value={regiaoId}
+                            onChange={(e) => {
+                              setRegiaoId(e.target.value);
+                              setCidade("");
+                            }}
+                            disabled={!regioesDe(paisId).length}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50 text-sm appearance-none disabled:opacity-50"
+                          >
+                            <option value="" className="bg-ink">Selecione...</option>
+                            {regioesDe(paisId).map(r => (
+                              <option key={r.id} value={r.id} className="bg-ink">{r.nome}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] uppercase font-bold text-stone px-1">Cidade</label>
+                          <select 
+                            value={cidade}
+                            onChange={(e) => setCidade(e.target.value)}
+                            disabled={!cidadesDe(paisId, regiaoId).length}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50 text-sm appearance-none disabled:opacity-50"
+                          >
+                            <option value="" className="bg-ink">Selecione...</option>
+                            {cidadesDe(paisId, regiaoId).map(c => (
+                              <option key={c} value={c} className="bg-ink">{c}</option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
 
                       <button 
