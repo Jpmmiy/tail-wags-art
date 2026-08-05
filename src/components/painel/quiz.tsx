@@ -123,8 +123,9 @@ export function Quiz() {
   }, []);
 
   const autosave = async (step: number, status: any = 'rascunho') => {
-    await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical }, status);
+    return await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical }, status);
   };
+
 
   const avancar = async (s: any = 'rascunho') => {
     const proximo = passo + 1;
