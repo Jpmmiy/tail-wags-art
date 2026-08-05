@@ -1,25 +1,29 @@
-export const CREDIT_COSTS = {
-  LITE: 10,
-  FAST: 25,
-  QUALITY: 100,
-  CREDITOS_DIARIOS_GRATIS: 50
+export const FLOW_CREDITS = {
+  DAILY_LIMIT: 50,
+  COST_PER_SHOT: 25,
+  RESET_HOURS: 24
 };
 
-export const VIDEO_PLAN = [
-  {
-    dia: 1,
-    justificativa: "são os dois clipes que mais convencem o anfitrião",
-    items: [
-      { id: "shot2", nome: "Área Social", shot: 2, modo: "FAST" },
-      { id: "shot3", nome: "Diferencial do Imóvel", shot: 3, modo: "FAST" }
-    ]
-  },
-  {
-    dia: 2,
-    justificativa: "complementam a narrativa com chegada e detalhes",
-    items: [
-      { id: "shot1", nome: "Fachada / Chegada", shot: 1, modo: "FAST" },
-      { id: "shot4", nome: "Detalhe e Frame Final", shot: 4, modo: "FAST" }
-    ]
-  }
-];
+export function getRemainingTime(lastGeneratedAt: Date) {
+  const resetTime = new Date(lastGeneratedAt.getTime() + FLOW_CREDITS.RESET_HOURS * 60 * 60 * 1000);
+  const now = new Date();
+  const diff = resetTime.getTime() - now.getTime();
+  
+  if (diff <= 0) return null;
+  
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  
+  return `${hours}h ${minutes}m`;
+}
+
+// Para manter compatibilidade temporária enquanto refatoro o quiz
+export const VIDEO_PLAN = {
+  daily_limit: FLOW_CREDITS.DAILY_LIMIT,
+  cost_per_shot: FLOW_CREDITS.COST_PER_SHOT
+};
+
+export const CREDIT_COSTS = {
+  SHOT: FLOW_CREDITS.COST_PER_SHOT
+};
+
