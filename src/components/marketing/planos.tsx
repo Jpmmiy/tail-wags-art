@@ -139,7 +139,7 @@ export function Planos() {
               </ul>
 
               <div className="mt-7">
-                <CtaGhost href="/painel" size="lg" className="w-full">
+                <CtaGhost href={mensal.href} size="lg" className="w-full">
                   {mensal.acao}
                 </CtaGhost>
               </div>
@@ -195,7 +195,7 @@ export function Planos() {
               </ul>
 
               <div className="mt-8">
-                <Cta href="/painel" size="lg" className="w-full">
+                <Cta href={vitalicio.href} size="lg" className="w-full">
                   {vitalicio.acao}
                 </Cta>
               </div>
