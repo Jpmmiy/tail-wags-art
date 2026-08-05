@@ -14,6 +14,88 @@ export type Database = {
   }
   public: {
     Tables: {
+      briefings: {
+        Row: {
+          comodos: Json | null
+          diaria: number | null
+          estilo_inferido: string | null
+          formato_video: string | null
+          id: string
+          project_id: string
+          publico: string | null
+        }
+        Insert: {
+          comodos?: Json | null
+          diaria?: number | null
+          estilo_inferido?: string | null
+          formato_video?: string | null
+          id?: string
+          project_id: string
+          publico?: string | null
+        }
+        Update: {
+          comodos?: Json | null
+          diaria?: number | null
+          estilo_inferido?: string | null
+          formato_video?: string | null
+          id?: string
+          project_id?: string
+          publico?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "briefings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deliverables: {
+        Row: {
+          conteudo: string | null
+          creditos: number | null
+          dia_plano: number | null
+          gerado: boolean | null
+          id: string
+          modo: string | null
+          project_id: string
+          shot_number: number | null
+          tipo: string | null
+        }
+        Insert: {
+          conteudo?: string | null
+          creditos?: number | null
+          dia_plano?: number | null
+          gerado?: boolean | null
+          id?: string
+          modo?: string | null
+          project_id: string
+          shot_number?: number | null
+          tipo?: string | null
+        }
+        Update: {
+          conteudo?: string | null
+          creditos?: number | null
+          dia_plano?: number | null
+          gerado?: boolean | null
+          id?: string
+          modo?: string | null
+          project_id?: string
+          shot_number?: number | null
+          tipo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliverables_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_messages: {
         Row: {
           content: string
@@ -126,6 +208,71 @@ export type Database = {
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      properties: {
+        Row: {
+          angulo_abordagem: string | null
+          endereco: string | null
+          id: string
+          last_review_at: string | null
+          lat: number | null
+          lng: number | null
+          nome: string
+          opportunity_band: string | null
+          opportunity_score: number | null
+          photos_count: number | null
+          place_id: string | null
+          project_id: string
+          rating: number | null
+          signals: Json | null
+          user_rating_count: number | null
+          website_uri: string | null
+        }
+        Insert: {
+          angulo_abordagem?: string | null
+          endereco?: string | null
+          id?: string
+          last_review_at?: string | null
+          lat?: number | null
+          lng?: number | null
+          nome: string
+          opportunity_band?: string | null
+          opportunity_score?: number | null
+          photos_count?: number | null
+          place_id?: string | null
+          project_id: string
+          rating?: number | null
+          signals?: Json | null
+          user_rating_count?: number | null
+          website_uri?: string | null
+        }
+        Update: {
+          angulo_abordagem?: string | null
+          endereco?: string | null
+          id?: string
+          last_review_at?: string | null
+          lat?: number | null
+          lng?: number | null
+          nome?: string
+          opportunity_band?: string | null
+          opportunity_score?: number | null
+          photos_count?: number | null
+          place_id?: string | null
+          project_id?: string
+          rating?: number | null
+          signals?: Json | null
+          user_rating_count?: number | null
+          website_uri?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "properties_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
