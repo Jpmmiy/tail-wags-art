@@ -248,7 +248,7 @@ export function Quiz() {
 
 
   const autosave = async (step: number, status: any = 'rascunho') => {
-    return await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade }, status);
+    return await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis }, status);
   };
 
 
