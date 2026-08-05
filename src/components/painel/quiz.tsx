@@ -58,6 +58,9 @@ import {
 import type { ImovelEncontrado, Modalidade } from "@/lib/imoveis-tipos";
 import { TelaGeracao } from "./tela-geracao";
 import { cn } from "@/lib/utils";
+import { saveProjectStep, loadProject, setCurrentProjectId, getCurrentProjectId } from "@/lib/persistence";
+import { toast } from "sonner";
+
 
 const TITULOS = ["Alvo", "Diagnóstico", "Briefing", "Plano", "Fechamento"];
 
@@ -211,6 +214,62 @@ export function Quiz() {
     if (mapa[p]) setEstilo(mapa[p]);
   };
 
+  useEffect(() => {
+    const resumeProject = async () => {
+      const pid = getCurrentProjectId();
+      if (pid) {
+        const p = await loadProject(pid);
+        if (p) {
+          setModalidade(p.modalidade as Modalidade);
+          setPasso(p.current_step || 0);
+          if (p.properties && p.properties.length > 0) {
+            const prop = p.properties[0];
+            setEscolhido({
+              id: prop.place_id || "",
+              nome: prop.nome,
+              endereco: prop.endereco || "",
+              lat: prop.lat || 0,
+              lng: prop.lng || 0,
+              nota: prop.rating || 0,
+              avaliacoes: prop.user_rating_count || 0,
+              fotos: prop.photos_count || 0,
+              site: prop.website_uri || "",
+              score: {
+                total: prop.opportunity_score || 0,
+                faixa: prop.opportunity_band as any,
+                signals: (prop.signals as string[]) || [],
+                angulo: prop.angulo_abordagem || ""
+              }
+            });
+          }
+          if (p.briefings && p.briefings.length > 0) {
+            const b = p.briefings[0];
+            setPublico(b.publico || "casais");
+            setComodos((b.comodos as string[]) || []);
+            setEstilo(b.estilo_inferido || "aconchegante");
+            setVideoVertical(b.formato_video === '9:16');
+            if (p.modalidade === 'temporada') setDiaria(String(b.diaria || 250));
+            else setValorImobiliario(String(b.diaria || 450000));
+          }
+        }
+      }
+    };
+    resumeProject();
+  }, []);
+
+  const autosave = async (step: number) => {
+    await saveProjectStep(step, {
+      modalidade,
+      escolhido,
+      publico,
+      comodos,
+      diaria,
+      valorImobiliario,
+      estilo,
+      videoVertical
+    });
+  };
+
   const resultadosFiltrados = useMemo(() => {
     if (filtroScore === "TODOS") return resultados;
     return resultados.filter((r) => r.score?.faixa === filtroScore);
@@ -232,15 +291,18 @@ export function Quiz() {
     }
   };
 
-  const avancar = () => {
+  const avancar = async () => {
+    const proximo = passo + 1;
     if (passo === 0 && escolhido) {
       const novos = ["video", "abordagem"];
       if (!escolhido.site) novos.push("site");
       if (escolhido.fotos < 10) novos.push("fotos");
       setEntregaveis(novos);
     }
-    setPasso(prev => prev + 1);
+    setPasso(proximo);
+    await autosave(proximo);
   };
+
 
   const imovel: ImovelSelecionado | null = escolhido ? {
     id: escolhido.id,
@@ -393,9 +455,13 @@ export function Quiz() {
                 <span>Estilo: <b className="text-bone">{estilo}</b></span>
                 <button className="text-chrome hover:underline">trocar</button>
               </div>
-              <button onClick={() => setGerando(true)} className="metal-pill px-8 py-3 rounded-xl font-bold text-black flex items-center gap-2">
+              <button onClick={async () => {
+                setGerando(true);
+                await autosave(3); // Mark we generated
+              }} className="metal-pill px-8 py-3 rounded-xl font-bold text-black flex items-center gap-2">
                  Gerar material <Sparkles className="size-4" />
               </button>
+
            </div>
         </section>
       )}
