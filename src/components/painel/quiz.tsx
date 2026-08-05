@@ -176,7 +176,7 @@ export function Quiz() {
 
 
 
-      <button onClick={() => setPasso(1)} className="bg-red-500 p-2">FORCAR</button>
+      
       {passo === 0 && (
 
 
