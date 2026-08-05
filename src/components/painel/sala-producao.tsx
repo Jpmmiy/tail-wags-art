@@ -12,7 +12,10 @@ import {
   ChevronLeft,
   ChevronRight,
   LayoutGrid,
-  Image as ImageIcon
+  Image as ImageIcon,
+  ChevronDown,
+  MessageSquare,
+  Copy as CopyIcon
 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 
@@ -32,6 +35,7 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
   const [idioma, setIdioma] = useState<'pt' | 'en'>('en');
   const [shotsGerados, setShotsGerados] = useState<number[]>([]);
   const [creditosUsados, setCreditosUsados] = useState(0);
+  const [propostaAberta, setPropostaAberta] = useState(false);
   const [lastGeneratedAt, setLastGeneratedAt] = useState<Date | null>(null);
 
   const prompts = useMemo(() => {
@@ -120,7 +124,7 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-stone text-xs font-mono uppercase tracking-widest">Sala de Produção</h2>
-            <h1 className="text-bone text-xl font-semibold">{projeto.properties?.[0]?.nome}</h1>
+            <h1 className="text-bone text-xl font-semibold">{projeto.properties?.[0]?.nome || "Este imóvel"}</h1>
           </div>
           <div className="text-right">
             <span className="text-[10px] text-stone uppercase font-bold">Shot {shotAtual + 1} de {prompts.length}</span>
@@ -277,6 +281,44 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
               </div>
            </div>
         </div>
+      </div>
+      
+      {/* PROPOSTA COMPLETA (Movido do Fechamento) */}
+      <div className="glass rounded-2xl border border-white/5 overflow-hidden">
+          <button 
+              onClick={() => setPropostaAberta(!propostaAberta)}
+              className="w-full flex items-center justify-between p-4 text-stone hover:text-bone transition-colors"
+          >
+              <div className="flex items-center gap-2">
+                <MessageSquare className="size-4 text-chrome" />
+                <span className="text-sm font-medium">Ver proposta comercial para enviar por e-mail</span>
+              </div>
+              <ChevronDown className={cn("size-4 transition-transform", propostaAberta && "rotate-180")} />
+          </button>
+          {propostaAberta && (
+              <div className="p-6 border-t border-white/5 space-y-4 motion-safe:animate-rise">
+                  <div className="p-5 bg-white/[0.03] rounded-xl text-[0.85rem] text-stone whitespace-pre-wrap leading-relaxed border-l-2 border-white/10 font-sans">
+                      {(() => {
+                          const nome = projeto.properties?.[0]?.nome || "este imóvel";
+                          const nota = projeto.properties?.[0]?.nota;
+                          const dadoReal = nota ? `${nota}★ no Google` : "o potencial de mercado";
+                          
+                          return `Oi, vi que o ${nome} tem ${dadoReal}.\n\nO imóvel é excelente, mas o material visual atual pode não estar refletindo todo o seu potencial, o que impacta diretamente na percepção de valor do cliente.\n\nPara resolver isso, realizei a produção de:\n- Vídeo Curto (Reels/Stories)\n- Roteiros de abordagem\n- Estratégia de renovação visual\n\nEste material já está pronto para implementação.\n\nInvestimento sugerido para o pacote completo: A combinar.`;
+                      })()}
+                  </div>
+                  <button 
+                      onClick={() => {
+                          const nome = projeto.properties?.[0]?.nome || "este imóvel";
+                          const texto = `Oi, vi que o ${nome} tem potencial de destaque.\n\nPara valorizar o imóvel, realizei a produção de material visual completo (Vídeo + Estratégia).\n\nO material já está pronto.\n\nPodemos conversar sobre a entrega?`;
+                          navigator.clipboard.writeText(texto);
+                          toast.success("Proposta copiada!");
+                      }}
+                      className="w-full flex items-center justify-center gap-2 border border-white/10 py-2 rounded-xl text-xs text-bone hover:bg-white/5 transition-all"
+                  >
+                      <CopyIcon className="size-3" /> Copiar proposta comercial
+                  </button>
+              </div>
+          )}
       </div>
 
       {/* NAVEGAÇÃO E MINIATURAS */}
