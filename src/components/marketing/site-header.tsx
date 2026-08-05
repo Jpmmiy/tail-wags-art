@@ -69,13 +69,13 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2.5">
           <Link
-            href="/painel"
+            href="/auth"
             className="hidden rounded-full px-3.5 py-2 text-[0.86rem] font-medium text-stone transition-colors hover:text-bone sm:inline-flex"
           >
             Entrar
           </Link>
-          <Cta href="#planos" className="hidden h-10 px-5 sm:inline-flex">
-            Assinar
+          <Cta href="/auth" className="hidden h-10 px-5 sm:inline-flex">
+            Criar Conta
           </Cta>
 
           <button
@@ -122,11 +122,11 @@ export function SiteHeader() {
             ))}
           </nav>
           <div className="mt-6 flex flex-col gap-3">
-            <Cta href="#planos" size="lg">
-              Assinar a Nexofly
+            <Cta href="/auth" size="lg">
+              Começar Agora
             </Cta>
             <Link
-              href="/painel"
+              href="/auth"
               className="py-2 text-center text-sm text-stone"
             >
               Já tenho conta
