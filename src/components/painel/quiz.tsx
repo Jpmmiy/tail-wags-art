@@ -188,15 +188,33 @@ export function Quiz() {
                 ))}
             </div>
             {modalidade && (
-                <div className="flex gap-4">
-                    <input value={cidade} onChange={e => setCidade(e.target.value)} className="flex-1 bg-white/5 rounded-xl px-4 py-3" placeholder="Cidade..." />
-                    <button onClick={async () => {
-                        const r = await fetch("/api/imoveis", { method: "POST", body: JSON.stringify({ modalidade, cidade }), headers:{"Content-Type":"application/json"} });
-                        const d = await r.json();
-                        setResultados(d.imoveis ?? []);
-                    }} className="metal-pill px-6 py-2 rounded-xl text-black font-bold">Buscar</button>
+                <div className="flex gap-4 p-4 bg-white/5 rounded-2xl rim-lit">
+                    <input 
+                      value={cidade} 
+                      onChange={e => setCidade(e.target.value)} 
+                      className="flex-1 bg-white/5 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50" 
+                      placeholder="Cidade..." 
+                    />
+                    <button onClick={async (e) => {
+                        e.preventDefault();
+                        console.log('Botão Buscar clicado!', { modalidade, cidade });
+                        try {
+                          const r = await fetch("/api/imoveis", { 
+                            method: "POST", 
+                            body: JSON.stringify({ modalidade, cidade, pais: 'BR' }), // Adicionado pais default
+                            headers:{"Content-Type":"application/json"} 
+                          });
+                          const d = await r.json();
+                          console.log('Resposta busca:', d);
+                          setResultados(d.imoveis ?? []);
+                        } catch (err) {
+                          console.error('Erro na busca:', err);
+                          toast.error("Erro ao buscar imóveis.");
+                        }
+                    }} className="metal-pill px-6 py-2 rounded-xl text-black font-bold hover:scale-105 active:scale-95 transition-all">Buscar</button>
                 </div>
             )}
+
             <div className="grid gap-4">
                 {resultados.map(im => (
                     <div key={im.id} onClick={() => { setEscolhido(im); avancar(); }} className="glass p-5 rounded-2xl cursor-pointer">
