@@ -429,8 +429,28 @@ export function Quiz() {
                   </div>
                 </div>
 
+                {/* Lista de Imóveis (Loading Skeleton) */}
+                {buscando && (
+                  <div className="grid gap-4">
+                    {[1, 2, 3, 4].map(i => (
+                      <div key={i} className="glass p-5 rounded-2xl animate-pulse flex gap-4">
+                        <div className="size-16 rounded-lg bg-white/5 shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-white/5 rounded w-1/3" />
+                          <div className="h-3 bg-white/5 rounded w-1/2" />
+                          <div className="flex gap-2">
+                            <div className="h-4 bg-white/5 rounded w-16" />
+                            <div className="h-4 bg-white/5 rounded w-16" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {/* Lista de Imóveis */}
-                <div className="grid gap-4">
+                {!buscando && (
+                  <div className="grid gap-4">
                     {resultadosFiltrados.map(im => (
                         <div 
                           key={im.id} 
