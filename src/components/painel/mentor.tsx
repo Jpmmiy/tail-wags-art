@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Copy, Check, RefreshCw, Square } from "lucide-react";
 import { LogoMark } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { id: string; de: "voce" | "mentor"; texto: string };
 
@@ -93,6 +94,29 @@ export function Mentor() {
   const [escrevendo, setEscrevendo] = useState(false);
   const fim = useRef<HTMLDivElement>(null);
   const controle = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    const carregarHistorico = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return;
+
+      const { data, error } = await supabase
+        .from("mentor_messages")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .order("created_at", { ascending: true });
+
+      if (data && !error) {
+        setMsgs(data.map(m => ({
+          id: m.id,
+          de: m.role === "user" ? "voce" : "mentor",
+          texto: m.content
+        })));
+      }
+    };
+
+    carregarHistorico();
+  }, []);
 
   useEffect(() => {
     fim.current?.scrollIntoView({ behavior: "smooth", block: "end" });
