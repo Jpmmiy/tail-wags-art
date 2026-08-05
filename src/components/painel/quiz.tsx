@@ -170,27 +170,40 @@ export function Quiz() {
       {passo === 0 && (
         <div className="space-y-6 motion-safe:animate-rise">
             <div className="grid gap-4 sm:grid-cols-2">
-                {MODALIDADES.map(m => (
-                    <button 
-                      key={m.id} 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        console.log('Selecionando modalidade:', m.id);
-                        setModalidade(m.id);
-                      }} 
-                      className={cn(
-                        "glass p-6 rounded-2xl text-left transition-all hover:bg-white/5", 
-                        modalidade === m.id && "rim-lit border-chrome/50"
-                      )}
-                    >
-                        <div className="flex items-center gap-3 mb-2">
-                          <m.icone className={cn("size-5", modalidade === m.id ? "text-chrome" : "text-stone")} />
-                          <h3 className="text-bone font-medium">{m.titulo}</h3>
-                        </div>
-                        <p className="text-xs text-stone">{m.desc}</p>
-                    </button>
-                ))}
+                <button 
+                  onClick={() => {
+                    console.log('Selecionando temporada');
+                    setModalidade('temporada');
+                  }} 
+                  className={cn(
+                    "glass p-6 rounded-2xl text-left transition-all hover:bg-white/5", 
+                    modalidade === 'temporada' && "rim-lit border-chrome/50"
+                  )}
+                >
+                    <div className="flex items-center gap-3 mb-2">
+                      <Home className={cn("size-5", modalidade === 'temporada' ? "text-chrome" : "text-stone")} />
+                      <h3 className="text-bone font-medium">Airbnb e temporada</h3>
+                    </div>
+                    <p className="text-xs text-stone">Pousadas, chalés e casas anunciadas por diária.</p>
+                </button>
+                <button 
+                  onClick={() => {
+                    console.log('Selecionando imobiliario');
+                    setModalidade('imobiliario');
+                  }} 
+                  className={cn(
+                    "glass p-6 rounded-2xl text-left transition-all hover:bg-white/5", 
+                    modalidade === 'imobiliario' && "rim-lit border-chrome/50"
+                  )}
+                >
+                    <div className="flex items-center gap-3 mb-2">
+                      <Building2 className={cn("size-5", modalidade === 'imobiliario' ? "text-chrome" : "text-stone")} />
+                      <h3 className="text-bone font-medium">Mercado imobiliário</h3>
+                    </div>
+                    <p className="text-xs text-stone">Imobiliárias e imóveis para alugar ou vender.</p>
+                </button>
             </div>
+
 
             {modalidade && (
                 <div className="flex gap-4 p-4 bg-white/5 rounded-2xl rim-lit">
