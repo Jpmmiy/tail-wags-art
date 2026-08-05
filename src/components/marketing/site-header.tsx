@@ -7,10 +7,11 @@ import { Cta } from "@/components/brand/cta";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
+  { href: "#plataforma", label: "Plataforma" },
+  { href: "#capacidades", label: "Recursos" },
+  { href: "#padrao", label: "Galeria" },
   { href: "#processo", label: "Como funciona" },
-  { href: "#plataforma", label: "Entregáveis" },
-  { href: "#planos", label: "Preço" },
-  { href: "#duvidas", label: "FAQ" },
+  { href: "#planos", label: "Planos" },
 ];
 
 export function SiteHeader() {
@@ -67,8 +68,14 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2.5">
-          <Cta href="/auth" className="h-10 px-5">
-            Acessar Painel
+          <Link
+            href="/painel"
+            className="hidden rounded-full px-3.5 py-2 text-[0.86rem] font-medium text-stone transition-colors hover:text-bone sm:inline-flex"
+          >
+            Entrar
+          </Link>
+          <Cta href="#planos" className="hidden h-10 px-5 sm:inline-flex">
+            Assinar
           </Cta>
 
           <button
@@ -115,9 +122,15 @@ export function SiteHeader() {
             ))}
           </nav>
           <div className="mt-6 flex flex-col gap-3">
-            <Cta href="/auth" size="lg">
-              Acessar Painel
+            <Cta href="#planos" size="lg">
+              Assinar a Nexofly
             </Cta>
+            <Link
+              href="/painel"
+              className="py-2 text-center text-sm text-stone"
+            >
+              Já tenho conta
+            </Link>
           </div>
         </div>
       )}
