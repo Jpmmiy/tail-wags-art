@@ -5,7 +5,17 @@ export const Route = createFileRoute('/api/public/webhook')({
     handlers: {
       POST: async ({ request }) => {
         try {
-          const body = await request.json();
+          const bodyText = await request.text();
+          const signature = request.headers.get('x-applyfy-signature') || request.headers.get('Authorization');
+          
+          // Se houver uma chave configurada, validamos
+          const webhookSecret = process.env['APPLYFY_WEBHOOK_SECRET'];
+          if (webhookSecret && signature !== webhookSecret) {
+            console.error('[Webhook] Assinatura inválida');
+            return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+          }
+
+          const body = JSON.parse(bodyText);
           console.log('Applyfy Webhook Received:', body);
 
           const { event, data } = body;
@@ -17,26 +27,22 @@ export const Route = createFileRoute('/api/public/webhook')({
 
           if (isApproved && data?.customer?.email) {
             const email = data.customer.email;
-            
-            // Segurança: Garantir que estamos no ambiente de servidor
-            if (typeof process !== 'undefined') {
-              const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+            const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-              const { error: authError } = await supabaseAdmin.auth.admin.createUser({
-                email: email,
-                password: '12345678',
-                email_confirm: true
-              });
+            const { error: authError } = await supabaseAdmin.auth.admin.createUser({
+              email: email,
+              password: '12345678',
+              email_confirm: true
+            });
 
-              if (authError) {
-                if (authError.message.includes('already registered')) {
-                  console.log(`[Webhook] Usuário ${email} já existe.`);
-                } else {
-                  console.error(`[Webhook] Erro Auth: ${authError.message}`);
-                }
+            if (authError) {
+              if (authError.message.includes('already registered')) {
+                console.log(`[Webhook] Usuário ${email} já existe.`);
               } else {
-                console.log(`[Webhook] Usuário criado: ${email}`);
+                console.error(`[Webhook] Erro Auth: ${authError.message}`);
               }
+            } else {
+              console.log(`[Webhook] Usuário criado: ${email}`);
             }
           }
 
