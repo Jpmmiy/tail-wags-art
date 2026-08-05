@@ -42,7 +42,9 @@ import {
   type ImovelSelecionado,
 } from "@/lib/gerador";
 import type { ImovelEncontrado, Modalidade } from "@/lib/imoveis-tipos";
+import { PAISES, cidadesDe, regioesDe } from "@/lib/locais";
 import { TelaGeracao } from "./tela-geracao";
+
 import { SalaProducao, TelaConcluida } from "./sala-producao";
 import { cn } from "@/lib/utils";
 
@@ -86,8 +88,11 @@ export function Quiz() {
   const [passo, setPasso] = useState(0);
   const [modalidade, setModalidade] = useState<Modalidade | null>(null);
   const [escolhido, setEscolhido] = useState<ImovelEncontrado | null>(null);
+  const [paisId, setPaisId] = useState("BR");
+  const [regiaoId, setRegiaoId] = useState("");
   const [cidade, setCidade] = useState("");
   const [resultados, setResultados] = useState<ImovelEncontrado[]>([]);
+
   const [estilo, setEstilo] = useState("aconchegante");
   const [publico, setPublico] = useState("casais");
   const [comodos, setComodos] = useState<string[]>(["Sala", "Quarto principal"]);
@@ -127,8 +132,9 @@ export function Quiz() {
 
 
   const autosave = async (step: number, status: any = 'rascunho') => {
-    return await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical }, status);
+    return await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade }, status);
   };
+
 
 
   const avancar = async (s: any = 'rascunho') => {
@@ -222,32 +228,99 @@ export function Quiz() {
 
 
             {modalidade && (
-                <div className="flex gap-4 p-4 bg-white/5 rounded-2xl rim-lit">
-                    <input 
-                      value={cidade} 
-                      onChange={e => setCidade(e.target.value)} 
-                      className="flex-1 bg-white/5 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50" 
-                      placeholder="Cidade..." 
-                    />
-                    <button onClick={async (e) => {
-                        e.preventDefault();
-                        console.log('Botão Buscar clicado!', { modalidade, cidade });
-                        try {
-                          const r = await fetch("/api/imoveis", { 
-                            method: "POST", 
-                            body: JSON.stringify({ modalidade, cidade, pais: 'BR' }), // Adicionado pais default
-                            headers:{"Content-Type":"application/json"} 
-                          });
-                          const d = await r.json();
-                          console.log('Resposta busca:', d);
-                          setResultados(d.imoveis ?? []);
-                        } catch (err) {
-                          console.error('Erro na busca:', err);
-                          toast.error("Erro ao buscar imóveis.");
-                        }
-                    }} className="metal-pill px-6 py-2 rounded-xl text-black font-bold hover:scale-105 active:scale-95 transition-all">Buscar</button>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {/* País */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] uppercase font-bold text-stone px-1">País</label>
+                      <select 
+                        value={paisId}
+                        onChange={(e) => {
+                          setPaisId(e.target.value);
+                          setRegiaoId("");
+                          setCidade("");
+                        }}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50"
+                      >
+                        {PAISES.map(p => (
+                          <option key={p.id} value={p.id} className="bg-ink">{p.bandeira} {p.nome}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Estado / Região (se houver) */}
+                    {regioesDe(paisId).length > 0 && (
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] uppercase font-bold text-stone px-1">Estado</label>
+                        <select 
+                          value={regiaoId}
+                          onChange={(e) => {
+                            setRegiaoId(e.target.value);
+                            setCidade("");
+                          }}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50"
+                        >
+                          <option value="" className="bg-ink">Selecione...</option>
+                          {regioesDe(paisId).map(r => (
+                            <option key={r.id} value={r.id} className="bg-ink">{r.nome}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Cidade */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] uppercase font-bold text-stone px-1">Cidade</label>
+                      {cidadesDe(paisId, regiaoId).length > 0 ? (
+                        <select 
+                          value={cidade}
+                          onChange={(e) => setCidade(e.target.value)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50"
+                        >
+                          <option value="" className="bg-ink">Selecione...</option>
+                          {cidadesDe(paisId, regiaoId).map(c => (
+                            <option key={c} value={c} className="bg-ink">{c}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input 
+                          value={cidade} 
+                          onChange={e => setCidade(e.target.value)} 
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50" 
+                          placeholder="Digite a cidade..." 
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      if (!cidade) {
+                        toast.error("Por favor, selecione ou digite uma cidade.");
+                        return;
+                      }
+                      console.log('Buscando imóveis:', { modalidade, paisId, regiaoId, cidade });
+                      try {
+                        const r = await fetch("/api/imoveis", { 
+                          method: "POST", 
+                          body: JSON.stringify({ modalidade, cidade, pais: paisId, regiao: regiaoId }),
+                          headers:{"Content-Type":"application/json"} 
+                        });
+                        const d = await r.json();
+                        setResultados(d.imoveis ?? []);
+                      } catch (err) {
+                        console.error('Erro na busca:', err);
+                        toast.error("Erro ao buscar imóveis.");
+                      }
+                    }} 
+                    className="metal-pill w-full py-4 rounded-2xl text-black font-bold hover:scale-[1.02] active:scale-95 transition-all text-lg shadow-xl shadow-chrome/10"
+                  >
+                    Buscar imóveis em {cidade || '...'}
+                  </button>
                 </div>
             )}
+
 
             <div className="grid gap-4">
                 {resultados.map(im => (
