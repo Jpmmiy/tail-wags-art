@@ -1,6 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from "uuid";
-import type { Database } from "@/integrations/supabase/types";
 
 const SESSION_KEY = "nexofly_session_id";
 const PROJECT_KEY = "nexofly_current_project_id";
@@ -35,7 +34,6 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
   let currentProjectId = projectId;
 
   try {
-    // Step 1: Create or update project
     if (step === 1 && data.escolhido) {
       const projectData: any = {
         user_id: user?.id || null,
@@ -48,8 +46,8 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
 
       if (currentProjectId) projectData.id = currentProjectId;
 
-      const { data: project, error } = await supabase
-        .from("projects")
+      const { data: project, error } = await (supabase
+        .from("projects") as any)
         .upsert(projectData)
         .select()
         .single();
@@ -58,8 +56,7 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
       currentProjectId = project.id;
       setCurrentProjectId(currentProjectId);
 
-      // Save property
-      await supabase.from("properties").upsert({
+      await (supabase.from("properties") as any).upsert({
         project_id: currentProjectId,
         place_id: data.escolhido.id,
         nome: data.escolhido.nome,
@@ -77,16 +74,14 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
       });
 
     } else if (currentProjectId) {
-      // Update step and status
-      await supabase.from("projects").update({ 
+      await (supabase.from("projects") as any).update({ 
         current_step: step,
         status: status,
         updated_at: new Date().toISOString()
       }).eq("id", currentProjectId);
 
       if (step === 2) {
-        // Save briefing (now in step 2)
-        await supabase.from("briefings").upsert({
+        await (supabase.from("briefings") as any).upsert({
           project_id: currentProjectId,
           publico: data.publico,
           comodos: data.comodos,
@@ -104,8 +99,7 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
 };
 
 export const saveDeliverable = async (projectId: string, shotData: any) => {
-  // @ts-ignore - Temporary bypass until types are regenerated
-  const { error } = await supabase.from("deliverables").upsert({
+  const { error } = await (supabase.from("deliverables") as any).upsert({
     project_id: projectId,
     shot_number: shotData.shot_number,
     prompt_pt: shotData.prompt_pt,
@@ -124,8 +118,8 @@ export const saveDeliverable = async (projectId: string, shotData: any) => {
 };
 
 export const loadProject = async (id: string) => {
-  const { data: project, error } = await supabase
-    .from("projects")
+  const { data: project, error } = await (supabase
+    .from("projects") as any)
     .select(`
       *,
       properties (*),
@@ -136,18 +130,15 @@ export const loadProject = async (id: string) => {
     .single();
 
   if (error) return null;
-  return project as any;
+  return project;
 };
-
-
-
 
 export const listProjects = async () => {
   const sessionId = getSessionId();
   const { data: { session } } = await supabase.auth.getSession();
   const user = session?.user;
 
-  let query = supabase.from("projects").select(`
+  let query = (supabase.from("projects") as any).select(`
     *,
     properties (nome, opportunity_score),
     deliverables (gerado)
@@ -166,9 +157,9 @@ export const listProjects = async () => {
 
 export const syncProjectsOnLogin = async (userId: string) => {
   const sessionId = getSessionId();
-  const { error } = await supabase
-    .from("projects")
-    .update({ user_id: userId } as any)
+  const { error } = await (supabase
+    .from("projects") as any)
+    .update({ user_id: userId })
     .eq("session_id", sessionId)
     .is("user_id", null);
   
