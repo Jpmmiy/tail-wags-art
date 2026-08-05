@@ -555,14 +555,16 @@ export function Quiz() {
               {(() => {
                 const dadoReal = escolhido?.nota ? `${escolhido.nota}★ no Google` : escolhido?.avaliacoes ? `${escolhido.avaliacoes} avaliações` : "ausência de site próprio";
                 const listaEntregaveis = PACOTE_CONFIG.filter(p => entregaveis.includes(p.id)).map(p => p.rotulo).join(", ");
-                return `Oi, vi que o ${escolhido?.nome} tem ${dadoReal}.\n\nO imóvel é excelente, mas o anúncio atual não reflete todo o seu potencial visual, o que pode estar afastando hóspedes qualificados.\n\nPara resolver isso, entrego:\n- ${listaEntregaveis}\n\nPrazo: 5 dias úteis após a captação.\n\nInvestimento: A partir de R$ ${calculatePricing(Number(modalidade === 'temporada' ? diaria : valorImobiliario), modalidade).completo.valor.toLocaleString('pt-BR')}`;
+                const preco = calculatePricing(Number(modalidade === 'temporada' ? diaria : valorImobiliario), modalidade || 'temporada').completo.valor;
+                return `Oi, vi que o ${escolhido?.nome} tem ${dadoReal}.\n\nO imóvel é excelente, mas o anúncio atual não reflete todo o seu potencial visual, o que pode estar afastando hóspedes qualificados.\n\nPara resolver isso, entrego:\n- ${listaEntregaveis}\n\nPrazo: 5 dias úteis após a captação.\n\nInvestimento: A partir de R$ ${preco.toLocaleString('pt-BR')}`;
               })()}
             </div>
             <button 
               onClick={() => {
                 const dadoReal = escolhido?.nota ? `${escolhido.nota}★ no Google` : escolhido?.avaliacoes ? `${escolhido.avaliacoes} avaliações` : "ausência de site próprio";
                 const listaEntregaveis = PACOTE_CONFIG.filter(p => entregaveis.includes(p.id)).map(p => p.rotulo).join(", ");
-                const texto = `Oi, vi que o ${escolhido?.nome} tem ${dadoReal}.\n\nO imóvel é excelente, mas o anúncio atual não reflete todo o seu potencial visual, o que pode estar afastando hóspedes qualificados.\n\nPara resolver isso, entrego:\n- ${listaEntregaveis}\n\nPrazo: 5 dias úteis após a captação.\n\nInvestimento: A partir de R$ ${calculatePricing(Number(modalidade === 'temporada' ? diaria : valorImobiliario), modalidade).completo.valor.toLocaleString('pt-BR')}`;
+                const preco = calculatePricing(Number(modalidade === 'temporada' ? diaria : valorImobiliario), modalidade || 'temporada').completo.valor;
+                const texto = `Oi, vi que o ${escolhido?.nome} tem ${dadoReal}.\n\nO imóvel é excelente, mas o anúncio atual não reflete todo o seu potencial visual, o que pode estar afastando hóspedes qualificados.\n\nPara resolver isso, entrego:\n- ${listaEntregaveis}\n\nPrazo: 5 dias úteis após a captação.\n\nInvestimento: A partir de R$ ${preco.toLocaleString('pt-BR')}`;
                 navigator.clipboard.writeText(texto);
               }}
               className="w-full mt-4 flex items-center justify-center gap-2 border border-white/10 hover:border-chrome/50 py-3 rounded-xl text-sm text-bone transition-all"
@@ -577,8 +579,9 @@ export function Quiz() {
               <DollarSign className="size-4 text-chrome" /> Investimento Sugerido
             </h3>
             <div className="grid gap-4 md:grid-cols-3">
-              {Object.entries(calculatePricing(Number(modalidade === 'temporada' ? diaria : valorImobiliario), modalidade)).map(([key, plano]) => (
+              {Object.entries(calculatePricing(Number(modalidade === 'temporada' ? diaria : valorImobiliario), modalidade || 'temporada')).map(([key, plano]) => (
                 <div key={key} className={cn("glass p-5 rounded-2xl border transition-all", key === 'completo' ? "border-chrome/40 rim-lit" : "border-white/5")}>
+
                   <div className="text-[10px] text-stone font-mono uppercase mb-1">{plano.titulo}</div>
                   <div className="text-2xl font-bold text-bone mb-4">R$ {plano.valor.toLocaleString('pt-BR')}</div>
                   <ul className="space-y-2 mb-6">
