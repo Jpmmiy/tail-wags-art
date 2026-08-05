@@ -50,7 +50,7 @@ import type { ImovelEncontrado, Modalidade } from "@/lib/imoveis-tipos";
 import { TelaGeracao } from "./tela-geracao";
 import { cn } from "@/lib/utils";
 
-const TITULOS = ["Imóvel", "Briefing", "Entrega"];
+const TITULOS = ["Alvo", "Diagnóstico", "Briefing", "Plano"];
 
 const MODALIDADES = [
   {
@@ -379,18 +379,11 @@ export function Quiz() {
 
   const [estilo, setEstilo] = useState("aconchegante");
   const [publico, setPublico] = useState("casais");
-  const [comodos, setComodos] = useState<string[]>([
-    "Quarto principal",
-    "Sala de estar",
-  ]);
-  const [entregaveis, setEntregaveis] = useState<string[]>([
-    "fotos",
-    "video",
-    "site",
-    "abordagem",
-  ]);
+  const [comodos, setComodos] = useState<string[]>(["Quarto principal", "Sala de estar"]);
+  const [entregaveis, setEntregaveis] = useState<string[]>(["fotos", "video", "site", "abordagem"]);
   const [notas, setNotas] = useState<Respostas["notas"]>({});
-  const [diaria, setDiaria] = useState("280");
+  const [diaria, setDiaria] = useState("250");
+  const [valorImobiliario, setValorImobiliario] = useState("450000");
 
   const [gerando, setGerando] = useState(false);
   const [aba, setAba] = useState("fotos");
@@ -476,6 +469,18 @@ export function Quiz() {
       ? { modalidade, imovel, estilo, publico, comodos, entregaveis, notas }
       : null;
 
+  const inferirEstilo = (p: string) => {
+    const mapa: Record<string, string> = {
+      casais: "aconchegante",
+      familias: "claro",
+      trabalho: "limpo",
+      grupos: "vibrante",
+      "alto-padrao": "sóbrio",
+      investidor: "sóbrio",
+    };
+    if (mapa[p]) setEstilo(mapa[p]);
+  };
+
   const reiniciar = () => {
     setPasso(0);
     setModalidade(null);
@@ -485,6 +490,19 @@ export function Quiz() {
 
   const podeAvancar =
 passo === 0 ? !!escolhido : true;
+
+  const avancar = () => {
+    if (passo === 0 && escolhido) {
+      // Pré-configurar entregaveis baseado no diagnóstico
+      const novos = ["video", "abordagem"];
+      if (!escolhido.site) novos.push("site");
+      if (escolhido.fotos < 10) novos.push("fotos");
+      setEntregaveis(novos);
+      setPasso(1);
+    } else {
+      setPasso(prev => prev + 1);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -782,7 +800,10 @@ passo === 0 ? !!escolhido : true;
                         <div className="mt-6 flex flex-col gap-3">
                           <button
                             type="button"
-                            onClick={() => setEscolhido(im)}
+                            onClick={() => {
+                              setEscolhido(im);
+                              avancar();
+                            }}
                             className={cn(
                               "w-full rounded-xl py-2.5 text-[0.85rem] font-semibold transition-all",
                               on 
