@@ -29,13 +29,15 @@ import {
   ChevronDown,
   Calendar,
   Zap,
+  DollarSign,
+  Send,
 } from "lucide-react";
 import { generateVideoPrompts } from "@/config/videoPrompts";
 import { VIDEO_PLAN, CREDIT_COSTS } from "@/config/credits";
+import { calculatePricing } from "@/config/pricing";
 import {
   ESTILOS,
   PUBLICOS,
-
   COMODOS,
   promptFoto,
   promptVideo,
@@ -57,7 +59,8 @@ import type { ImovelEncontrado, Modalidade } from "@/lib/imoveis-tipos";
 import { TelaGeracao } from "./tela-geracao";
 import { cn } from "@/lib/utils";
 
-const TITULOS = ["Alvo", "Diagnóstico", "Briefing", "Plano"];
+const TITULOS = ["Alvo", "Diagnóstico", "Briefing", "Plano", "Fechamento"];
+
 
 const MODALIDADES = [
   {
