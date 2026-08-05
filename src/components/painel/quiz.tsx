@@ -1,4 +1,6 @@
 "use client";
+import * as React from "react";
+
 
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "@/components/ui/link";
@@ -83,27 +85,28 @@ function Progresso({ passo }: { passo: number }) {
 }
 
 export function Quiz() {
-  const [passo, setPasso] = useState(0);
-  const [modalidade, setModalidade] = useState<Modalidade | null>(null);
-  const [escolhido, setEscolhido] = useState<ImovelEncontrado | null>(null);
-  const [cidade, setCidade] = useState("");
-  const [resultados, setResultados] = useState<ImovelEncontrado[]>([]);
-  const [estilo, setEstilo] = useState("aconchegante");
-  const [publico, setPublico] = useState("casais");
-  const [comodos, setComodos] = useState<string[]>(["Sala", "Quarto principal"]);
-  const [entregaveis, setEntregaveis] = useState<string[]>(["video", "abordagem"]);
-  const [diaria, setDiaria] = useState("250");
-  const [valorImobiliario, setValorImobiliario] = useState("450000");
-  const [gerando, setGerando] = useState(false);
-  const [aba, setAba] = useState("video");
-  const [videoVertical, setVideoVertical] = useState(true);
-  const [gerados, setGerados] = useState<string[]>([]);
-  const [propostaAberta, setPropostaAberta] = useState(false);
-  const [projetoCarregado, setProjetoCarregado] = useState<any>(null);
-  const [concluido, setConcluido] = useState(false);
+  const [passo, setPasso] = React.useState(0);
+  const [modalidade, setModalidade] = React.useState<Modalidade | null>(null);
+  const [escolhido, setEscolhido] = React.useState<ImovelEncontrado | null>(null);
+  const [cidade, setCidade] = React.useState("");
+  const [resultados, setResultados] = React.useState<ImovelEncontrado[]>([]);
+  const [estilo, setEstilo] = React.useState("aconchegante");
+  const [publico, setPublico] = React.useState("casais");
+  const [comodos, setComodos] = React.useState<string[]>(["Sala", "Quarto principal"]);
+  const [entregaveis, setEntregaveis] = React.useState<string[]>(["video", "abordagem"]);
+  const [diaria, setDiaria] = React.useState("250");
+  const [valorImobiliario, setValorImobiliario] = React.useState("450000");
+  const [gerando, setGerando] = React.useState(false);
+  const [aba, setAba] = React.useState("video");
+  const [videoVertical, setVideoVertical] = React.useState(true);
+  const [gerados, setGerados] = React.useState<string[]>([]);
+  const [propostaAberta, setPropostaAberta] = React.useState(false);
+  const [projetoCarregado, setProjetoCarregado] = React.useState<any>(null);
+  const [concluido, setConcluido] = React.useState(false);
 
 
-  useEffect(() => {
+
+  React.useEffect(() => {
     const resumeProject = async () => {
       const pid = getCurrentProjectId();
       if (pid) {
@@ -122,6 +125,7 @@ export function Quiz() {
     resumeProject();
   }, []);
 
+
   const autosave = async (step: number, status: any = 'rascunho') => {
     return await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical }, status);
   };
@@ -138,7 +142,7 @@ export function Quiz() {
   };
 
 
-  const whatsMessage = useMemo(() => {
+  const whatsMessage = React.useMemo(() => {
     if (!escolhido) return "";
     const dadoReal = escolhido.nota 
       ? `${escolhido.nota} com ${escolhido.avaliacoes} avaliações` 
@@ -149,13 +153,15 @@ export function Quiz() {
     return `Oi! Vi o anúncio do ${escolhido.nome} — ${dadoReal} é resultado de gente que trabalha bem.\nReparei que as fotos não acompanham esse nível, e isso costuma segurar o clique antes da descrição.\nFiz um vídeo curto do imóvel pra te mostrar como ficaria. Sem compromisso.\nPosso te mandar aqui?`;
   }, [escolhido]);
 
-  const precos = useMemo(() => {
+
+  const precos = React.useMemo(() => {
     return calculatePricing(
       Number(modalidade === 'temporada' ? diaria : valorImobiliario), 
       modalidade || 'temporada',
       entregaveis
     );
   }, [modalidade, diaria, valorImobiliario, entregaveis]);
+
 
   return (
     <div className="space-y-8">
