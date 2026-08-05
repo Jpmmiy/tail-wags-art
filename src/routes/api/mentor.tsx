@@ -139,6 +139,7 @@ export const Route = createFileRoute("/api/mentor")({
           async pull(controlador) {
             const { done, value } = await leitor.read();
             if (done) {
+              await salvarRespostaMentor(acumuladoParaSalvar);
               controlador.close();
               return;
             }
