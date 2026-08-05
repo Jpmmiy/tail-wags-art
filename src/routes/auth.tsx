@@ -11,7 +11,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
+  const isLogin = true;
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -196,21 +196,9 @@ function AuthPage() {
             </button>
 
             <div className="pt-4 text-center">
-              <button
-                type="button"
-                onClick={() => setIsLogin(!isLogin)}
-                className="group inline-flex items-center gap-1.5 text-sm text-stone transition-colors hover:text-bone"
-              >
-                {isLogin ? (
-                  <>
-                    Ainda não tem conta? <span className="font-semibold text-chrome group-hover:underline">Cadastre-se grátis</span>
-                  </>
-                ) : (
-                  <>
-                    Já possui uma conta? <span className="font-semibold text-chrome group-hover:underline">Fazer login</span>
-                  </>
-                )}
-              </button>
+              <p className="text-sm text-stone/50">
+                Acesso restrito a membros autorizados.
+              </p>
             </div>
           </form>
         </div>
