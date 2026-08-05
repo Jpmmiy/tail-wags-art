@@ -97,6 +97,14 @@ export function Quiz() {
   const [cidade, setCidade] = useState("");
   const [resultados, setResultados] = useState<ImovelEncontrado[]>([]);
 
+  // Radar States
+  const [buscando, setBuscando] = useState(false);
+  const [progressoTexto, setProgressoTexto] = useState("");
+  const [filtro, setFiltro] = useState<'todos' | 'alta' | 'media' | 'sem_site' | 'poucas_fotos'>('todos');
+  const [ordenacao, setOrdenacao] = useState<'score' | 'avaliacoes' | 'sem_site'>('score');
+  const [atualizadoHa, setAtualizadoHa] = useState<number | null>(null);
+  const [totalVarridos, setTotalVarridos] = useState(0);
+
   const [estilo, setEstilo] = useState("aconchegante");
   const [publico, setPublico] = useState("casais");
   const [comodos, setComodos] = useState<string[]>(["Sala", "Quarto principal"]);
@@ -110,6 +118,108 @@ export function Quiz() {
   const [propostaAberta, setPropostaAberta] = useState(false);
   const [projetoCarregado, setProjetoCarregado] = useState<any>(null);
   const [concluido, setConcluido] = useState(false);
+
+  const resultadosFiltrados = useMemo(() => {
+    let base = [...resultados];
+    
+    if (filtro === 'alta') base = base.filter(r => r.score?.faixa === 'ALTA');
+    if (filtro === 'media') base = base.filter(r => r.score?.faixa === 'MEDIA');
+    if (filtro === 'sem_site') base = base.filter(r => !r.site);
+    if (filtro === 'poucas_fotos') base = base.filter(r => r.fotos < 10);
+
+    if (ordenacao === 'score') base.sort((a, b) => (b.score?.total || 0) - (a.score?.total || 0));
+    if (ordenacao === 'avaliacoes') base.sort((a, b) => (b.avaliacoes || 0) - (a.avaliacoes || 0));
+    if (ordenacao === 'sem_site') base.sort((a, b) => (a.site ? 1 : 0) - (b.site ? 1 : 0));
+
+    return base;
+  }, [resultados, filtro, ordenacao]);
+
+  const stats = useMemo(() => {
+    return {
+      varridos: totalVarridos,
+      alta: resultados.filter(r => r.score?.faixa === 'ALTA').length,
+      semSite: resultados.filter(r => !r.site).length
+    };
+  }, [resultados, totalVarridos]);
+
+  const exportarCSV = useCallback(() => {
+    if (resultados.length === 0) return;
+    const headers = ["Nome", "Endereço", "Score", "Faixa", "Telefone", "Site", "Link Maps"];
+    const rows = resultados.map(r => [
+      r.nome,
+      r.endereco,
+      r.score?.total || 0,
+      r.score?.faixa || "",
+      r.telefone || "",
+      r.site || "",
+      r.mapa || ""
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers, ...rows].map(e => e.join(",")).join("\n");
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `radar_nexofly_${cidade.toLowerCase().replace(/ /g, '_')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("CSV exportado com sucesso!");
+  }, [resultados, cidade]);
+
+  const ativarRadar = async (force: boolean = false) => {
+    if (!cidade) {
+      toast.error("Selecione uma cidade primeiro.");
+      return;
+    }
+
+    setBuscando(true);
+    setProgressoTexto("Iniciando radar...");
+    setResultados([]);
+    setAtualizadoHa(null);
+
+    const checkPoints = [
+      "Localizando cidade...",
+      "Acessando base do Google...",
+      "Varrendo pousadas e chalés...",
+      "Identificando casas de temporada...",
+      "Deduplicando resultados...",
+      "Calculando Score de Oportunidade..."
+    ];
+
+    let cpIdx = 0;
+    const interval = setInterval(() => {
+      if (cpIdx < checkPoints.length) {
+        setProgressoTexto(checkPoints[cpIdx]);
+        cpIdx++;
+      }
+    }, 1500);
+
+    try {
+      const r = await fetch("/api/imoveis", { 
+        method: "POST", 
+        body: JSON.stringify({ modalidade, cidade, pais: paisId, regiao: regiaoId, forceRefresh: force }),
+        headers:{"Content-Type":"application/json"} 
+      });
+      const d = await r.json();
+      
+      if (d.erro) throw new Error(d.erro);
+      
+      setResultados(d.imoveis ?? []);
+      setTotalVarridos(d.total || d.imoveis?.length || 0);
+      if (d.fonte === 'cache') setAtualizadoHa(d.atualizado_ha);
+      
+      toast.success(d.fonte === 'cache' ? "Resultados carregados do cache." : "Radar concluído com sucesso!");
+    } catch (err: any) {
+      console.error('Erro no radar:', err);
+      toast.error(err.message || "Falha na varredura. Tente novamente.");
+    } finally {
+      clearInterval(interval);
+      setBuscando(false);
+      setProgressoTexto("");
+    }
+  };
 
 
 
