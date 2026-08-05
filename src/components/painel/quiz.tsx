@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "@/components/ui/link";
 import {
   Check,
@@ -26,10 +26,16 @@ import {
   Flame,
   AlertCircle,
   ChevronRight,
+  ChevronDown,
+  Calendar,
+  Zap,
 } from "lucide-react";
+import { generateVideoPrompts } from "@/config/videoPrompts";
+import { VIDEO_PLAN, CREDIT_COSTS } from "@/config/credits";
 import {
   ESTILOS,
   PUBLICOS,
+
   COMODOS,
   promptFoto,
   promptVideo,
