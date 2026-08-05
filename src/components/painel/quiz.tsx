@@ -179,14 +179,30 @@ export function Quiz() {
 
 
       {passo === 0 && (
-        <div className="space-y-6">
+        <div className="space-y-6 motion-safe:animate-rise">
             <div className="grid gap-4 sm:grid-cols-2">
                 {MODALIDADES.map(m => (
-                    <button key={m.id} onClick={() => setModalidade(m.id)} className={cn("glass p-6 rounded-2xl", modalidade === m.id && "rim-lit")}>
-                        <h3 className="text-bone font-medium">{m.titulo}</h3>
+                    <button 
+                      key={m.id} 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        console.log('Selecionando modalidade:', m.id);
+                        setModalidade(m.id);
+                      }} 
+                      className={cn(
+                        "glass p-6 rounded-2xl text-left transition-all hover:bg-white/5", 
+                        modalidade === m.id && "rim-lit border-chrome/50"
+                      )}
+                    >
+                        <div className="flex items-center gap-3 mb-2">
+                          <m.icone className={cn("size-5", modalidade === m.id ? "text-chrome" : "text-stone")} />
+                          <h3 className="text-bone font-medium">{m.titulo}</h3>
+                        </div>
+                        <p className="text-xs text-stone">{m.desc}</p>
                     </button>
                 ))}
             </div>
+
             {modalidade && (
                 <div className="flex gap-4 p-4 bg-white/5 rounded-2xl rim-lit">
                     <input 
