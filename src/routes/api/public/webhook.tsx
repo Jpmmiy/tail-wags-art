@@ -9,6 +9,7 @@ export const Route = createFileRoute('/api/public/webhook')({
           console.log('Applyfy Webhook Received:', body);
 
           const { event, data } = body;
+          // Mapeamento flexível de eventos da Applyfy
           const isApproved = event === 'order_approved' || 
                             event === 'transaction_paid' || 
                             event === 'Transação paga' ||
@@ -16,22 +17,26 @@ export const Route = createFileRoute('/api/public/webhook')({
 
           if (isApproved && data?.customer?.email) {
             const email = data.customer.email;
-            const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+            
+            // Segurança: Garantir que estamos no ambiente de servidor
+            if (typeof process !== 'undefined') {
+              const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-            const { error: authError } = await supabaseAdmin.auth.admin.createUser({
-              email: email,
-              password: '12345678',
-              email_confirm: true
-            });
+              const { error: authError } = await supabaseAdmin.auth.admin.createUser({
+                email: email,
+                password: '12345678',
+                email_confirm: true
+              });
 
-            if (authError) {
-              if (authError.message.includes('already registered')) {
-                console.log(`Usuário ${email} já existe.`);
+              if (authError) {
+                if (authError.message.includes('already registered')) {
+                  console.log(`[Webhook] Usuário ${email} já existe.`);
+                } else {
+                  console.error(`[Webhook] Erro Auth: ${authError.message}`);
+                }
               } else {
-                console.error(`Erro Auth: ${authError.message}`);
+                console.log(`[Webhook] Usuário criado: ${email}`);
               }
-            } else {
-              console.log(`Usuário criado: ${email}`);
             }
           }
 
@@ -40,7 +45,7 @@ export const Route = createFileRoute('/api/public/webhook')({
             headers: { 'Content-Type': 'application/json' },
           });
         } catch (error) {
-          console.error('Applyfy Webhook Error:', error);
+          console.error('[Webhook] Error:', error);
           return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
