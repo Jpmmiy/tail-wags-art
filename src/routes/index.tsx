@@ -41,10 +41,18 @@ function Home() {
         Pular para o conteúdo
       </a>
 
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink p-6 text-center">
+        <div className="max-w-2xl animate-rise">
+          <p className="font-display text-2xl leading-relaxed text-bone sm:text-3xl">
+            "vou te mandar o link do checkout mensal e vitalicio pra direcionar a parte de pagamento c a appyfy e depois eu conecto co o weehbook"
+          </p>
+        </div>
+      </div>
+
       <ScrollSuave />
       <SiteHeader />
 
-      <main id="conteudo">
+      <main id="conteudo" className="pointer-events-none opacity-20 blur-sm">
         <Hero />
         <Ferramentas />
         <Numeros />
