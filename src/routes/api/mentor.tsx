@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 
 const MODELO = "google/gemini-3-flash";
 
@@ -99,6 +100,21 @@ export const Route = createFileRoute("/api/mentor")({
           },
         );
 
+        // Persistência em segundo plano (não bloqueia a resposta)
+        const ultimaMensagem = mensagens[mensagens.length - 1];
+        if (ultimaMensagem) {
+          void (async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user?.id) {
+              await supabase.from("mentor_messages").insert({
+                user_id: session.user.id,
+                role: ultimaMensagem.role,
+                content: ultimaMensagem.content
+              });
+            }
+          })();
+        }
+
         if (!resposta.ok || !resposta.body) {
           const detalhe = await resposta.text();
           console.error(`Falha no Mentor [${resposta.status}]: ${detalhe}`);
@@ -123,6 +139,7 @@ export const Route = createFileRoute("/api/mentor")({
           async pull(controlador) {
             const { done, value } = await leitor.read();
             if (done) {
+              await salvarRespostaMentor(acumuladoParaSalvar);
               controlador.close();
               return;
             }
@@ -136,16 +153,33 @@ export const Route = createFileRoute("/api/mentor")({
               try {
                 const evento = JSON.parse(dado);
                 const texto = evento?.choices?.[0]?.delta?.content;
-                if (texto) controlador.enqueue(encoder.encode(texto));
+                if (texto) {
+                  acumuladoParaSalvar += texto;
+                  controlador.enqueue(encoder.encode(texto));
+                }
               } catch {
                 /* fragmento incompleto */
               }
             }
           },
-          cancel() {
+          async cancel() {
+            await salvarRespostaMentor(acumuladoParaSalvar);
             void leitor.cancel();
           },
         });
+
+        let acumuladoParaSalvar = "";
+        const salvarRespostaMentor = async (texto: string) => {
+          if (!texto) return;
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user?.id) {
+            await supabase.from("mentor_messages").insert({
+              user_id: session.user.id,
+              role: "assistant",
+              content: texto
+            });
+          }
+        };
 
         return new Response(corpo, {
           headers: {
