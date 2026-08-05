@@ -440,6 +440,7 @@ export function Quiz() {
                                   endereco: cidade,
                                   nota: null,
                                   avaliacoes: null,
+                                  telefone: null,
                                   site: manualLink || null,
                                   mapa: modalidade === 'imobiliario' ? manualLink : null,
                                   airbnb: modalidade === 'temporada' ? manualLink : null,
@@ -472,6 +473,10 @@ export function Quiz() {
                           endereco: "Bertioga, SP",
                           nota: 4.8,
                           avaliacoes: 120,
+                          telefone: "(11) 99999-9999",
+                          site: "https://exemplo.com",
+                          mapa: "https://maps.google.com",
+                          airbnb: "https://airbnb.com",
                           fotos: 15,
                           score: { total: 85, faixa: 'ALTA', signals: ["Alta demanda", "Fotos antigas"], angulo: "Maximização de Valor" }
                         };
