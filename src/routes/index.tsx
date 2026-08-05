@@ -41,23 +41,35 @@ function Home() {
         Pular para o conteúdo
       </a>
 
-      <ScrollSuave />
-      <SiteHeader />
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink p-6 text-center">
+        <div className="max-w-xl animate-rise space-y-8 rounded-[2.5rem] bg-white/[0.02] p-10 backdrop-blur-md border border-white/10">
+          <div className="flex justify-center">
+            <Logo markClassName="size-16" className="gap-4 text-3xl" />
+          </div>
+          
+          <div className="space-y-4">
+            <h2 className="font-display text-2xl text-bone">Logo para o Checkout</h2>
+            <p className="text-stone">Clique no botão abaixo para baixar o arquivo SVG da logo e usar na Appyfy.</p>
+          </div>
 
-      <main id="conteudo">
-        <Hero />
-        <Ferramentas />
-        <Numeros />
-        <Plataforma />
-        <Teia />
-        <Galeria />
-        <Fluxo />
-        <Planos />
-        <Duvidas />
-        <ChamadaFinal />
-      </main>
+          <div className="flex justify-center pt-4">
+            <a 
+              href="/logo-nexofly.svg" 
+              download="logo-nexofly.svg"
+              className="metal-pill flex h-14 items-center gap-3 px-8 font-bold text-[#08090B]"
+            >
+              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Baixar Logo SVG
+            </a>
+          </div>
 
-      <Rodape />
-    </>
-  );
-}
+          <button 
+            onClick={() => window.location.reload()} 
+            className="text-xs text-stone/40 hover:text-stone transition-colors"
+          >
+            Voltar para o site
+          </button>
+        </div>
+      </div>
