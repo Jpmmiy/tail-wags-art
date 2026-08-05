@@ -42,9 +42,9 @@ function Home() {
       </a>
 
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink p-6 text-center">
-        <div className="max-w-2xl animate-rise">
-          <p className="font-display text-2xl leading-relaxed text-bone sm:text-3xl">
-            "vou te mandar o link do checkout mensal e vitalicio pra direcionar a parte de pagamento c a appyfy e depois eu conecto co o weehbook"
+        <div className="max-w-3xl animate-rise">
+          <p className="font-mono text-lg break-all text-chrome sm:text-2xl">
+            https://checkout.applyfy.com.br/checkout/cms0w2pbd05j301n26c9xwryz?offer=NIYOXHU VITALICIO
           </p>
         </div>
       </div>
