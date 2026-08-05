@@ -115,16 +115,18 @@ export const ESTILOS = [
 const CENA_POR_COMODO: Record<string, string> = {
   "Quarto principal":
     "cama arrumada com a roupa de cama esticada e sem vincos, travesseiros alinhados, manta dobrada no pé, criado-mudo sem objetos pessoais, cortina aberta",
-  "Sala de estar":
+  "Sala":
     "sofá com as almofadas alinhadas, manta dobrada sobre o braço, mesa de centro com no máximo dois objetos, tapete centralizado e esticado, nada de fio aparente",
-  Cozinha:
+  "Cozinha":
     "bancada completamente livre, louça guardada, uma tábua ou fruteira como único objeto, panos dobrados, geladeira sem ímãs, pia seca",
-  Banheiro:
+  "Banheiro":
     "toalhas brancas dobradas, bancada livre, box sem produtos à mostra, espelho sem marcas, tampa do vaso fechada",
-  "Área externa":
+  "Lazer":
     "mobiliário alinhado, almofadas limpas e secas, churrasqueira ou fogueira limpa, vegetação aparada, chão sem mangueira nem objeto solto",
-  Vista: "enquadramento a partir da janela ou varanda mostrando exatamente o que se vê do imóvel, sem obstrução, linha do horizonte reta",
+  "Varanda/Vista": "enquadramento a partir da janela ou varanda mostrando exatamente o que se vê do imóvel, sem obstrução, linha do horizonte reta",
+  "Fachada": "arquitetura externa limpa, sem carros na frente, luz de contorno destacando o volume do prédio ou casa",
 };
+
 
 export const PUBLICOS = [
   { id: "casais", rotulo: "Casais", foco: "intimidade, banheira, vista e jantar a dois" },
