@@ -8,6 +8,7 @@ const CAMPOS = [
   "places.id",
   "places.displayName",
   "places.formattedAddress",
+  "places.addressComponents",
   "places.rating",
   "places.userRatingCount",
   "places.websiteUri",
@@ -94,7 +95,13 @@ export const Route = createFileRoute("/api/imoveis")({
         const uf = corpo.regiao ? nomeRegiao(corpo.pais, corpo.regiao) : paisNome;
 
         if (!chave) {
-          return json({ fonte: "exemplo" as const, imoveis: exemplos(corpo) });
+          return json(
+            {
+              erro: "Chave do Google Places não configurada.",
+              detalhe: "Configure a variável de ambiente GOOGLE_MAPS_API_KEY.",
+            },
+            500,
+          );
         }
 
         const consulta =
