@@ -78,33 +78,36 @@ export const ESTILOS = [
     id: "aconchegante",
     rotulo: "Aconchegante",
     desc: "Madeira, luz quente, tecidos",
-    luz: "sol baixo de fim de tarde entrando pela janela lateral, luz quente e direcional, sombras longas e suaves",
-    materiais:
-      "madeira aparente com textura visível, tecidos de lã e linho, cerâmica, paleta em âmbar e bege",
+    luz: "sol baixo de fim de tarde entrando pela janela lateral, luz quente e direcional, sombras longas e suaves (golden hour)",
+    materiais: "madeira aparente com textura visível, tecidos de lã e linho, cerâmica, paleta em âmbar e bege",
   },
   {
-    id: "moderno",
-    rotulo: "Moderno",
-    desc: "Linhas retas, contraste, neutro",
-    luz: "luz difusa de meio da tarde, janela ampla sem cortina, sombras curtas e limpas",
-    materiais:
-      "superfícies lisas, metal escovado, paleta neutra em no máximo três tons, um único ponto de cor",
+    id: "claro",
+    rotulo: "Claro",
+    desc: "Amplo, luz difusa, arejado",
+    luz: "luz difusa de meio-dia, sombras curtas, ambiente muito iluminado e arejado",
+    materiais: "superfícies brancas, madeira clara, tecidos leves, paleta neutra e alta exposição",
   },
   {
-    id: "rustico",
-    rotulo: "Rústico",
-    desc: "Pedra, ferro, campo",
-    luz: "luz de manhã cedo, névoa leve na janela, temperatura de cor levemente fria contrastando com a madeira",
-    materiais:
-      "pedra e madeira bruta aparentes, ferro, algodão cru, cerâmica artesanal, tons terrosos",
+    id: "limpo",
+    rotulo: "Limpo",
+    desc: "Minimalista, funcional, neutro",
+    luz: "luz neutra e uniforme, sem sombras marcadas, foco na funcionalidade e clareza",
+    materiais: "metal, vidro, superfícies lisas, paleta de cinzas e brancos",
   },
   {
-    id: "praiano",
-    rotulo: "Praiano",
-    desc: "Claro, arejado, azul",
-    luz: "luz alta de sol de praia filtrada por cortina branca, ambiente muito claro, sem sombras duras",
-    materiais:
-      "fibras naturais, madeira clara, algodão leve, paleta em branco e areia com toques de azul",
+    id: "vibrante",
+    rotulo: "Vibrante",
+    desc: "Social, dinâmico, colorido",
+    luz: "blue hour com pontos de luz artificiais quentes, contraste entre interior e exterior",
+    materiais: "cores saturadas, texturas variadas, foco em áreas sociais e lazer",
+  },
+  {
+    id: "sóbrio",
+    rotulo: "Sóbrio",
+    desc: "Elegante, alto contraste, luxo",
+    luz: "golden hour lateral com alto contraste, luz dramática que destaca volumes e texturas",
+    materiais: "pedras escuras, couro, metal nobre, paleta profunda e elegante",
   },
 ];
 
@@ -128,6 +131,8 @@ export const PUBLICOS = [
   { id: "familias", rotulo: "Famílias", foco: "espaço, segurança para crianças, cozinha completa" },
   { id: "amigos", rotulo: "Grupos de amigos", foco: "área externa, churrasqueira, número de camas" },
   { id: "trabalho", rotulo: "Viagem a trabalho", foco: "internet rápida, mesa de trabalho, silêncio, check-in autônomo" },
+  { id: "alto-padrao", rotulo: "Alto padrão", foco: "exclusividade, acabamentos, tecnologia e privacidade" },
+  { id: "investidor", rotulo: "Investidor", foco: "rentabilidade, manutenção, localização e automação" },
 ];
 
 export const COMODOS = [
@@ -155,6 +160,10 @@ export type ImovelSelecionado = {
   anfitriao: string;
   diaria: number;
   potencial: number;
+  nota: number;
+  avaliacoes: number;
+  fotos: number;
+  problemas: string[];
   mapa?: string | null;
   airbnb?: string | null;
   site?: string | null;
