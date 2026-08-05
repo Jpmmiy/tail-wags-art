@@ -24,6 +24,7 @@ import {
   ChevronRight,
   ChevronDown,
   Send,
+  MessageCircle,
 } from "lucide-react";
 import { generateVideoPrompts } from "@/config/videoPrompts";
 import { VIDEO_PLAN, CREDIT_COSTS } from "@/config/credits";
@@ -94,6 +95,7 @@ export function Quiz() {
   const [aba, setAba] = useState("video");
   const [videoVertical, setVideoVertical] = useState(true);
   const [gerados, setGerados] = useState<string[]>([]);
+  const [propostaAberta, setPropostaAberta] = useState(false);
 
   useEffect(() => {
     const resumeProject = async () => {
@@ -120,6 +122,25 @@ export function Quiz() {
     setPasso(proximo);
     await autosave(proximo, s);
   };
+
+  const whatsMessage = useMemo(() => {
+    if (!escolhido) return "";
+    const dadoReal = escolhido.nota 
+      ? `${escolhido.nota} com ${escolhido.avaliacoes} avaliações` 
+      : escolhido.avaliacoes 
+        ? `${escolhido.avaliacoes} avaliações`
+        : "o potencial do anúncio";
+    
+    return `Oi! Vi o anúncio do ${escolhido.nome} — ${dadoReal} é resultado de gente que trabalha bem.\nReparei que as fotos não acompanham esse nível, e isso costuma segurar o clique antes da descrição.\nFiz um vídeo curto do imóvel pra te mostrar como ficaria. Sem compromisso.\nPosso te mandar aqui?`;
+  }, [escolhido]);
+
+  const precos = useMemo(() => {
+    return calculatePricing(
+      Number(modalidade === 'temporada' ? diaria : valorImobiliario), 
+      modalidade || 'temporada',
+      entregaveis
+    );
+  }, [modalidade, diaria, valorImobiliario, entregaveis]);
 
   return (
     <div className="space-y-8">
@@ -189,10 +210,106 @@ export function Quiz() {
       )}
 
       {passo === 2 && (
-        <div className="space-y-6">
-            <h3 className="text-bone">Proposta pronta</h3>
-            <button onClick={() => avancar('em_producao')} className="metal-pill px-8 py-3 rounded-xl font-bold text-black">Já fechei — ir para produção</button>
-            <button onClick={() => { autosave(passo, 'aguardando_resposta'); window.location.href='/projetos'; }} className="border border-white/10 px-8 py-3 rounded-xl">Salvar e voltar depois</button>
+        <div className="space-y-8 motion-safe:animate-rise pb-12">
+            {/* BLOCO 1 — WHATSAPP */}
+            <div className="glass p-6 rounded-2xl border-chrome/20">
+                <h3 className="text-bone font-medium flex items-center gap-2 mb-4">
+                    <MessageCircle className="size-4 text-chrome" /> Abordagem WhatsApp
+                </h3>
+                <div className="p-4 bg-white/[0.03] rounded-xl text-[0.9rem] text-bone italic border-l-2 border-chrome whitespace-pre-wrap">
+                    {whatsMessage}
+                </div>
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                    <button 
+                        onClick={() => {
+                            navigator.clipboard.writeText(whatsMessage);
+                            toast.success("Mensagem copiada!");
+                        }}
+                        className="flex items-center justify-center gap-2 border border-white/10 hover:border-chrome/50 py-3 rounded-xl text-sm text-bone transition-all"
+                    >
+                        <Copy className="size-4" /> Copiar mensagem
+                    </button>
+                    <a 
+                        href={`https://wa.me/?text=${encodeURIComponent(whatsMessage)}`}
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="flex items-center justify-center gap-2 bg-[#25D366] text-white py-3 rounded-xl text-sm font-bold"
+                    >
+                        <Send className="size-4" /> Abrir WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            {/* BLOCO 2 — PACOTES DE PREÇO */}
+            <div className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-3">
+                    {Object.entries(precos).filter(([_, p]) => p.visivel).map(([key, plano]) => (
+                        <div key={key} className={cn("glass p-5 rounded-2xl border transition-all relative", key === 'completo' ? "border-chrome/40 rim-lit" : "border-white/5")}>
+                            {key === 'completo' && (
+                                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-chrome text-black text-[9px] font-bold uppercase px-2 py-0.5 rounded-full">mais escolhido</span>
+                            )}
+                            <div className="text-[10px] text-stone font-mono uppercase mb-1">{plano.titulo}</div>
+                            <div className="text-2xl font-bold text-bone mb-4">R$ {plano.valor.toLocaleString('pt-BR')}</div>
+                            <ul className="space-y-2">
+                                {plano.inclui.map((item, i) => (
+                                    <li key={i} className="text-[0.75rem] text-stone flex items-start gap-2">
+                                        <Check className="size-3 text-chrome mt-0.5 shrink-0" /> {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+                <p className="text-[11px] text-stone text-center">Valores sugeridos com base na diária informada. Ajuste conforme seu mercado.</p>
+            </div>
+
+            {/* BLOCO 3 — PROPOSTA COMPLETA */}
+            <div className="glass rounded-2xl border border-white/5 overflow-hidden">
+                <button 
+                    onClick={() => setPropostaAberta(!propostaAberta)}
+                    className="w-full flex items-center justify-between p-4 text-stone hover:text-bone transition-colors"
+                >
+                    <span className="text-sm font-medium">Ver proposta completa para enviar por e-mail</span>
+                    <ChevronDown className={cn("size-4 transition-transform", propostaAberta && "rotate-180")} />
+                </button>
+                {propostaAberta && (
+                    <div className="p-6 border-t border-white/5 space-y-4 motion-safe:animate-rise">
+                        <div className="p-5 bg-white/[0.03] rounded-xl text-[0.85rem] text-stone whitespace-pre-wrap leading-relaxed">
+                            {(() => {
+                                const dadoReal = escolhido?.nota ? `${escolhido.nota}★ no Google` : "o potencial do anúncio";
+                                const listaEntregaveis = PACOTE_CONFIG.filter(p => entregaveis.includes(p.id)).map(p => p.rotulo).join(", ");
+                                return `Oi, vi que o ${escolhido?.nome} tem ${dadoReal}.\n\nO imóvel é excelente, mas o anúncio atual não reflete todo o seu potencial visual, o que pode estar afastando hóspedes qualificados.\n\nPara resolver isso, entrego:\n- ${listaEntregaveis}\n\nPrazo: 5 dias úteis após a captação.\n\nInvestimento: A partir de R$ ${precos.completo.valor.toLocaleString('pt-BR')}`;
+                            })()}
+                        </div>
+                        <button 
+                            onClick={() => {
+                                const texto = `Oi, vi que o ${escolhido?.nome} tem ${escolhido?.nota ? `${escolhido.nota}★ no Google` : "o potencial do anúncio"}.\n\nPara resolver isso, entrego:\n- ${PACOTE_CONFIG.filter(p => entregaveis.includes(p.id)).map(p => p.rotulo).join(", ")}\n\nPrazo: 5 dias úteis.\n\nInvestimento: R$ ${precos.completo.valor.toLocaleString('pt-BR')}`;
+                                navigator.clipboard.writeText(texto);
+                                toast.success("Proposta copiada!");
+                            }}
+                            className="w-full flex items-center justify-center gap-2 border border-white/10 py-2 rounded-xl text-xs text-bone"
+                        >
+                            <Copy className="size-3" /> Copiar proposta completa
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            {/* RODAPÉ DA ETAPA */}
+            <div className="flex flex-col gap-3 pt-4">
+                <button onClick={() => avancar('em_producao')} className="metal-pill w-full py-4 rounded-2xl font-bold text-black text-lg">
+                    Já fechei — ir para produção
+                </button>
+                <button 
+                    onClick={() => { 
+                        autosave(passo, 'aguardando_resposta'); 
+                        window.location.href='/projetos'; 
+                    }} 
+                    className="w-full py-3 rounded-2xl border border-white/10 text-stone hover:text-bone transition-all text-sm"
+                >
+                    Salvar e voltar depois
+                </button>
+            </div>
         </div>
       )}
 
