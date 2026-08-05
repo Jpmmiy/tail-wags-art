@@ -486,12 +486,12 @@ export function Quiz() {
                 </div>
             )}
 
-            </div>
-          )}
-        </div>
-      )}
+          </div>
+        )
+      }
 
       {passo === 1 && escolhido && (
+
         <div className="space-y-6">
           <div className="glass p-6 rounded-2xl flex gap-6">
             {escolhido.primeiraFoto && <img src={`https://places.googleapis.com/v1/${escolhido.primeiraFoto}/media?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&maxWidthPx=200`} className="size-24 rounded-lg object-cover" />}
