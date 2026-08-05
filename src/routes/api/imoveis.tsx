@@ -164,12 +164,18 @@ export const Route = createFileRoute("/api/imoveis")({
 
         const results = await Promise.allSettled(promises);
         const allPlaces: any[] = [];
+        let successCount = 0;
         
         results.forEach(res => {
-          if (res.status === "fulfilled" && res.value.places) {
-            allPlaces.push(...res.value.places);
+          if (res.status === "fulfilled") {
+            successCount++;
+            if (res.value.places) allPlaces.push(...res.value.places);
           }
         });
+
+        if (successCount === 0 && results.length > 0) {
+          return json({ erro: "Todas as buscas no Google Places falharam. Verifique sua chave API." }, 502);
+        }
 
         // Step 4: Deduplicate
         const uniquePlaces = Array.from(new Map(allPlaces.map(p => [p.id, p])).values());
