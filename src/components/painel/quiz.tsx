@@ -27,8 +27,9 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { generateVideoPrompts } from "@/config/videoPrompts";
-import { VIDEO_PLAN, CREDIT_COSTS } from "@/config/credits";
+import { FLOW_CREDITS, getRemainingTime } from "@/config/credits";
 import { calculatePricing } from "@/config/pricing";
+
 import {
   ESTILOS,
   PUBLICOS,
@@ -42,7 +43,9 @@ import {
 } from "@/lib/gerador";
 import type { ImovelEncontrado, Modalidade } from "@/lib/imoveis-tipos";
 import { TelaGeracao } from "./tela-geracao";
+import { SalaProducao, TelaConcluida } from "./sala-producao";
 import { cn } from "@/lib/utils";
+
 import { saveProjectStep, loadProject, setCurrentProjectId, getCurrentProjectId } from "@/lib/persistence";
 import { toast } from "sonner";
 
@@ -96,6 +99,9 @@ export function Quiz() {
   const [videoVertical, setVideoVertical] = useState(true);
   const [gerados, setGerados] = useState<string[]>([]);
   const [propostaAberta, setPropostaAberta] = useState(false);
+  const [projetoCarregado, setProjetoCarregado] = useState<any>(null);
+  const [concluido, setConcluido] = useState(false);
+
 
   useEffect(() => {
     const resumeProject = async () => {
@@ -106,10 +112,13 @@ export function Quiz() {
           if (p) {
             setPasso(p.current_step || 0);
             setModalidade(p.modalidade as Modalidade);
+            setProjetoCarregado(p);
+            if (p.status === 'concluido') setConcluido(true);
           }
         } catch (err) { console.error(err); }
       }
     };
+
     resumeProject();
   }, []);
 
@@ -120,8 +129,13 @@ export function Quiz() {
   const avancar = async (s: any = 'rascunho') => {
     const proximo = passo + 1;
     setPasso(proximo);
-    await autosave(proximo, s);
+    const pid = await autosave(proximo, s);
+    if (pid) {
+      const p = await loadProject(pid);
+      setProjetoCarregado(p);
+    }
   };
+
 
   const whatsMessage = useMemo(() => {
     if (!escolhido) return "";
@@ -313,12 +327,20 @@ export function Quiz() {
         </div>
       )}
 
-      {passo === 3 && (
-        <div className="space-y-6">
-            <h3 className="text-bone">Sala de produção</h3>
-            <p className="text-stone">Use os prompts abaixo no Google Flow.</p>
-        </div>
+      {passo === 3 && projetoCarregado && !concluido && (
+        <SalaProducao 
+          projeto={projetoCarregado} 
+          aoConcluir={() => setConcluido(true)} 
+        />
+      )}
+
+      {concluido && (
+        <TelaConcluida 
+          aoVoltar={() => window.location.href = '/projetos'} 
+          aoNovo={() => window.location.href = '/'} 
+        />
       )}
     </div>
   );
 }
+

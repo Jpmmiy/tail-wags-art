@@ -11,9 +11,11 @@ import {
   Info,
   ChevronLeft,
   ChevronRight,
-  LayoutGrid
+  LayoutGrid,
+  Image as ImageIcon
 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
+
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { generateVideoPrompts } from "@/config/videoPrompts";
