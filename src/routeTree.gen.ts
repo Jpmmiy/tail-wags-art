@@ -25,7 +25,7 @@ import { Route as PainelCreditosRouteImport } from './routes/painel/creditos'
 import { Route as PainelContaRouteImport } from './routes/painel/conta'
 import { Route as ApiMentorRouteImport } from './routes/api/mentor'
 import { Route as ApiImoveisRouteImport } from './routes/api/imoveis'
-import { Route as ApiPublicApplyfyRouteImport } from './routes/api/public/applyfy'
+import { Route as ApiPublicWebhookRouteImport } from './routes/api/public/webhook'
 
 const ProjetosRoute = ProjetosRouteImport.update({
   id: '/projetos',
@@ -107,9 +107,9 @@ const ApiImoveisRoute = ApiImoveisRouteImport.update({
   path: '/api/imoveis',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicApplyfyRoute = ApiPublicApplyfyRouteImport.update({
-  id: '/api/public/applyfy',
-  path: '/api/public/applyfy',
+const ApiPublicWebhookRoute = ApiPublicWebhookRouteImport.update({
+  id: '/api/public/webhook',
+  path: '/api/public/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -130,7 +130,7 @@ export interface FileRoutesByFullPath {
   '/painel/presente': typeof PainelPresenteRoute
   '/painel/projetos': typeof PainelProjetosRoute
   '/painel/': typeof PainelIndexRoute
-  '/api/public/applyfy': typeof ApiPublicApplyfyRoute
+  '/api/public/webhook': typeof ApiPublicWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -148,7 +148,7 @@ export interface FileRoutesByTo {
   '/painel/presente': typeof PainelPresenteRoute
   '/painel/projetos': typeof PainelProjetosRoute
   '/painel': typeof PainelIndexRoute
-  '/api/public/applyfy': typeof ApiPublicApplyfyRoute
+  '/api/public/webhook': typeof ApiPublicWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -168,7 +168,7 @@ export interface FileRoutesById {
   '/painel/presente': typeof PainelPresenteRoute
   '/painel/projetos': typeof PainelProjetosRoute
   '/painel/': typeof PainelIndexRoute
-  '/api/public/applyfy': typeof ApiPublicApplyfyRoute
+  '/api/public/webhook': typeof ApiPublicWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -189,7 +189,7 @@ export interface FileRouteTypes {
     | '/painel/presente'
     | '/painel/projetos'
     | '/painel/'
-    | '/api/public/applyfy'
+    | '/api/public/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -207,7 +207,7 @@ export interface FileRouteTypes {
     | '/painel/presente'
     | '/painel/projetos'
     | '/painel'
-    | '/api/public/applyfy'
+    | '/api/public/webhook'
   id:
     | '__root__'
     | '/'
@@ -226,7 +226,7 @@ export interface FileRouteTypes {
     | '/painel/presente'
     | '/painel/projetos'
     | '/painel/'
-    | '/api/public/applyfy'
+    | '/api/public/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -236,7 +236,7 @@ export interface RootRouteChildren {
   ProjetosRoute: typeof ProjetosRoute
   ApiImoveisRoute: typeof ApiImoveisRoute
   ApiMentorRoute: typeof ApiMentorRoute
-  ApiPublicApplyfyRoute: typeof ApiPublicApplyfyRoute
+  ApiPublicWebhookRoute: typeof ApiPublicWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -353,11 +353,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiImoveisRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/applyfy': {
-      id: '/api/public/applyfy'
-      path: '/api/public/applyfy'
-      fullPath: '/api/public/applyfy'
-      preLoaderRoute: typeof ApiPublicApplyfyRouteImport
+    '/api/public/webhook': {
+      id: '/api/public/webhook'
+      path: '/api/public/webhook'
+      fullPath: '/api/public/webhook'
+      preLoaderRoute: typeof ApiPublicWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -399,7 +399,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProjetosRoute: ProjetosRoute,
   ApiImoveisRoute: ApiImoveisRoute,
   ApiMentorRoute: ApiMentorRoute,
-  ApiPublicApplyfyRoute: ApiPublicApplyfyRoute,
+  ApiPublicWebhookRoute: ApiPublicWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
