@@ -63,8 +63,8 @@ export const saveProjectStep = async (step: number, data: any) => {
         place_id: data.escolhido.id,
         nome: data.escolhido.nome,
         endereco: data.escolhido.endereco,
-        lat: data.escolhido.lat,
-        lng: data.escolhido.lng,
+        lat: data.escolhido.location?.latitude || null,
+        lng: data.escolhido.location?.longitude || null,
         rating: data.escolhido.nota,
         user_rating_count: data.escolhido.avaliacoes,
         photos_count: data.escolhido.fotos,
@@ -74,6 +74,7 @@ export const saveProjectStep = async (step: number, data: any) => {
         signals: data.escolhido.score?.signals,
         angulo_abordagem: data.escolhido.score?.angulo,
       });
+
     } else if (currentProjectId) {
       // Update step
       await supabase.from("projects").update({ 
