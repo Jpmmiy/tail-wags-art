@@ -41,11 +41,23 @@ function Home() {
         Pular para o conteúdo
       </a>
 
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink p-6 text-center">
-        <div className="max-w-3xl animate-rise">
-          <p className="font-mono text-lg break-all text-chrome sm:text-2xl">
-            https://checkout.applyfy.com.br/checkout/cms0w2pbd05j301n26c9xwryz?offer=NIYOXHU VITALICIO
-          </p>
+      <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-ink p-6 text-center">
+        <div className="max-w-3xl animate-rise space-y-8">
+          <div className="space-y-2">
+            <p className="eyebrow text-chrome/60">Link Mensal</p>
+            <p className="font-mono text-lg break-all text-chrome sm:text-2xl">
+              https://checkout.applyfy.com.br/checkout/cms0w2pbd05j301n26c9xwryz?offer=NIYOXHU MENSAL
+            </p>
+          </div>
+          
+          <div className="h-px w-24 mx-auto bg-white/10" />
+
+          <div className="space-y-2">
+            <p className="eyebrow text-chrome/60">Link Vitalício</p>
+            <p className="font-mono text-lg break-all text-chrome/80 sm:text-2xl">
+              https://checkout.applyfy.com.br/checkout/cms0w2pbd05j301n26c9xwryz?offer=NIYOXHU VITALICIO
+            </p>
+          </div>
         </div>
       </div>
 
