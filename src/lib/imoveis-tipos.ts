@@ -12,6 +12,7 @@ export type ImovelEncontrado = {
   /** Busca do Airbnb já filtrada pela cidade. */
   airbnb: string | null;
   fotos: number;
+  primeiraFoto?: string;
   /** Novos campos da API Google Places (New) */
   priceLevel?: string;
   editorialSummary?: string;
