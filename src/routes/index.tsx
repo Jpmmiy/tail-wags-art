@@ -12,6 +12,7 @@ import { Fluxo } from "@/components/marketing/fluxo";
 import { Planos } from "@/components/marketing/planos";
 import { Duvidas } from "@/components/marketing/duvidas";
 import { ChamadaFinal, Rodape } from "@/components/marketing/rodape";
+import { Logo } from "@/components/brand/logo";
 
 const TITULO = "Nexofly · Fotos, vídeo e site para anúncios de temporada";
 const DESCRICAO =
@@ -73,3 +74,24 @@ function Home() {
           </button>
         </div>
       </div>
+
+      <ScrollSuave />
+      <SiteHeader />
+
+      <main id="conteudo" className="pointer-events-none opacity-20 blur-sm">
+        <Hero />
+        <Ferramentas />
+        <Numeros />
+        <Plataforma />
+        <Teia />
+        <Galeria />
+        <Fluxo />
+        <Planos />
+        <Duvidas />
+        <ChamadaFinal />
+      </main>
+
+      <Rodape />
+    </>
+  );
+}
