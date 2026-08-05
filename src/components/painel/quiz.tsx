@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "@/components/ui/link";
 import {
   Check,
@@ -23,6 +23,8 @@ import {
   Info,
   Eye,
   EyeOff,
+  Flame,
+  AlertCircle,
 } from "lucide-react";
 import {
   ESTILOS,
@@ -393,9 +395,16 @@ export function Quiz() {
   const [gerando, setGerando] = useState(false);
   const [aba, setAba] = useState("fotos");
 
-  // Região e cidade são derivadas, não sincronizadas por efeito: ao trocar
-  // de país a seleção antiga deixa de existir, e cair no primeiro item
-  // válido é o comportamento certo — sem render extra.
+  const [filtroScore, setFiltroScore] = useState<"TODOS" | "ALTA" | "MEDIA">("TODOS");
+
+  const resultadosFiltrados = useMemo(() => {
+    if (filtroScore === "TODOS") return resultados;
+    return resultados.filter((r) => r.score?.faixa === filtroScore);
+  }, [resultados, filtroScore]);
+
+  const contagemAlta = resultados.filter((r) => r.score?.faixa === "ALTA").length;
+
+  // Região e cidade são derivadas, não sincronizadas por efeito
   const temRegioes = !!achaPais(pais)?.regioes;
   const regioes = regioesDe(pais);
   const regiaoValida = temRegioes

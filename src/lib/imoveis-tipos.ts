@@ -12,6 +12,18 @@ export type ImovelEncontrado = {
   /** Busca do Airbnb já filtrada pela cidade. */
   airbnb: string | null;
   fotos: number;
+  /** Novos campos da API Google Places (New) */
+  priceLevel?: string;
+  editorialSummary?: string;
+  reviews?: Array<{ publishTime: string }>;
+  location?: { latitude: number; longitude: number };
+  /** Metadados de Score calculados */
+  score?: {
+    total: number;
+    signals: string[];
+    angulo: string;
+    faixa: 'ALTA' | 'MEDIA' | 'BAIXA';
+  };
 };
 
 export type CorpoBusca = {
