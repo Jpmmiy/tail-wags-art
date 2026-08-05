@@ -114,28 +114,6 @@ export const saveDeliverable = async (projectId: string, shotData: any) => {
     creditos: shotData.creditos,
     gerado: shotData.gerado,
     gerado_em: shotData.gerado_em
-  }, {
-    onConflict: 'project_id, shot_number'
-  });
-
-  if (error) {
-    console.error("Error saving deliverable:", error);
-    throw error;
-  }
-};
-
-
-export const saveDeliverable = async (projectId: string, shotData: any) => {
-  const { error } = await supabase.from("deliverables").upsert({
-    project_id: projectId,
-    shot_number: shotData.shot_number,
-    prompt_pt: shotData.prompt_pt,
-    prompt_en: shotData.prompt_en,
-    idioma_escolhido: shotData.idioma_escolhido,
-    modo: shotData.modo,
-    creditos: shotData.creditos,
-    gerado: shotData.gerado,
-    gerado_em: shotData.gerado_em
   });
 
   if (error) {
@@ -159,6 +137,7 @@ export const loadProject = async (id: string) => {
   if (error) return null;
   return project as any;
 };
+
 
 
 export const listProjects = async () => {
