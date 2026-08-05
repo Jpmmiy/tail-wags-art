@@ -264,6 +264,7 @@ export function Quiz() {
   }, []);
 
 
+
   const autosave = async (step: number) => {
     await saveProjectStep(step, {
       modalidade,
