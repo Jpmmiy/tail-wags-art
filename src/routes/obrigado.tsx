@@ -35,7 +35,7 @@ function Obrigado() {
 
   return (
     <div className="flex min-h-screen flex-col bg-ink">
-      <SiteHeader />
+      
       
       <main className="flex flex-1 items-center justify-center px-4 pt-24 pb-12">
         <div className="relative w-full max-w-[440px]">
@@ -122,7 +122,7 @@ function Obrigado() {
         </div>
       </main>
 
-      <Rodape />
+      
     </div>
   );
 }
