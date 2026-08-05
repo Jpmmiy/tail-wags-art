@@ -218,44 +218,51 @@ export function Quiz() {
     const resumeProject = async () => {
       const pid = getCurrentProjectId();
       if (pid) {
-        const p = await loadProject(pid);
-        if (p) {
-          setModalidade(p.modalidade as Modalidade);
-          setPasso(p.current_step || 0);
-          if (p.properties && p.properties.length > 0) {
-            const prop = p.properties[0];
-            setEscolhido({
-              id: prop.place_id || "",
-              nome: prop.nome,
-              endereco: prop.endereco || "",
-              lat: prop.lat || 0,
-              lng: prop.lng || 0,
-              nota: prop.rating || 0,
-              avaliacoes: prop.user_rating_count || 0,
-              fotos: prop.photos_count || 0,
-              site: prop.website_uri || "",
-              score: {
-                total: prop.opportunity_score || 0,
-                faixa: prop.opportunity_band as any,
-                signals: (prop.signals as string[]) || [],
-                angulo: prop.angulo_abordagem || ""
-              }
-            });
+        try {
+          const p = await loadProject(pid);
+          if (p) {
+            setModalidade(p.modalidade as Modalidade);
+            setPasso(p.current_step || 0);
+            if (p.properties && p.properties.length > 0) {
+              const prop = p.properties[0];
+              setEscolhido({
+                id: prop.place_id || "",
+                nome: prop.nome,
+                endereco: prop.endereco || "",
+                nota: prop.rating || 0,
+                avaliacoes: prop.user_rating_count || 0,
+                fotos: prop.photos_count || 0,
+                site: prop.website_uri || "",
+                mapa: null,
+                airbnb: null,
+                telefone: null,
+                location: prop.lat && prop.lng ? { latitude: prop.lat, longitude: prop.lng } : undefined,
+                score: {
+                  total: prop.opportunity_score || 0,
+                  faixa: prop.opportunity_band as any,
+                  signals: (prop.signals as string[]) || [],
+                  angulo: prop.angulo_abordagem || ""
+                }
+              });
+            }
+            if (p.briefings && p.briefings.length > 0) {
+              const b = p.briefings[0];
+              setPublico(b.publico || "casais");
+              setComodos((b.comodos as string[]) || []);
+              setEstilo(b.estilo_inferido || "aconchegante");
+              setVideoVertical(b.formato_video === '9:16');
+              if (p.modalidade === 'temporada') setDiaria(String(b.diaria || 250));
+              else setValorImobiliario(String(b.diaria || 450000));
+            }
           }
-          if (p.briefings && p.briefings.length > 0) {
-            const b = p.briefings[0];
-            setPublico(b.publico || "casais");
-            setComodos((b.comodos as string[]) || []);
-            setEstilo(b.estilo_inferido || "aconchegante");
-            setVideoVertical(b.formato_video === '9:16');
-            if (p.modalidade === 'temporada') setDiaria(String(b.diaria || 250));
-            else setValorImobiliario(String(b.diaria || 450000));
-          }
+        } catch (err) {
+          console.error("Failed to resume project", err);
         }
       }
     };
     resumeProject();
   }, []);
+
 
   const autosave = async (step: number) => {
     await saveProjectStep(step, {
