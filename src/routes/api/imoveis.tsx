@@ -63,7 +63,7 @@ function exemplos(c: CorpoBusca): ImovelEncontrado[] {
       airbnb: linkAirbnb(c.cidade, uf, nomePais(c.pais)),
       fotos: b.fotos,
       score,
-    };
+    } as ImovelEncontrado;
   }).sort((a, b) => (b.score?.total || 0) - (a.score?.total || 0));
 }
 
@@ -173,7 +173,7 @@ export const Route = createFileRoute("/api/imoveis")({
               editorialSummary: p.editorialSummary?.text,
               reviews: p.reviews,
               location: p.location,
-            };
+            } as ImovelEncontrado;
           }).sort((a, b) => (b.score?.total || 0) - (a.score?.total || 0));
 
           return json({ fonte: "google" as const, imoveis });

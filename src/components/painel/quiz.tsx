@@ -697,93 +697,126 @@ passo === 0 ? !!escolhido : true;
 
           {resultados.length > 0 && (
             <div className="motion-safe:animate-rise">
-              <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-                <h2 className="text-[0.95rem] font-medium text-bone">
-                  {resultados.length} encontrados
-                </h2>
-                <p className="text-[0.82rem] text-stone">
-                  {cidadeValida}
-                  {regiaoValida ? `, ${nomeRegiao(pais, regiaoValida)}` : ""} ·{" "}
-                  {nomePais(pais)}
-                </p>
+              <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <h2 className="text-[0.95rem] font-medium text-bone">
+                    {resultados.length} imóveis encontrados
+                  </h2>
+                  <p className="mt-1 text-[0.82rem] text-stone">
+                    {contagemAlta} com oportunidade alta em {cidadeValida}
+                  </p>
+                </div>
+                
+                <div className="flex rounded-xl bg-white/5 p-1">
+                  {(["TODOS", "ALTA", "MEDIA"] as const).map((f) => (
+                    <button
+                      key={f}
+                      onClick={() => setFiltroScore(f)}
+                      className={cn(
+                        "rounded-lg px-3 py-1.5 text-[0.75rem] font-medium transition-all",
+                        filtroScore === f 
+                          ? "bg-white/10 text-bone shadow-sm" 
+                          : "text-stone hover:text-bone"
+                      )}
+                    >
+                      {f.charAt(0) + f.slice(1).toLowerCase()}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <ul className="grid gap-3 sm:grid-cols-2">
-                {resultados.map((im) => {
+              <ul className="grid gap-4 sm:grid-cols-2">
+                {resultadosFiltrados.map((im) => {
                   const on = escolhido?.id === im.id;
+                  const sc = im.score;
+                  
                   return (
                     <li key={im.id}>
                       <div
                         className={cn(
-                          "h-full rounded-2xl p-5 transition-all duration-300",
+                          "group relative flex h-full flex-col rounded-2xl p-5 transition-all duration-300",
                           on
                             ? "glass-deep shadow-[0_0_0_1px_var(--chrome)_inset]"
                             : "glass hover:-translate-y-0.5",
                         )}
                       >
-                        <button
-                          type="button"
-                          onClick={() => setEscolhido(im)}
-                          aria-pressed={on}
-                          className="w-full text-left"
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <p className="font-display text-[1.02rem] font-semibold text-bone">
-                                {im.nome}
-                              </p>
-                              <p className="mt-0.5 flex items-start gap-1.5 text-[0.78rem] text-stone">
-                                <MapPin
-                                  className="mt-0.5 size-3 shrink-0"
-                                  strokeWidth={1.8}
-                                />
-                                {im.endereco}
+                        {sc && (
+                          <div className="mb-4 flex items-center justify-between">
+                            <div className={cn(
+                              "flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.7rem] font-bold uppercase tracking-wider",
+                              sc.faixa === 'ALTA' ? "bg-orange-500/20 text-orange-400" :
+                              sc.faixa === 'MEDIA' ? "bg-amber-500/20 text-amber-400" :
+                              "bg-stone-500/20 text-stone-400"
+                            )}>
+                              {sc.faixa === 'ALTA' && <Flame className="size-3" />}
+                              {sc.faixa === 'MEDIA' && <AlertCircle className="size-3" />}
+                              {sc.total} pts · {sc.faixa}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex-1">
+                          <h3 className="font-display text-[1.05rem] font-semibold text-bone group-hover:text-chrome transition-colors">
+                            {im.nome}
+                          </h3>
+                          <p className="mt-1 flex items-start gap-1.5 text-[0.78rem] text-stone">
+                            <MapPin className="mt-0.5 size-3 shrink-0" strokeWidth={1.8} />
+                            {im.endereco}
+                          </p>
+                          
+                          {sc && (
+                            <div className="mt-4 space-y-2">
+                              {sc.signals.map((sig, i) => (
+                                <p key={i} className="flex items-start gap-2 text-[0.82rem] leading-tight text-stone/90">
+                                  <span className="mt-1.5 size-1 shrink-0 rounded-full bg-chrome/40" />
+                                  {sig}
+                                </p>
+                              ))}
+                              <p className="mt-3 text-[0.82rem] font-medium text-chrome/90 italic">
+                                {sc.angulo}
                               </p>
                             </div>
-                            {im.nota != null && (
-                              <span className="flex shrink-0 items-center gap-1 rounded-md bg-white/8 px-2 py-1 text-[0.7rem] text-stone">
-                                <Star className="size-3 fill-chrome text-chrome" />
-                                {im.nota.toFixed(1)}
-                                {im.avaliacoes ? ` · ${im.avaliacoes}` : ""}
-                              </span>
+                          )}
+                        </div>
+
+                        <div className="mt-6 flex flex-col gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setEscolhido(im)}
+                            className={cn(
+                              "w-full rounded-xl py-2.5 text-[0.85rem] font-semibold transition-all",
+                              on 
+                                ? "metal-pill text-black" 
+                                : "bg-white/5 text-bone hover:bg-white/10"
+                            )}
+                          >
+                            {on ? "Imóvel selecionado" : "Usar este imóvel"}
+                          </button>
+                          
+                          <div className="flex items-center gap-2 border-t border-white/5 pt-3">
+                            {im.mapa && (
+                              <a
+                                href={im.mapa}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[0.7rem] text-stone/60 hover:text-chrome"
+                              >
+                                <ExternalLink className="size-3" />
+                                Maps
+                              </a>
+                            )}
+                            {im.airbnb && (
+                              <a
+                                href={im.airbnb}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[0.7rem] text-stone/60 hover:text-chrome"
+                              >
+                                <ExternalLink className="size-3" />
+                                Airbnb
+                              </a>
                             )}
                           </div>
-                        </button>
-
-                        <div className="mt-4 flex flex-wrap gap-2 border-t border-white/8 pt-3">
-                          {im.mapa && (
-                            <a
-                              href={im.mapa}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 rounded-lg border border-white/12 px-2.5 py-1.5 text-[0.74rem] text-stone transition-colors hover:border-chrome/40 hover:text-bone"
-                            >
-                              <ExternalLink className="size-3" strokeWidth={1.8} />
-                              Google Maps
-                            </a>
-                          )}
-                          {im.airbnb && (
-                            <a
-                              href={im.airbnb}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 rounded-lg border border-white/12 px-2.5 py-1.5 text-[0.74rem] text-stone transition-colors hover:border-chrome/40 hover:text-bone"
-                            >
-                              <ExternalLink className="size-3" strokeWidth={1.8} />
-                              Airbnb da região
-                            </a>
-                          )}
-                          {im.site && (
-                            <a
-                              href={im.site}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 rounded-lg border border-white/12 px-2.5 py-1.5 text-[0.74rem] text-stone transition-colors hover:border-chrome/40 hover:text-bone"
-                            >
-                              <ExternalLink className="size-3" strokeWidth={1.8} />
-                              Site
-                            </a>
-                          )}
                         </div>
                       </div>
                     </li>
