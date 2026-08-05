@@ -29,13 +29,15 @@ import {
   ChevronDown,
   Calendar,
   Zap,
+  DollarSign,
+  Send,
 } from "lucide-react";
 import { generateVideoPrompts } from "@/config/videoPrompts";
 import { VIDEO_PLAN, CREDIT_COSTS } from "@/config/credits";
+import { calculatePricing } from "@/config/pricing";
 import {
   ESTILOS,
   PUBLICOS,
-
   COMODOS,
   promptFoto,
   promptVideo,
@@ -57,7 +59,8 @@ import type { ImovelEncontrado, Modalidade } from "@/lib/imoveis-tipos";
 import { TelaGeracao } from "./tela-geracao";
 import { cn } from "@/lib/utils";
 
-const TITULOS = ["Alvo", "Diagnóstico", "Briefing", "Plano"];
+const TITULOS = ["Alvo", "Diagnóstico", "Briefing", "Plano", "Fechamento"];
+
 
 const MODALIDADES = [
   {
@@ -530,11 +533,107 @@ export function Quiz() {
             {aba === "abordagem" && <Peca indice={0} icone={MessageSquare} titulo="Proposta" legenda="Mensagem de abertura" texto={abordagem(respostas)} />}
           </div>
           
-          <button onClick={() => setPasso(0)} className="text-stone hover:text-bone text-sm flex items-center gap-2">
-             <RotateCcw className="size-4" /> Novo projeto
+          <div className="flex items-center justify-between mt-8 border-t border-white/5 pt-6">
+            <button onClick={() => setPasso(0)} className="text-stone hover:text-bone text-sm flex items-center gap-2">
+               <RotateCcw className="size-4" /> Novo projeto
+            </button>
+            <button onClick={() => setPasso(4)} className="metal-pill px-8 py-3 rounded-xl font-bold text-black flex items-center gap-2">
+              Ir para Fechamento <ArrowRight className="size-4" />
+            </button>
+          </div>
+        </section>
+      )}
+
+      {passo === 4 && respostas && (
+        <section className="space-y-8 motion-safe:animate-rise pb-12">
+          {/* BLOCO 1 — PROPOSTA COMERCIAL */}
+          <div className="glass p-6 rounded-2xl border-chrome/20">
+            <h3 className="text-bone font-medium flex items-center gap-2 mb-4">
+              <PenLine className="size-4 text-chrome" /> Proposta Comercial
+            </h3>
+            <div className="p-5 bg-white/[0.03] rounded-xl text-[0.85rem] text-stone whitespace-pre-wrap font-sans leading-relaxed">
+              {(() => {
+                const dadoReal = escolhido?.nota ? `${escolhido.nota}★ no Google` : escolhido?.avaliacoes ? `${escolhido.avaliacoes} avaliações` : "ausência de site próprio";
+                const listaEntregaveis = PACOTE_CONFIG.filter(p => entregaveis.includes(p.id)).map(p => p.rotulo).join(", ");
+                const preco = calculatePricing(Number(modalidade === 'temporada' ? diaria : valorImobiliario), modalidade || 'temporada').completo.valor;
+                return `Oi, vi que o ${escolhido?.nome} tem ${dadoReal}.\n\nO imóvel é excelente, mas o anúncio atual não reflete todo o seu potencial visual, o que pode estar afastando hóspedes qualificados.\n\nPara resolver isso, entrego:\n- ${listaEntregaveis}\n\nPrazo: 5 dias úteis após a captação.\n\nInvestimento: A partir de R$ ${preco.toLocaleString('pt-BR')}`;
+              })()}
+            </div>
+            <button 
+              onClick={() => {
+                const dadoReal = escolhido?.nota ? `${escolhido.nota}★ no Google` : escolhido?.avaliacoes ? `${escolhido.avaliacoes} avaliações` : "ausência de site próprio";
+                const listaEntregaveis = PACOTE_CONFIG.filter(p => entregaveis.includes(p.id)).map(p => p.rotulo).join(", ");
+                const preco = calculatePricing(Number(modalidade === 'temporada' ? diaria : valorImobiliario), modalidade || 'temporada').completo.valor;
+                const texto = `Oi, vi que o ${escolhido?.nome} tem ${dadoReal}.\n\nO imóvel é excelente, mas o anúncio atual não reflete todo o seu potencial visual, o que pode estar afastando hóspedes qualificados.\n\nPara resolver isso, entrego:\n- ${listaEntregaveis}\n\nPrazo: 5 dias úteis após a captação.\n\nInvestimento: A partir de R$ ${preco.toLocaleString('pt-BR')}`;
+                navigator.clipboard.writeText(texto);
+              }}
+              className="w-full mt-4 flex items-center justify-center gap-2 border border-white/10 hover:border-chrome/50 py-3 rounded-xl text-sm text-bone transition-all"
+            >
+              <Copy className="size-4" /> Copiar proposta completa
+            </button>
+          </div>
+
+          {/* BLOCO 2 — PREÇO SUGERIDO */}
+          <div className="space-y-4">
+            <h3 className="text-bone font-medium flex items-center gap-2">
+              <DollarSign className="size-4 text-chrome" /> Investimento Sugerido
+            </h3>
+            <div className="grid gap-4 md:grid-cols-3">
+              {Object.entries(calculatePricing(Number(modalidade === 'temporada' ? diaria : valorImobiliario), modalidade || 'temporada')).map(([key, plano]) => (
+                <div key={key} className={cn("glass p-5 rounded-2xl border transition-all", key === 'completo' ? "border-chrome/40 rim-lit" : "border-white/5")}>
+
+                  <div className="text-[10px] text-stone font-mono uppercase mb-1">{plano.titulo}</div>
+                  <div className="text-2xl font-bold text-bone mb-4">R$ {plano.valor.toLocaleString('pt-BR')}</div>
+                  <ul className="space-y-2 mb-6">
+                    {plano.inclui.map((item, i) => (
+                      <li key={i} className="text-[0.75rem] text-stone flex items-start gap-2">
+                        <Check className="size-3 text-chrome mt-0.5 shrink-0" /> {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* BLOCO 3 — MENSAGEM DE WHATSAPP */}
+          <div className="glass p-6 rounded-2xl border-chrome/20">
+            <h3 className="text-bone font-medium flex items-center gap-2 mb-4">
+              <MessageSquare className="size-4 text-chrome" /> Contato Rápido
+            </h3>
+            <div className="p-4 bg-white/[0.03] rounded-xl text-[0.9rem] text-bone italic border-l-2 border-chrome">
+              {(() => {
+                const dadoReal = escolhido?.nota ? `${escolhido.nota}★ no Google` : "o potencial do anúncio";
+                return `Oi, tudo bem? Vi o ${escolhido?.nome} e notei ${dadoReal}. Tenho uma proposta visual que pode aumentar seus cliques e ocupação. Podemos falar? 🚀`;
+              })()}
+            </div>
+            <div className="grid grid-cols-2 gap-3 mt-4">
+              <button 
+                onClick={() => {
+                  const dadoReal = escolhido?.nota ? `${escolhido.nota}★ no Google` : "o potencial do anúncio";
+                  navigator.clipboard.writeText(`Oi, tudo bem? Vi o ${escolhido?.nome} e notei ${dadoReal}. Tenho uma proposta visual que pode aumentar seus cliques e ocupação. Podemos falar? 🚀`);
+                }}
+                className="flex items-center justify-center gap-2 border border-white/10 hover:border-chrome/50 py-3 rounded-xl text-sm text-bone transition-all"
+              >
+                <Copy className="size-4" /> Copiar mensagem
+              </button>
+              <a 
+                href={`https://wa.me/?text=${encodeURIComponent(`Oi, tudo bem? Vi o ${escolhido?.nome} e notei ${escolhido?.nota ? `${escolhido.nota}★ no Google` : "o potencial do anúncio"}. Tenho uma proposta visual que pode aumentar seus cliques e ocupação. Podemos falar? 🚀`)}`}
+                target="_blank" 
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 bg-[#25D366] text-white py-3 rounded-xl text-sm font-bold"
+              >
+                <Send className="size-4" /> Abrir WhatsApp
+              </a>
+            </div>
+          </div>
+
+          <button onClick={() => setPasso(0)} className="text-stone hover:text-bone text-sm flex items-center gap-2 mx-auto">
+             <RotateCcw className="size-4" /> Iniciar novo atendimento
           </button>
         </section>
       )}
+
 
     </div>
   );
