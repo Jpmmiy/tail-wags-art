@@ -24,21 +24,30 @@ let instantaneo: Instantaneo = VAZIO;
 let timer: ReturnType<typeof setInterval> | null = null;
 const ouvintes = new Set<() => void>();
 
-function lerInicio() {
+async function lerInicio() {
   const salvo = localStorage.getItem(CHAVE);
   if (salvo) return Number(salvo);
+
+  const { data: { session } } = await supabase.auth.getSession();
+  const metaInicio = session?.user?.user_metadata?.initial_login_timer_start;
+  
   const agora = Date.now();
-  localStorage.setItem(CHAVE, String(agora));
-  return agora;
+  const inicio = metaInicio ? Number(metaInicio) : agora;
+  
+  localStorage.setItem(CHAVE, String(inicio));
+  return inicio;
 }
 
 function assinar(aoMudar: () => void) {
   if (ouvintes.size === 0) {
-    instantaneo = { inicio: lerInicio(), agora: Date.now() };
-    timer = setInterval(() => {
-      instantaneo = { inicio: instantaneo.inicio, agora: Date.now() };
+    lerInicio().then(inicio => {
+      instantaneo = { inicio, agora: Date.now() };
+      timer = setInterval(() => {
+        instantaneo = { inicio: instantaneo.inicio, agora: Date.now() };
+        ouvintes.forEach((f) => f());
+      }, 1000);
       ouvintes.forEach((f) => f());
-    }, 1000);
+    });
   }
   ouvintes.add(aoMudar);
 
