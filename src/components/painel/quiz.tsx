@@ -324,7 +324,7 @@ export function Quiz() {
             <p className="text-stone">Selecione seu objetivo para personalizarmos o fluxo.</p>
           </div>
 
-          <div className="grid gap-4 max-w-2xl mx-auto">
+          <div className="grid gap-4 sm:grid-cols-2 max-w-4xl mx-auto">
             <button 
               onClick={() => {
                 setObjetivo("video");
@@ -338,8 +338,8 @@ export function Quiz() {
                   <Clapperboard className="size-7" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-display font-semibold text-bone">Criar Vídeos Airbnb</h3>
-                  <p className="text-sm text-stone mt-1">Foco em roteiros profissionais de 8s para Google Flow.</p>
+                  <h3 className="text-xl font-display font-semibold text-bone">Criação de Vídeo</h3>
+                  <p className="text-sm text-stone mt-1">Roteiros profissionais otimizados para Airbnb e Google Flow.</p>
                 </div>
                 <ChevronRight className="size-6 ml-auto text-stone group-hover:text-chrome transition-colors" />
               </div>
@@ -358,28 +358,8 @@ export function Quiz() {
                   <LayoutTemplate className="size-7" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-display font-semibold text-bone">Criar Landing Page</h3>
-                  <p className="text-sm text-stone mt-1">Foco em briefings de alta conversão para o Lovable.</p>
-                </div>
-                <ChevronRight className="size-6 ml-auto text-stone group-hover:text-chrome transition-colors" />
-              </div>
-            </button>
-
-            <button 
-              onClick={() => {
-                setObjetivo("completo");
-                setEntregaveis(["fotos", "video", "site", "abordagem"]);
-                setPasso(0);
-              }}
-              className="glass p-8 rounded-3xl text-left transition-all hover:bg-white/5 border-white/10 group"
-            >
-              <div className="flex items-center gap-5">
-                <div className="size-14 rounded-2xl bg-white/5 grid place-items-center text-stone group-hover:scale-110 transition-transform">
-                  <Sparkles className="size-7" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-display font-semibold text-bone">Pack Completo</h3>
-                  <p className="text-sm text-stone mt-1">Fotos, Vídeo, Site e Estratégia de Venda.</p>
+                  <h3 className="text-xl font-display font-semibold text-bone">Landing Page</h3>
+                  <p className="text-sm text-stone mt-1">Briefings de alta conversão prontos para o Lovable.</p>
                 </div>
                 <ChevronRight className="size-6 ml-auto text-stone group-hover:text-chrome transition-colors" />
               </div>
