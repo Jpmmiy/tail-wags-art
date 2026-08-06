@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { isMentorEnabled } from "@/lib/mentor-config";
 
 const MODELO = "google/gemini-3-flash";
 
@@ -54,6 +55,13 @@ export const Route = createFileRoute("/api/mentor")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        if (!isMentorEnabled()) {
+          return json(
+            { erro: "O Mentor está em manutenção ou foi desativado temporariamente." },
+            403,
+          );
+        }
+
         const chave = process.env["LOVABLE_API_KEY"];
         if (!chave) {
           return json(

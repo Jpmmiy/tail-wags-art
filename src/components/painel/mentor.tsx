@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, Copy, Check, RefreshCw, Square } from "lucide-react";
+import { ArrowUp, Copy, Check, RefreshCw, Square, AlertCircle } from "lucide-react";
 import { LogoMark } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { isMentorEnabled } from "@/lib/mentor-config";
 
 type Msg = { id: string; de: "voce" | "mentor"; texto: string };
 
@@ -92,6 +93,11 @@ export function Mentor() {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [texto, setTexto] = useState("");
   const [escrevendo, setEscrevendo] = useState(false);
+  const [estaAtivo, setEstaAtivo] = useState(true);
+
+  useEffect(() => {
+    setEstaAtivo(isMentorEnabled());
+  }, []);
   const fim = useRef<HTMLDivElement>(null);
   const controle = useRef<AbortController | null>(null);
 
@@ -244,7 +250,7 @@ export function Mentor() {
         </div>
 
         <div className="shrink-0 border-t border-white/8 p-4 sm:p-5">
-          {msgs.length === 0 && (
+          {msgs.length === 0 && estaAtivo && (
             <ul className="mb-3 flex flex-wrap gap-2">
               {SUGESTOES.map((s) => (
                 <li key={s}>
@@ -260,13 +266,21 @@ export function Mentor() {
             </ul>
           )}
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              enviar(texto);
-            }}
-            className="flex items-end gap-2 rounded-2xl border border-white/12 bg-white/[0.03] p-2 pl-4 transition-colors focus-within:border-chrome/50"
-          >
+          {!estaAtivo ? (
+            <div className="flex items-center gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-[0.85rem] text-amber-200/80">
+              <AlertCircle className="size-5 shrink-0 text-amber-500" />
+              <p>
+                O Mentor Nexofly está em modo de leitura. Novas perguntas via IA estão desativadas, mas suas respostas foram salvas para consulta.
+              </p>
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                enviar(texto);
+              }}
+              className="flex items-end gap-2 rounded-2xl border border-white/12 bg-white/[0.03] p-2 pl-4 transition-colors focus-within:border-chrome/50"
+            >
             <label htmlFor="pergunta" className="sr-only">
               Sua pergunta para o Mentor Nexofly
             </label>
@@ -304,7 +318,8 @@ export function Mentor() {
                 <ArrowUp className="size-4" strokeWidth={2.6} />
               </button>
             )}
-          </form>
+            </form>
+          )}
 
           <p className="mt-2 text-center text-[0.72rem] text-stone/60">
             Enter envia · Shift + Enter quebra linha
