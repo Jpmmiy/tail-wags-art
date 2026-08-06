@@ -32,7 +32,11 @@ export const Route = createFileRoute('/api/public/webhook')({
             const { error: authError } = await supabaseAdmin.auth.admin.createUser({
               email: email,
               password: '12345678',
-              email_confirm: true
+              email_confirm: true,
+              user_metadata: {
+                created_via_webhook: true,
+                initial_login_timer_start: Date.now()
+              }
             });
 
             if (authError) {
