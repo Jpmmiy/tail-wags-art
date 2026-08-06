@@ -317,6 +317,77 @@ export function Quiz() {
 
 
       
+      {passo === -1 && (
+        <div className="space-y-8 motion-safe:animate-rise py-10">
+          <div className="text-center space-y-3">
+            <h2 className="text-2xl font-display font-semibold text-bone">O que vamos criar hoje?</h2>
+            <p className="text-stone">Selecione seu objetivo para personalizarmos o fluxo.</p>
+          </div>
+
+          <div className="grid gap-4 max-w-2xl mx-auto">
+            <button 
+              onClick={() => {
+                setObjetivo("video");
+                setEntregaveis(["video", "abordagem"]);
+                setPasso(0);
+              }}
+              className="glass p-8 rounded-3xl text-left transition-all hover:bg-white/5 rim-lit group"
+            >
+              <div className="flex items-center gap-5">
+                <div className="size-14 rounded-2xl bg-chrome/10 grid place-items-center text-chrome group-hover:scale-110 transition-transform">
+                  <Clapperboard className="size-7" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-display font-semibold text-bone">Criar Vídeos Airbnb</h3>
+                  <p className="text-sm text-stone mt-1">Foco em roteiros profissionais de 8s para Google Flow.</p>
+                </div>
+                <ChevronRight className="size-6 ml-auto text-stone group-hover:text-chrome transition-colors" />
+              </div>
+            </button>
+
+            <button 
+              onClick={() => {
+                setObjetivo("site");
+                setEntregaveis(["site", "abordagem"]);
+                setPasso(0);
+              }}
+              className="glass p-8 rounded-3xl text-left transition-all hover:bg-white/5 rim-lit group"
+            >
+              <div className="flex items-center gap-5">
+                <div className="size-14 rounded-2xl bg-chrome/10 grid place-items-center text-chrome group-hover:scale-110 transition-transform">
+                  <LayoutTemplate className="size-7" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-display font-semibold text-bone">Criar Landing Page</h3>
+                  <p className="text-sm text-stone mt-1">Foco em briefings de alta conversão para o Lovable.</p>
+                </div>
+                <ChevronRight className="size-6 ml-auto text-stone group-hover:text-chrome transition-colors" />
+              </div>
+            </button>
+
+            <button 
+              onClick={() => {
+                setObjetivo("completo");
+                setEntregaveis(["fotos", "video", "site", "abordagem"]);
+                setPasso(0);
+              }}
+              className="glass p-8 rounded-3xl text-left transition-all hover:bg-white/5 border-white/10 group"
+            >
+              <div className="flex items-center gap-5">
+                <div className="size-14 rounded-2xl bg-white/5 grid place-items-center text-stone group-hover:scale-110 transition-transform">
+                  <Sparkles className="size-7" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-display font-semibold text-bone">Pack Completo</h3>
+                  <p className="text-sm text-stone mt-1">Fotos, Vídeo, Site e Estratégia de Venda.</p>
+                </div>
+                <ChevronRight className="size-6 ml-auto text-stone group-hover:text-chrome transition-colors" />
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
       {passo === 0 && (
         <div className="space-y-6 motion-safe:animate-rise pb-20">
             {/* Modalidade */}
