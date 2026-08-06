@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { Link2, Eye } from "lucide-react";
 import { RoomScene } from "@/components/marketing/room-scene";
+import { GeradorPortfolio } from "@/components/painel/gerador-portfolio";
 
 
 const TRABALHOS = [
