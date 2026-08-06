@@ -94,7 +94,7 @@ export function Presente() {
         <p className="mt-1.5 text-[0.95rem] text-stone">
           {liberado
             ? "O prazo acabou. Seu presente está aberto."
-            : "Liberamos em 7 dias a partir da sua entrada."}
+            : `Liberamos em ${DIAS} dias a partir da sua entrada.`}
         </p>
       </header>
 
