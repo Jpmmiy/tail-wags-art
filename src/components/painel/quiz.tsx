@@ -89,7 +89,8 @@ function Progresso({ passo }: { passo: number }) {
 }
 
 export function Quiz() {
-  const [passo, setPasso] = useState(0);
+  const [passo, setPasso] = useState(-1);
+  const [objetivo, setObjetivo] = useState<"site" | "video" | "completo" | null>(null);
   const [modalidade, setModalidade] = useState<Modalidade | null>(null);
   const [escolhido, setEscolhido] = useState<ImovelEncontrado | null>(null);
   const [manualNome, setManualNome] = useState("");
