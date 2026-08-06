@@ -55,7 +55,7 @@ import { cn } from "@/lib/utils";
 import { saveProjectStep, loadProject, setCurrentProjectId, getCurrentProjectId } from "@/lib/persistence";
 import { toast } from "sonner";
 
-const TITULOS = ["Radar de Oportunidades", "Briefing", "Fechamento", "Produção"];
+const TITULOS = ["Radar de Oportunidades", "Personalização", "Abordagem", "Sala de Produção"];
 
 const MODALIDADES = [
   { id: "temporada" as const, icone: Home, titulo: "Airbnb e temporada", desc: "Pousadas, chalés e casas anunciadas por diária." },
@@ -337,11 +337,11 @@ export function Quiz() {
                 <div className="size-14 rounded-2xl bg-chrome/10 grid place-items-center text-chrome group-hover:scale-110 transition-transform">
                   <Clapperboard className="size-7" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-display font-semibold text-bone">Criação de Vídeo</h3>
-                  <p className="text-sm text-stone mt-1">Roteiros profissionais otimizados para Airbnb e Google Flow.</p>
+                <div className="flex-1">
+                  <h3 className="text-xl font-display font-semibold text-bone">Fluxo de Vídeos</h3>
+                  <p className="text-sm text-stone mt-1">Roteiros profissionais para Airbnb e handoff direto para Google Flow.</p>
                 </div>
-                <ChevronRight className="size-6 ml-auto text-stone group-hover:text-chrome transition-colors" />
+                <ChevronRight className="size-6 text-stone group-hover:text-chrome transition-colors" />
               </div>
             </button>
 
@@ -357,11 +357,11 @@ export function Quiz() {
                 <div className="size-14 rounded-2xl bg-chrome/10 grid place-items-center text-chrome group-hover:scale-110 transition-transform">
                   <LayoutTemplate className="size-7" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-display font-semibold text-bone">Landing Page</h3>
-                  <p className="text-sm text-stone mt-1">Briefings de alta conversão prontos para o Lovable.</p>
+                <div className="flex-1">
+                  <h3 className="text-xl font-display font-semibold text-bone">Fluxo de Site</h3>
+                  <p className="text-sm text-stone mt-1">Estrutura de alta conversão com envio automático para o Lovable.</p>
                 </div>
-                <ChevronRight className="size-6 ml-auto text-stone group-hover:text-chrome transition-colors" />
+                <ChevronRight className="size-6 text-stone group-hover:text-chrome transition-colors" />
               </div>
             </button>
           </div>
