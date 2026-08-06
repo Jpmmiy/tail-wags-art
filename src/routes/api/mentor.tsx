@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { isMentorEnabled } from "@/lib/mentor-config";
 
 const MODELO = "google/gemini-3-flash";
 
