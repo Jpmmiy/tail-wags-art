@@ -174,9 +174,6 @@ export function Planos() {
                   <p className="text-[0.86rem] text-stone">
                     {vitalicio.periodo}
                   </p>
-                  <p className="mt-1 text-[0.82rem] font-medium text-jade">
-                    Economiza R$ 1.789 no primeiro ano
-                  </p>
                 </div>
               </div>
 
