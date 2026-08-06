@@ -311,7 +311,7 @@ export function Quiz() {
       <header>
         <h1 className="font-display text-3xl font-semibold text-bone">{TITULOS[passo]}</h1>
       </header>
-      <Progresso passo={passo} />
+      {passo >= 0 && <Progresso passo={passo} />}
 
 
 
