@@ -33,22 +33,7 @@ function Portfolio() {
             Uma página só sua. Mande o link junto com a abordagem.
           </p>
         </div>
-        <button
-          type="button"
-          className="inline-flex h-11 items-center gap-2 rounded-xl border border-white/12 px-4 text-[0.88rem] text-bone transition-colors hover:border-chrome/40 hover:text-chrome"
-        >
-          <Link2 className="size-4" strokeWidth={1.8} />
-          nexofly.com.br/joao
-        </button>
       </header>
-
-      <div className="flex items-center gap-2 glass rounded-xl px-4 py-3">
-        <Eye className="size-4 text-stone" strokeWidth={1.8} />
-        <p className="text-[0.85rem] text-stone">
-          <span className="text-bone">47 visitas</span> nos últimos 30 dias ·{" "}
-          <span className="text-jade">6 viraram conversa</span>
-        </p>
-      </div>
 
       <ul className="grid gap-5 lg:grid-cols-2">
         {TRABALHOS.map((t) => (
