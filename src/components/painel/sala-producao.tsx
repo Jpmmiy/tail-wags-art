@@ -116,7 +116,7 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
                 <Copy className="size-4" /> Copiar prompt
               </button>
               <a 
-                href="https://labs.google/flow" 
+                href={`https://labs.google/flow`} 
                 target="_blank" 
                 rel="noreferrer"
                 className="flex items-center justify-center gap-2 bg-chrome text-black py-3 rounded-xl text-sm font-bold hover:scale-[1.02] transition-all"
