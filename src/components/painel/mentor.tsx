@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, Copy, Check, RefreshCw, Square } from "lucide-react";
+import { ArrowUp, Copy, Check, RefreshCw, Square, AlertCircle } from "lucide-react";
 import { LogoMark } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { isMentorEnabled } from "@/lib/mentor-config";
 
 type Msg = { id: string; de: "voce" | "mentor"; texto: string };
 
