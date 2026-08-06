@@ -174,9 +174,9 @@ export const PLANOS = [
     chamada: "Paga uma vez. É seu para sempre.",
     destaque: true,
     inclui: [
-      "Busca de imóveis e Leads ilimitada",
-      "Criação de Vídeos Airbnb (Prompts)",
-      "Landing Pages infinitas via Lovable",
+      "Busca de imóveis e Leads infinitas",
+      "Criação de Vídeos Airbnb",
+      "Landing Pages infinitas",
       "Créditos infinitos (Suporte Lovable)",
       "Mentor Nexofly a qualquer hora",
       "Prospecção Estratégica",
