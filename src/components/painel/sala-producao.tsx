@@ -110,19 +110,23 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button 
+                onClick={async () => {
+                  await navigator.clipboard.writeText(promptVideo(respostas));
+                  toast.success("Roteiro copiado! Abrindo Google Flow...");
+                  setTimeout(() => {
+                    window.open('https://labs.google/flow', '_blank');
+                  }, 800);
+                }}
+                className="flex items-center justify-center gap-2 bg-chrome text-black py-3 rounded-xl text-sm font-bold hover:scale-[1.02] transition-all"
+              >
+                <Clapperboard className="size-4" /> Gerar no Google Flow
+              </button>
+              <button 
                 onClick={() => copiar(promptVideo(respostas), "Prompt de vídeo")}
                 className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 py-3 rounded-xl text-sm text-bone transition-all"
               >
-                <Copy className="size-4" /> Copiar prompt
+                <Copy className="size-4" /> Apenas copiar
               </button>
-              <a 
-                href={`https://labs.google/flow`} 
-                target="_blank" 
-                rel="noreferrer"
-                className="flex items-center justify-center gap-2 bg-chrome text-black py-3 rounded-xl text-sm font-bold hover:scale-[1.02] transition-all"
-              >
-                <ExternalLink className="size-4" /> Abrir Google Flow
-              </a>
             </div>
           </div>
         )}
@@ -157,19 +161,24 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button 
+                onClick={async () => {
+                  const prompt = promptSite(respostas);
+                  await navigator.clipboard.writeText(prompt);
+                  toast.success("Briefing copiado! Abrindo Lovable...");
+                  setTimeout(() => {
+                    window.open(`https://lovable.dev/new?prompt=${encodeURIComponent(prompt)}`, '_blank');
+                  }, 800);
+                }}
+                className="flex items-center justify-center gap-2 bg-chrome text-black py-3 rounded-xl text-sm font-bold hover:scale-[1.02] transition-all"
+              >
+                <LayoutTemplate className="size-4" /> Gerar no Lovable
+              </button>
+              <button 
                 onClick={() => copiar(promptSite(respostas), "Conteúdo do site")}
                 className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 py-3 rounded-xl text-sm text-bone transition-all"
               >
-                <Copy className="size-4" /> Copiar conteúdo
+                <Copy className="size-4" /> Apenas copiar
               </button>
-              <a 
-                href={`https://lovable.dev/new?prompt=${encodeURIComponent(promptSite(respostas))}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-center gap-2 bg-chrome text-black py-3 rounded-xl text-sm font-bold hover:scale-[1.02] transition-all"
-              >
-                <ExternalLink className="size-4" /> Abrir no Lovable
-              </a>
             </div>
           </div>
         )}
