@@ -168,10 +168,10 @@ export const PLANOS = [
   },
   {
     id: "vitalicio",
-    nome: "Vitalício",
+    nome: "Plano Acesso Pra Sempre (vitalício)",
     preco: "497,00",
     periodo: "pagamento único",
-    chamada: "Paga uma vez. É seu para sempre.",
+    chamada: "Pague uma única vez (acesso pra sempre)",
     destaque: true,
     inclui: [
       "Busca de imóveis e Leads infinitas",
