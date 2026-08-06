@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { FakeSaleNotifications } from "@/components/painel/fake-sale-notifications";
 import { supabase } from "@/integrations/supabase/client";
 import { syncProjectsOnLogin } from "@/lib/persistence";
 
@@ -144,6 +145,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <FakeSaleNotifications />
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );

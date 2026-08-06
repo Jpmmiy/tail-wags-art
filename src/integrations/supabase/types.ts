@@ -292,6 +292,33 @@ export type Database = {
         }
         Relationships: []
       }
+      system_errors: {
+        Row: {
+          context: Json | null
+          created_at: string | null
+          error_message: string
+          error_stack: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string | null
+          error_message: string
+          error_stack?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string | null
+          error_message?: string
+          error_stack?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

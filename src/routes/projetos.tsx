@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { listProjects, setCurrentProjectId } from '@/lib/persistence';
+import { useProtocoloStore } from '@/lib/protocolo';
 import { 
   Calendar, 
   ChevronRight, 
@@ -15,6 +16,7 @@ export const Route = createFileRoute('/projetos')({
 });
 
 function ProjetosPage() {
+  const { overrides } = useProtocoloStore();
   const { data: projects, isLoading } = useQuery({
     queryKey: ['projects'],
     queryFn: listProjects,
@@ -73,7 +75,7 @@ function ProjetosPage() {
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between text-[11px] uppercase tracking-wider text-stone">
                           <span>Progresso</span>
-                          <span className="text-bone">{gerados} de 4 clipes</span>
+                          <span className="text-bone">{overrides.projetosConcluidos || `${gerados} de 4 clipes`}</span>
                         </div>
                         <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
                           <div 
