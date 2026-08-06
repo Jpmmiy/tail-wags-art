@@ -1,8 +1,9 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore, useEffect } from "react";
 import { Gift, Sparkles, Ticket } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const CHAVE = "nexofly:presente:inicio";
 const DIAS = 5;
