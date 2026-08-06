@@ -235,34 +235,38 @@ export function promptVideo(r: Respostas) {
   const e = acheEstilo(r.estilo);
   const p = achePublico(r.publico);
 
-  return `Vídeo de 8 segundos — ${r.imovel.nome}, ${r.imovel.cidade}
+  return `### PLANO DE PRODUÇÃO VÍDEO AIRBNB — ${r.imovel.nome.toUpperCase()}
 
-MOVIMENTO
-Travelling lento entrando pelo ambiente principal. Câmera na altura
-do peito (1,45m), deslocamento contínuo de 1,2m em linha reta.
-Sem tremor, sem zoom brusco, sem drone dentro do cômodo.
+OBJETIVO COMERCIAL
+Transformar visualizadores em hóspedes destacando ${p.foco}.
 
-LUZ
-${e.luz}.
+ESTRUTURA DE 6 CAMADAS (GOOGLE FLOW)
 
-FOCO
-Primeiro segundo com profundidade de campo rasa no detalhe mais
-forte do imóvel. Depois abre lentamente para o ambiente inteiro.
+1. CENA (MOVIMENTO)
+Travelling lento entrando pelo ambiente principal. Câmera na altura do peito (1,45m), deslocamento contínuo de 1.2 metros em linha reta. Estabilização total, sem tremores.
 
-O QUE PRECISA APARECER
-${p.foco}.
+2. ILUMINAÇÃO (STYLING)
+${e.luz}. Partículas de poeira visíveis nos feixes de luz se possível. Sombras suaves.
 
-SOM
-Sem trilha. Ambiente natural leve (vento, pássaros, mar — conforme
-a região).
+3. TEXTURAS E MATERIAIS
+Foco em: ${e.materiais}.
 
-NÃO INCLUIR
-Pessoas, texto na tela, logotipo, transições chamativas, filtro
-saturado.
+4. PONTO DE INTERESSE (HOOK)
+Primeiro segundo com profundidade de campo rasa focando em um detalhe que represente ${p.rotulo.toLowerCase()}. Depois, abertura suave para o ambiente completo.
 
-ENTREGA
-9:16 para Stories e 16:9 para o anúncio. Primeiro frame precisa
-funcionar como capa.${obs(r.notas.pacote)}`;
+5. AMBIENTAÇÃO SONORA
+Som ambiente natural (diegetico). Silêncio de fundo com sons sutis de natureza local. Sem música.
+
+6. REGRAS DE OURO (NEGATIVE PROMPT)
+- Zero pessoas ou animais.
+- Zero texto, logotipos ou marcas d'água.
+- Zero transições digitais ou efeitos de flash.
+- Zero cortes bruscos.
+
+ESPECIFICAÇÕES TÉCNICAS
+- Duração: 8 a 10 segundos.
+- Formato: 9:16 (Vertical) para Reels/Stories.
+- Estilo Visual: Cinematic Real Estate.${obs(r.notes?.pacote)}`;
 }
 
 export function promptSite(r: Respostas) {
