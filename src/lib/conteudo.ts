@@ -157,7 +157,7 @@ export const PLANOS = [
       "Busca de imóveis e Leads infinitas",
       "Criação de Vídeos Airbnb",
       "Landing Pages infinitas",
-      "Créditos infinitos (Suporte Lovable)",
+      "Créditos infinitos Lovable",
       "Mentor Nexofly a qualquer hora",
       "Prospecção Estratégica",
       "Atualizações enquanto for assinante",
