@@ -27,28 +27,28 @@ const PERGUNTAS = [
 ];
 
 export function GeradorPortfolio() {
-  const [etapa, setEtapa] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, string>>({});
   const [gerando, setGerando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
 
-  const perguntaAtual = PERGUNTAS[etapa];
+  const aoMudar = (id: string, valor: string) => {
+    setRespostas(prev => ({ ...prev, [id]: valor }));
+    if (erro) setErro(null);
+  };
 
-  const aoResponder = (valor: string) => {
-    if (!valor) return;
-    const novasRespostas = { ...respostas, [perguntaAtual.id]: valor };
-    setRespostas(novasRespostas);
-    
-    if (etapa < PERGUNTAS.length - 1) {
-      setEtapa(etapa + 1);
-    } else {
-      gerarPrompt(novasRespostas);
+  const validarERodar = () => {
+    const pendentes = PERGUNTAS.filter(p => !respostas[p.id]);
+    if (pendentes.length > 0) {
+      setErro("Por favor, preencha todos os campos antes de gerar.");
+      return;
     }
+    gerarPrompt(respostas);
   };
 
   const gerarPrompt = (dados: Record<string, string>) => {
     setGerando(true);
     
-    const prompt = `Crie um portfólio profissional de alto impacto para ${dados.nome || "um profissional"}.
+    const prompt = `Crie um portfólio profissional de alto impacto para ${dados.nome}.
 Foco: ${dados.tipo}.
 Experiência: ${dados.experiencia}.
 Estilo Visual: ${dados.estilo}.
@@ -73,73 +73,63 @@ Crie o layout moderno em React/Tailwind seguindo a estética Dark/Apple da Nexof
   return (
     <section className="glass-deep relative overflow-hidden rounded-3xl p-8 sm:p-12 mt-12">
       <div className="relative z-10">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-8">
           <span className="metal-pill grid size-10 place-items-center rounded-xl text-[#08090B]">
             <Sparkles className="size-5" />
           </span>
           <div>
             <h2 className="font-display text-xl font-semibold text-bone">Arquiteto de Portfólio</h2>
-            <p className="text-stone text-sm">Responda e gere seu site no Lovable em segundos</p>
+            <p className="text-stone text-sm">Preencha o formulário e gere seu site no Lovable em segundos</p>
           </div>
         </div>
 
         {!gerando ? (
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <p className="text-stone text-[0.8rem] uppercase tracking-wider font-mono">
-                Pergunta {etapa + 1} de {PERGUNTAS.length}
-              </p>
-              <h3 className="text-bone font-display text-lg sm:text-xl font-medium">
-                {perguntaAtual.pergunta}
-              </h3>
+          <div className="space-y-8">
+            <div className="grid gap-6 sm:grid-cols-2">
+              {PERGUNTAS.map((pergunta) => (
+                <div key={pergunta.id} className="space-y-3">
+                  <label className="text-bone font-medium text-[0.9rem] flex items-center gap-2">
+                    {pergunta.pergunta}
+                  </label>
+                  
+                  {pergunta.opcoes ? (
+                    <select
+                      value={respostas[pergunta.id] || ""}
+                      onChange={(e) => aoMudar(pergunta.id, e.target.value)}
+                      className="w-full glass bg-white/5 border-none rounded-xl px-4 py-3 text-bone outline-none ring-1 ring-white/10 focus:ring-chrome/40 transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="" disabled className="bg-[#08090B]">Selecione uma opção...</option>
+                      {pergunta.opcoes.map(opcao => (
+                        <option key={opcao} value={opcao} className="bg-[#08090B]">{opcao}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      placeholder={pergunta.placeholder}
+                      value={respostas[pergunta.id] || ""}
+                      onChange={(e) => aoMudar(pergunta.id, e.target.value)}
+                      className="w-full glass bg-white/5 border-none rounded-xl px-4 py-3 text-bone outline-none ring-1 ring-white/10 focus:ring-chrome/40 transition-all"
+                    />
+                  )}
+                </div>
+              ))}
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              {perguntaAtual.opcoes ? (
-                perguntaAtual.opcoes.map((opcao) => (
-                  <button
-                    key={opcao}
-                    onClick={() => aoResponder(opcao)}
-                    className="glass text-left p-4 rounded-xl text-[0.9rem] text-stone hover:text-bone hover:border-chrome/40 transition-all group"
-                  >
-                    <div className="flex items-center justify-between">
-                      {opcao}
-                      <ArrowRight className="size-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                    </div>
-                  </button>
-                ))
-              ) : (
-                <div className="sm:col-span-2 flex gap-2">
-                  <input
-                    type="text"
-                    autoFocus
-                    placeholder={perguntaAtual.placeholder}
-                    className="flex-1 glass bg-white/5 border-none rounded-xl px-4 py-3 text-bone outline-none ring-1 ring-white/10 focus:ring-chrome/40 transition-all"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        aoResponder((e.target as HTMLInputElement).value);
-                      }
-                    }}
-                  />
-                  <button 
-                    onClick={(e) => {
-                      const input = (e.currentTarget.previousSibling as HTMLInputElement);
-                      aoResponder(input.value);
-                    }}
-                    className="metal-pill px-6 rounded-xl text-[#08090B] font-medium"
-                  >
-                    Próximo
-                  </button>
-                </div>
-              )}
-            </div>
-            
-            <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-chrome transition-all duration-500" 
-                style={{ width: `${((etapa) / PERGUNTAS.length) * 100}%` }}
-              />
-            </div>
+            {erro && (
+              <div className="flex items-center gap-2 text-rose-400 bg-rose-400/10 p-4 rounded-xl text-sm animate-in fade-in slide-in-from-top-2">
+                <AlertCircle className="size-4" />
+                {erro}
+              </div>
+            )}
+
+            <button 
+              onClick={validarERodar}
+              className="w-full metal-pill py-4 rounded-xl text-[#08090B] font-semibold flex items-center justify-center gap-2 group hover:scale-[1.01] active:scale-[0.99] transition-all"
+            >
+              Criar meu Portfólio no Lovable
+              <ArrowRight className="size-5 group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
         ) : (
           <div className="py-12 flex flex-col items-center justify-center text-center">
