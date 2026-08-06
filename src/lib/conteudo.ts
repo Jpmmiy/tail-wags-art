@@ -148,10 +148,10 @@ export const ETAPAS = [
 export const PLANOS = [
   {
     id: "mensal",
-    nome: "Mensal",
+    nome: "Plano Mensal",
     preco: "247,00",
     periodo: "/mês",
-    chamada: "Para começar a atender agora.",
+    chamada: "Acesso completo ao Nexofly por mês",
     destaque: false,
     inclui: [
       "Busca de imóveis e Leads infinitas",
