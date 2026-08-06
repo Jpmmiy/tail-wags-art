@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, ArrowRight, Check, Send } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Sparkles, ArrowRight, AlertCircle } from "lucide-react";
 
 const PERGUNTAS = [
   {
@@ -35,21 +34,24 @@ export function GeradorPortfolio() {
   const perguntaAtual = PERGUNTAS[etapa];
 
   const aoResponder = (valor: string) => {
-    setRespostas((prev) => ({ ...prev, [perguntaAtual.id]: valor }));
+    if (!valor) return;
+    const novasRespostas = { ...respostas, [perguntaAtual.id]: valor };
+    setRespostas(novasRespostas);
+    
     if (etapa < PERGUNTAS.length - 1) {
       setEtapa(etapa + 1);
     } else {
-      gerarPrompt();
+      gerarPrompt(novasRespostas);
     }
   };
 
-  const gerarPrompt = () => {
+  const gerarPrompt = (dados: Record<string, string>) => {
     setGerando(true);
     
-    const prompt = `Crie um portfólio profissional de alto impacto para ${respostas.nome || "um profissional"}.
-Foco: ${respostas.tipo}.
-Experiência: ${respostas.experiencia}.
-Estilo Visual: ${respostas.estilo}.
+    const prompt = `Crie um portfólio profissional de alto impacto para ${dados.nome || "um profissional"}.
+Foco: ${dados.tipo}.
+Experiência: ${dados.experiencia}.
+Estilo Visual: ${dados.estilo}.
 
 O portfólio deve ser focado no ecossistema Nexofly (ajudando anfitriões a aumentarem o valor da diária através de conteúdo visual e sites). 
 Inclua seções de:
@@ -60,7 +62,7 @@ Inclua seções de:
 
 Crie o layout moderno em React/Tailwind seguindo a estética Dark/Apple da Nexofly.`;
 
-    const url = \`https://lovable.dev/new?message=\${encodeURIComponent(prompt)}\`;
+    const url = `https://lovable.dev/new?message=${encodeURIComponent(prompt)}`;
     
     setTimeout(() => {
       window.open(url, "_blank");
@@ -135,7 +137,7 @@ Crie o layout moderno em React/Tailwind seguindo a estética Dark/Apple da Nexof
             <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-chrome transition-all duration-500" 
-                style={{ width: \`\${((etapa) / PERGUNTAS.length) * 100}%\` }}
+                style={{ width: `${((etapa) / PERGUNTAS.length) * 100}%` }}
               />
             </div>
           </div>
