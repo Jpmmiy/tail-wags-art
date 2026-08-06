@@ -39,17 +39,17 @@ export const useProtocoloStore = create<ProtocoloState>()(
         onExit: false,
       },
       overrides: {},
-      setEnabled: (enabled) => set({ enabled }),
-      addSale: (sale) => set((state) => ({ 
+      setEnabled: (enabled: boolean) => set({ enabled }),
+      addSale: (sale: Omit<FakeSale, 'id'>) => set((state: ProtocoloState) => ({ 
         sales: [...state.sales, { ...sale, id: Math.random().toString(36).substr(2, 9) }] 
       })),
-      removeSale: (id) => set((state) => ({ 
-        sales: state.sales.filter((s) => s.id !== id) 
+      removeSale: (id: string) => set((state: ProtocoloState) => ({ 
+        sales: state.sales.filter((s: FakeSale) => s.id !== id) 
       })),
-      updateTriggers: (triggers) => set((state) => ({ 
+      updateTriggers: (triggers: Partial<ProtocoloState['triggers']>) => set((state: ProtocoloState) => ({ 
         triggers: { ...state.triggers, ...triggers } 
       })),
-      setOverride: (key, value) => set((state) => ({ 
+      setOverride: (key: keyof ProtocoloState['overrides'], value: string) => set((state: ProtocoloState) => ({ 
         overrides: { ...state.overrides, [key]: value } 
       })),
     }),

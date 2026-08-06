@@ -2,11 +2,12 @@ import { useProtocoloStore, FakeSale } from '@/lib/protocolo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trash2, Plus, Zap } from 'lucide-react';
 import { useState } from 'react';
 
+// Using a simplified switch if the component is missing, or we can use a button/checkbox
+// For safety, I'll use a checkbox-like button since switch might not exist yet
 export const ProtocoloPanel = () => {
   const { enabled, setEnabled, sales, addSale, removeSale, overrides, setOverride } = useProtocoloStore();
   const [newSale, setNewSale] = useState<Omit<FakeSale, 'id'>>({
@@ -28,7 +29,12 @@ export const ProtocoloPanel = () => {
             <Zap className="h-5 w-5 text-primary" />
             Módulo Protocolo
           </CardTitle>
-          <Switch checked={enabled} onCheckedChange={setEnabled} />
+          <Button 
+            variant={enabled ? "default" : "outline"} 
+            onClick={() => setEnabled(!enabled)}
+          >
+            {enabled ? "Ativo" : "Inativo"}
+          </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
@@ -66,7 +72,7 @@ export const ProtocoloPanel = () => {
             </Button>
 
             <div className="mt-4 space-y-2">
-              {sales.map(sale => (
+              {sales.map((sale: FakeSale) => (
                 <div key={sale.id} className="flex items-center justify-between p-2 rounded bg-muted/50 text-sm">
                   <span>{sale.nome_cliente} - {sale.valor}</span>
                   <Button variant="ghost" size="sm" onClick={() => removeSale(sale.id)}>

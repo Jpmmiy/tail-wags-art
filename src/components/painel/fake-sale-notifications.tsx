@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useProtocoloStore } from '@/lib/protocolo';
+import { useProtocoloStore, FakeSale } from '@/lib/protocolo';
 import { toast } from 'sonner';
 
 export const FakeSaleNotifications = () => {
@@ -10,7 +10,7 @@ export const FakeSaleNotifications = () => {
 
     const timeouts: NodeJS.Timeout[] = [];
 
-    sales.forEach((sale) => {
+    sales.forEach((sale: FakeSale) => {
       const timeout = setTimeout(() => {
         toast.success(`Venda Realizada!`, {
           description: `${sale.nome_cliente} acabou de comprar ${sale.produto} por ${sale.valor}`,
