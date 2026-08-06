@@ -84,6 +84,8 @@ function Portfolio() {
           </li>
         ))}
       </ul>
+
+      <GeradorPortfolio />
     </div>
   );
 }
