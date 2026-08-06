@@ -116,7 +116,7 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
                 <Copy className="size-4" /> Copiar prompt
               </button>
               <a 
-                href="https://labs.google/flow" 
+                href={`https://labs.google/flow`} 
                 target="_blank" 
                 rel="noreferrer"
                 className="flex items-center justify-center gap-2 bg-chrome text-black py-3 rounded-xl text-sm font-bold hover:scale-[1.02] transition-all"
@@ -155,12 +155,22 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
                 </div>
               </div>
             </div>
-            <button 
-              onClick={() => copiar(promptSite(respostas), "Conteúdo do site")}
-              className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 py-3 rounded-xl text-sm text-bone transition-all"
-            >
-              <Copy className="size-4" /> Copiar conteúdo
-            </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button 
+                onClick={() => copiar(promptSite(respostas), "Conteúdo do site")}
+                className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 py-3 rounded-xl text-sm text-bone transition-all"
+              >
+                <Copy className="size-4" /> Copiar conteúdo
+              </button>
+              <a 
+                href={`https://lovable.dev/new?prompt=${encodeURIComponent(promptSite(respostas))}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 bg-chrome text-black py-3 rounded-xl text-sm font-bold hover:scale-[1.02] transition-all"
+              >
+                <ExternalLink className="size-4" /> Abrir no Lovable
+              </a>
+            </div>
           </div>
         )}
 
