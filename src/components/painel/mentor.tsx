@@ -250,7 +250,7 @@ export function Mentor() {
         </div>
 
         <div className="shrink-0 border-t border-white/8 p-4 sm:p-5">
-          {msgs.length === 0 && (
+          {msgs.length === 0 && estaAtivo && (
             <ul className="mb-3 flex flex-wrap gap-2">
               {SUGESTOES.map((s) => (
                 <li key={s}>
