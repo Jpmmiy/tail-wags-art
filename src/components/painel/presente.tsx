@@ -5,7 +5,7 @@ import { Gift, Sparkles, Ticket } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const CHAVE = "nexofly:presente:inicio";
-const DIAS = 7;
+const DIAS = 5;
 const MS_DIA = 24 * 60 * 60 * 1000;
 
 /**
