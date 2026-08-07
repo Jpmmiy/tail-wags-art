@@ -7,9 +7,11 @@ export const Route = createFileRoute('/_authenticated')({
     // Tenta pegar a sessão atual
     const { data: { session } } = await supabase.auth.getSession()
     
-    // Se estiver logado e na página de auth, vai para o painel
-    if (session && location.pathname === '/auth') {
-      console.log("Usuário logado em /auth, redirecionando para painel");
+    console.log("Middleware _authenticated checando sessão:", !!session, "na rota:", location.pathname);
+
+    // Se estiver logado e na página de auth ou home, vai para o painel
+    if (session && (location.pathname === '/auth' || location.pathname === '/')) {
+      console.log("Usuário logado tentando acessar root/auth, redirecionando para painel");
       throw redirect({ to: '/painel' });
     }
 
