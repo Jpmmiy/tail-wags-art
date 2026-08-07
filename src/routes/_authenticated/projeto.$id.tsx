@@ -143,9 +143,10 @@ function ProjetoDetalhesPage() {
               <div className="grid gap-4">
                 {deliverables.length === 0 ? (
                   <div className="glass p-12 text-center rounded-2xl">
-                    <p className="text-stone">Nenhum entregável gerado ainda.</p>
+                    <p className="text-stone">Nenhum material gerado ainda.</p>
                   </div>
                 ) : (
+
                   deliverables.map((d: any) => (
                     <div key={d.id} className="glass rounded-2xl p-6 space-y-4 border border-white/5 hover:border-white/10 transition-colors">
                       <div className="flex items-center justify-between">
