@@ -81,10 +81,10 @@ function AuthPage() {
         
         await router.invalidate();
         
-        // Pequeno atraso para o toast ser visível e o cookie persistir
+        // Atraso mínimo e redirecionamento direto
         setTimeout(() => {
-          window.location.href = targetUrl;
-        }, 150);
+          window.location.assign(targetUrl);
+        }, 50);
       } else {
         const { error } = await supabase.auth.signUp({
           email,
