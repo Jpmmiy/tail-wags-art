@@ -36,6 +36,7 @@ const TIPOS = [
   { id: "video", rotulo: "Vídeos", icone: Clapperboard },
   { id: "site", rotulo: "Sites", icone: LayoutTemplate },
   { id: "abordagem", rotulo: "Propostas", icone: MessageSquare },
+
 ] as const;
 
 const brl = (n: number) =>
