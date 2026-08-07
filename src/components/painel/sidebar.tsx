@@ -33,15 +33,13 @@ const GRUPOS = [
   {
     titulo: "Recursos",
     itens: [
-      { href: "/painel/creditos", rotulo: "Créditos infinitos", icone: Infinito },
+      { href: "/painel/creditos", rotulo: "Créditos Nexofly", icone: Infinito },
       { href: "/painel/mentor", rotulo: "Mentor Nexofly", icone: Bot },
-      { href: "/painel/membros", rotulo: "Área de membros", icone: GraduationCap },
     ],
   },
   {
     titulo: "Conta",
     itens: [
-      { href: "/painel/premiacoes", rotulo: "Premiações", icone: Trophy },
       { href: "/painel/presente", rotulo: "Presente", icone: Gift },
       { href: "/painel/conta", rotulo: "Configurações", icone: Settings },
     ],
