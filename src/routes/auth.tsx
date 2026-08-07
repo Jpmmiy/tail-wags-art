@@ -137,7 +137,13 @@ function AuthPage() {
             }}
           />
 
-          <form onSubmit={handleAuth} className="relative space-y-5">
+          <form 
+            onSubmit={(e) => {
+              console.log("Formulário submetido via onSubmit nativo");
+              handleAuth(e);
+            }} 
+            className="relative space-y-5"
+          >
             {!isLogin && (
               <div className="space-y-2">
                 <label className="eyebrow ml-1" htmlFor="name">
@@ -166,11 +172,13 @@ function AuthPage() {
                 <Mail className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-stone/40 transition-colors group-focus-within:text-chrome" />
                 <input
                   id="email"
+                  name="email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="nome@empresa.com"
+                  autoComplete="username"
                   className="w-full rounded-2xl border border-white/8 bg-white/[0.03] py-3.5 pl-11 pr-4 text-bone placeholder:text-stone/30 outline-none transition-all focus:border-chrome/40 focus:bg-white/[0.06] focus:ring-1 focus:ring-chrome/20"
                 />
               </div>
@@ -191,11 +199,13 @@ function AuthPage() {
                 <Lock className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-stone/40 transition-colors group-focus-within:text-chrome" />
                 <input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   className="w-full rounded-2xl border border-white/8 bg-white/[0.03] py-3.5 pl-11 pr-12 text-bone placeholder:text-stone/30 outline-none transition-all focus:border-chrome/40 focus:bg-white/[0.06] focus:ring-1 focus:ring-chrome/20"
                 />
                 <button
@@ -209,6 +219,7 @@ function AuthPage() {
             </div>
 
             <button
+              id="submit-auth"
               type="submit"
               disabled={loading}
               className={cn(
