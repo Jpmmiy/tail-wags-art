@@ -162,21 +162,14 @@ export type ImovelSelecionado = {
   anfitriao: string;
   diaria: number;
   potencial: number;
-  nota: number | null;
-  avaliacoes: number | null;
+  nota: number;
+  avaliacoes: number;
   fotos: number;
   problemas: string[];
   mapa?: string | null;
   airbnb?: string | null;
   site?: string | null;
-  score?: {
-    total: number;
-    faixa: string;
-    signals: string[];
-    angulo: string;
-  };
 };
-
 
 export type Respostas = {
   modalidade: "temporada" | "imobiliario";
@@ -185,24 +178,14 @@ export type Respostas = {
   publico: string;
   comodos: string[];
   entregaveis: string[];
-  objetivo: string | null;
-  objetivoVideoTipo: "institucional" | "dinamico" | "cinematografico";
-  possuiDrone: boolean;
-  videoVertical: boolean;
-  cidade: string;
-  paisId: string;
-  regiaoId: string;
   /** Texto livre por seção do briefing. Vazio quando não preenchido. */
   notas: {
     estilo?: string;
     publico?: string;
     comodos?: string;
     pacote?: string;
-    objetivoVideoTipo?: string;
-    possuiDrone?: string;
   };
 };
-
 
 /** Bloco só aparece no material quando o usuário escreveu algo. */
 function obs(texto?: string) {
@@ -216,134 +199,107 @@ const achePublico = (id: string) => PUBLICOS.find((p) => p.id === id) ?? PUBLICO
 export function promptFoto(r: Respostas, comodo: string) {
   const e = acheEstilo(r.estilo);
   const p = achePublico(r.publico);
-  
-  // ESTRATÉGIA BASEADA EM SINAIS DO RADAR
-  const sinais = r.imovel.score?.signals || [];
-  const focoRadar = sinais.some((s: string) => s.toLowerCase().includes("foto")) 
-    ? "PRIORIDADE: Volume e variedade. O imóvel possui poucas fotos ou fotos ruins no radar. Capture ângulos inéditos."
-    : "FOCO: Qualidade e refinamento. O imóvel já tem base, foque em elevar o padrão visual.";
 
-  return `### PROMPT DE FOTOGRAFIA IMOBILIÁRIA (AI GENERATION)
-  
-[CONTEXTO DO IMÓVEL]
-Tipo: ${r.imovel.tipo}
-Nome: ${r.imovel.nome}
-Local: ${r.imovel.cidade}, ${r.paisId}
-Sinais do Radar: ${sinais.join(", ")}
-${focoRadar}
+  return `Fotografia imobiliária realista — ${comodo.toUpperCase()}
+${r.imovel.nome}, ${r.imovel.cidade} · ${r.imovel.tipo}
 
-[AMBIENTE ATUAL]
-Cômodo: ${comodo.toUpperCase()}
-Ação de Arrumação: ${CENA_POR_COMODO[comodo] ?? "Ambiente limpo, superfícies livres, enquadramento amplo."}
+LUZ
+${e.luz}. Sem flash direto, sem luz chapada de teto.
 
-[DIRETRIZES DE ESTILO]
-Conceito: ${e.rotulo}
-Iluminação: ${e.luz}
-Materiais/Paleta: ${e.materiais}
+CENA
+${CENA_POR_COMODO[comodo] ?? "ambiente arrumado, superfícies livres, nada fora do lugar"}.
 
-[DIRECIONAMENTO POR PÚBLICO]
-Público-alvo: ${p.rotulo}
-Valor Percebido: Destacar ${p.foco}
+MATERIAIS E PALETA
+${e.materiais}.
 
-[CONFIGURAÇÃO TÉCNICA]
-Câmera: 24mm wide-angle, f/8.0 para profundidade total, ISO 100.
-Enquadramento: Linhas verticais 100% corrigidas. Altura da lente: 1.20m.
-Saída: Alta fidelidade, sem artefatos, realista.
+O QUE PRECISA FICAR EVIDENTE
+Público do imóvel: ${p.rotulo.toLowerCase()}. Destacar ${p.foco}.
 
-[RESTRIÇÕES]
-- Não adicionar móveis ou cômodos inexistentes.
-- Manter a volumetria original do espaço.
-- Fidelidade total às janelas e aberturas de luz.${obs(r.notas.estilo)}`;
+CÂMERA
+Lente 24mm, f/4.0, ISO base. Altura de 1,40m. Linhas verticais
+corrigidas. Um ponto de fuga. Enquadramento na horizontal.
+
+TRATAMENTO
+Contraste suave, sem HDR agressivo. Brancos neutros. Verdes da
+vegetação fiéis. Sem vinheta artificial.
+
+RESTRIÇÕES (obrigatórias)
+- Não inventar móveis, portas, janelas ou cômodos que não existam
+  na foto original.
+- Não alterar o tamanho nem a proporção do ambiente.
+- Não adicionar vista que não é vista real do imóvel.
+- O hóspede precisa reconhecer o lugar na chegada.${obs(r.notas.estilo)}`;
 }
 
 export function promptVideo(r: Respostas) {
   const e = acheEstilo(r.estilo);
   const p = achePublico(r.publico);
-  
-  // LÓGICA DE DRONE E MOVIMENTO
-  const movDestaque = r.possuiDrone 
-    ? "DRONE SHOT: Revelação aérea começando do entorno (cidade/natureza) e aproximando da janela do imóvel em movimento circular (orbit)."
-    : "DOLLY SHOT: Movimento interno suave de aproximação (push-in) focando nos detalhes de acabamento.";
 
-  const direcaoTecnica = r.objetivoVideoTipo === 'cinematografico' 
-    ? "Slow motion (60fps), profundidade de campo rasa, foco seletivo (rack focus)."
-    : r.objetivoVideoTipo === 'dinamico'
-    ? "Movimentos rápidos, cortes rítmicos, transições de luz naturais."
-    : "Movimentos estáveis, pan horizontal lento, clareza total informativa.";
+  return `### PLANO DE PRODUÇÃO VÍDEO AIRBNB — ${r.imovel.nome.toUpperCase()}
 
-  return `### PLANO DE PRODUÇÃO VÍDEO — ${r.imovel.nome.toUpperCase()}
+OBJETIVO COMERCIAL
+Transformar visualizadores em hóspedes destacando ${p.foco}.
 
-[ESTRATÉGIA COMERCIAL]
-Objetivo: ${r.objetivo === 'video' ? 'Venda de pacotes de vídeo' : 'Conversão direta de hóspedes/compradores'}
-Público: ${p.rotulo} (${p.foco})
-Ângulo de Venda: ${r.imovel.score?.angulo || "Valorização visual"}
+ESTRUTURA DE 6 CAMADAS (GOOGLE FLOW)
 
-[DIREÇÃO DE FOTOGRAFIA]
-Estilo Visual: ${e.rotulo} (${e.luz})
-Formato de Saída: ${r.videoVertical ? "9:16 Vertical (Mobile/Reels)" : "16:9 Horizontal (Desktop/YouTube)"}
-Direção Técnica: ${direcaoTecnica}
+1. CENA (MOVIMENTO)
+Travelling lento entrando pelo ambiente principal. Câmera na altura do peito (1,45m), deslocamento contínuo de 1.2 metros em linha reta. Estabilização total, sem tremores.
 
-[CAMADAS DE MOVIMENTO (SHOT LIST)]
-1. ABERTURA: ${movDestaque}
-2. AMBIENTE: Travelling lateral mostrando a fluidez entre ${r.comodos.slice(0, 2).join(" e ")}.
-3. DETALHE: Macro shot revelando ${e.materiais}.
-4. FECHAMENTO: Frame estático com espaço para CTA no lado ${r.videoVertical ? "inferior" : "direito"}.
+2. ILUMINAÇÃO (STYLING)
+${e.luz}. Partículas de poeira visíveis nos feixes de luz se possível. Sombras suaves.
 
-[ILUMINAÇÃO E TEXTURA]
-Configuração: ${e.luz}
-Materiais em Destaque: ${e.materiais}
+3. TEXTURAS E MATERIAIS
+Foco em: ${e.materiais}.
 
-[AMBIENTAÇÃO E ÁUDIO]
-Atmosfera: ${e.desc}
-Som: Natural do ambiente, foco em silêncio e brisa local.
+4. PONTO DE INTERESSE (HOOK)
+Primeiro segundo com profundidade de campo rasa focando em um detalhe que represente ${p.rotulo.toLowerCase()}. Depois, abertura suave para o ambiente completo.
 
-[RESTRIÇÕES TÉCNICAS]
-- Sem pessoas ou animais.
-- Geometria de linhas retas preservada.
-- Sem distorção de lente olho de peixe.${obs(r.notas?.pacote)}`;
+5. AMBIENTAÇÃO SONORA
+Som ambiente natural (diegetico). Silêncio de fundo com sons sutis de natureza local. Sem música.
+
+6. REGRAS DE OURO (NEGATIVE PROMPT)
+- Zero pessoas ou animais.
+- Zero texto, logotipos ou marcas d'água.
+- Zero transições digitais ou efeitos de flash.
+- Zero cortes bruscos.
+
+ESPECIFICAÇÕES TÉCNICAS
+- Duração: 8 a 10 segundos.
+- Formato: 9:16 (Vertical) para Reels/Stories.
+- Estilo Visual: Cinematic Real Estate.${obs(r.notas?.pacote)}`;
 }
 
 export function promptSite(r: Respostas) {
   const p = achePublico(r.publico);
-  
-  // APROVEITAMENTO DE DADOS DO IMÓVEL (VALORES)
-  const precoSugerido = r.modalidade === 'temporada' ? `R$ ${r.imovel.potencial}/noite` : `R$ ${r.imovel.potencial.toLocaleString('pt-BR')}`;
-  const precoAtual = r.modalidade === 'temporada' ? `R$ ${r.imovel.diaria}/noite` : `R$ ${r.imovel.diaria.toLocaleString('pt-BR')}`;
 
-  return `### BRIEFING DE LANDING PAGE DE ALTA CONVERSÃO
+  return `Crie uma landing page de reservas para "${r.imovel.nome}",
+${r.imovel.tipo.toLowerCase()} por temporada em ${r.imovel.cidade}.
 
-[DADOS DO PRODUTO]
-Nome: ${r.imovel.nome}
-Tipo: ${r.imovel.tipo}
-Localização: ${r.imovel.cidade}
-Preço de Mercado (Meta): ${precoSugerido}
-Preço Atual: ${precoAtual}
+STACK
+React + Tailwind. Página única, responsiva, mobile-first.
+Carregamento rápido: imagens otimizadas e sem biblioteca pesada.
 
-[PÚBLICO E LINGUAGEM]
-Persona: ${p.rotulo}
-Promessa Principal: Como o imóvel atende a ${p.foco}
-Tom de Voz: ${r.estilo === 'aconchegante' ? 'Acolhedor e emocional' : 'Profissional e direto'}
+PÚBLICO
+${p.rotulo}. A página inteira deve responder a: ${p.foco}.
 
-[ARQUITETURA DA PÁGINA (COMPONENTES)]
-1. HERO: Destaque para ${r.imovel.nome} com headline focada em ${p.foco}.
-2. GALERIA: Grid dinâmico priorizando ${r.comodos.join(", ")}.
-3. PROVA SOCIAL: Destaque para ${r.imovel.avaliacoes} avaliações e nota ${r.imovel.nota}.
-4. CONVERSÃO: Widget de reserva direta via WhatsApp.
+SEÇÕES, NESTA ORDEM
+1. Hero com foto em tela cheia, nome do imóvel, cidade e botão
+   "Consultar disponibilidade".
+2. Galeria com as fotos em grade, abrindo em lightbox.
+3. "O que tem aqui": lista de comodidades com ícone e rótulo curto.
+4. Calendário de disponibilidade com as datas ocupadas marcadas.
+5. Avaliações reais dos hóspedes, com nome e data.
+6. Como chegar: mapa e tempo de carro das capitais mais próximas.
+7. Rodapé com política de cancelamento, regras da casa e contato.
 
-[DIRETRIZES VISUAIS]
-Paleta sugerida: Baseada em ${acheEstilo(r.estilo).materiais}
-Stack: React + Tailwind + Lucide Icons
+CONVERSÃO
+Botão de WhatsApp fixo em todas as telas. Ao clicar, abrir conversa
+com mensagem pré-preenchida citando a data selecionada no calendário.
 
-[DADOS ESTRUTURADOS]
-- Cidade: ${r.imovel.cidade}
-- Região: ${r.regiaoId}
-- Link Mapa: ${r.imovel.mapa || "Indisponível"}
-- Link OTA: ${r.imovel.airbnb || "Indisponível"}
-
-[NOTAS E ESPECIFICAÇÕES]
-${obs(r.notas.publico)}`;
+TOM
+Acolhedor e direto. Frases curtas. Nada de linguagem de corretor,
+nada de "aconchegante refúgio". Descrever o que existe.${obs(r.notas.publico)}`;
 }
-
 
 export function abordagem(r: Respostas) {
   const ganho = Math.max(0, r.imovel.potencial - r.imovel.diaria);
