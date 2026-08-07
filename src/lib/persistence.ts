@@ -267,19 +267,25 @@ export const listProjects = async () => {
 
 export const syncProjectsOnLogin = async (userId: string) => {
   const sessionId = getSessionId();
+  console.log("[AUTH] Iniciando syncProjectsOnLogin para:", userId);
   
-  // 1. Migra projetos anônimos da sessão para o usuário
-  const { error } = await (supabase
-    .from("projects") as any)
-    .update({ user_id: userId })
-    .eq("session_id", sessionId)
-    .is("user_id", null);
-  
-  if (error) console.error("Error syncing projects:", error);
+  try {
+    // 1. Migra projetos anônimos da sessão para o usuário
+    const { error } = await (supabase
+      .from("projects") as any)
+      .update({ user_id: userId })
+      .eq("session_id", sessionId)
+      .is("user_id", null);
+    
+    if (error) console.error("[AUTH] Erro ao sincronizar projetos:", error);
 
-  // 2. Tenta recuperar o ID do rascunho mais recente do usuário e salvar no localStorage
-  const latestId = await getLatestProjectId();
-  if (latestId) {
-    setCurrentProjectId(latestId);
+    // 2. Tenta recuperar o ID do rascunho mais recente do usuário e salvar no localStorage
+    const latestId = await getLatestProjectId();
+    if (latestId) {
+      setCurrentProjectId(latestId);
+    }
+    console.log("[AUTH] syncProjectsOnLogin concluído.");
+  } catch (e) {
+    console.error("[AUTH] Falha crítica em syncProjectsOnLogin (não bloqueante):", e);
   }
 };

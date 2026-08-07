@@ -6,34 +6,31 @@ export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
     console.log("[AUTH] 4. no início do beforeLoad de _authenticated na rota:", location.pathname);
     
-    // Tenta pegar a sessão atual
     const { data: { session } } = await supabase.auth.getSession()
-    console.log("[AUTH] 5. no resultado do getSession() dentro do beforeLoad. temSessao:", !!session);
+    console.log("[AUTH] 5. resultado getSession() no beforeLoad. temSessao:", !!session);
 
-    // Se estiver logado e na página de auth ou home, vai para o painel
+    if (!session) {
+      console.log("[AUTH] 6. Redirect para /auth");
+      throw redirect({ 
+        to: '/auth', 
+        search: { redirect: location.href } 
+      })
+    }
+
     if (session && (location.pathname === '/auth' || location.pathname === '/')) {
-      console.log("Usuário logado tentando acessar root/auth, redirecionando para painel");
+      console.log("[AUTH] Redirect para /painel (já logado)");
       throw redirect({ to: '/painel' });
     }
 
-    if (!session) {
-      console.log("[AUTH] 6. no momento exato em que o redirect para /auth é disparado");
-      // Se não estiver logado e NÃO estiver na rota de auth, redireciona para /auth
-      if (location.pathname !== '/auth') {
-        throw redirect({ 
-          to: '/auth', 
-          search: { 
-            redirect: location.href 
-          } 
-        })
-      }
-      return { session: null };
-    }
-
-    // Se estiver logado, sincroniza projetos
-    syncProjectsOnLogin(session.user.id).catch(console.error);
+    // REMOVIDO: syncProjectsOnLogin daqui para evitar chamadas duplicadas e bloqueios de guard.
+    // O onAuthStateChange em __root cuida disso de forma assíncrona.
 
     return { session }
   },
-  component: () => <Outlet />,
+  component: AuthenticatedLayout,
 })
+
+function AuthenticatedLayout() {
+  console.log("[RENDER] 1. Início do componente AuthenticatedLayout (_authenticated.tsx)");
+  return <Outlet />;
+}
