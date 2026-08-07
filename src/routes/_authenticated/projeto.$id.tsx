@@ -229,8 +229,8 @@ function ProjetoDetalhesPage() {
               <h3 className="font-medium text-bone">Perfil Utilizado</h3>
               <div className="flex items-center gap-3">
                 <div className="size-10 rounded-lg bg-white/5 overflow-hidden grid place-items-center">
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} className="size-full object-contain p-1" />
+                  {(profile as any)?.avatar_url ? (
+                    <img src={(profile as any).avatar_url} className="size-full object-contain p-1" />
                   ) : (
                     <Building2 className="size-5 text-stone" />
                   )}
