@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Check, X, Tag, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Check, X, Tag, Sparkles, Flame, Clock } from "lucide-react";
 import { Reveal } from "@/components/reveal";
 import { Cta, CtaGhost } from "@/components/brand/cta";
 import { PLANOS } from "@/lib/conteudo";
@@ -28,9 +28,25 @@ function Marca({ ok }: { ok: boolean }) {
 export function Planos() {
   const [codigo, setCodigo] = useState("");
   const [aplicado, setAplicado] = useState<string | null>(null);
+  const [timer, setTimer] = useState("08:25:40");
 
-  const mensal = PLANOS.find((p) => p.id === "mensal")!;
-  const vitalicio = PLANOS.find((p) => p.id === "vitalicio")!;
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const parts = timer.split(':').map(Number);
+      let s = parts[2], m = parts[1], h = parts[0];
+      
+      s--;
+      if (s < 0) { s = 59; m--; }
+      if (m < 0) { m = 59; h--; }
+      if (h < 0) { h = 23; }
+      
+      setTimer(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const mensal = PLANOS.find((p) => p.id === "mensal")! as any;
+  const vitalicio = PLANOS.find((p) => p.id === "vitalicio")! as any;
 
   return (
     <section
@@ -110,15 +126,32 @@ export function Planos() {
               </h3>
               <p className="mt-1 text-[0.85rem] text-stone">{mensal.chamada}</p>
 
-              <p className="mt-6 flex items-baseline gap-1.5">
-                <span className="font-display text-[1.2rem] text-stone">R$</span>
-                <span className="font-display text-[2.7rem] font-semibold leading-none tracking-[-0.035em] text-bone">
-                  {mensal.preco}
-                </span>
-                <span className="ml-1 text-[0.8rem] text-stone">
-                  {mensal.periodo}
-                </span>
-              </p>
+              <div className="mt-4 flex flex-col gap-2">
+                <div className="flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-[0.7rem] font-bold uppercase tracking-wider text-red-500">
+                  <span className="size-1.5 rounded-full bg-red-500 animate-pulse" />
+                  SUPER DESCONTO DE 1 ANO — ANIVERSÁRIO DA PLATAFORMA
+                </div>
+                
+                <div className="flex items-center gap-2 px-1 text-[0.75rem] font-medium text-red-500/80">
+                  <Clock className="size-3.5" />
+                  OFERTA TERMINA EM: <span className="font-mono">{timer}</span>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <p className="text-[0.9rem] font-medium text-red-500 line-through decoration-2 opacity-80">
+                  R$ {mensal.precoAntigo}
+                </p>
+                <p className="flex items-baseline gap-1.5">
+                  <span className="font-display text-[1.2rem] text-stone">R$</span>
+                  <span className="font-display text-[2.7rem] font-semibold leading-none tracking-[-0.035em] text-bone">
+                    {mensal.preco}
+                  </span>
+                  <span className="ml-1 text-[0.8rem] text-stone">
+                    {mensal.periodo}
+                  </span>
+                </p>
+              </div>
 
               <ul className="mt-6 flex-1 space-y-2.5">
                 {mensal.inclui.map((item) => (
@@ -149,7 +182,12 @@ export function Planos() {
           {/* vitalício */}
           <Reveal delay={120}>
             <article className="glass-deep rim-lit specular relative flex h-full flex-col rounded-[1.75rem] p-8 shadow-[0_50px_120px_-40px_rgba(255,255,255,0.22)] transition-all duration-500 hover:-translate-y-1.5 sm:p-9">
-              <span className="metal-pill absolute -top-3.5 left-1/2 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#08090B] shadow-[0_10px_24px_-10px_rgba(255,255,255,0.5)]">
+              <div className="absolute -right-2 -top-4 z-10 flex animate-bounce items-center gap-1.5 rounded-full bg-red-600 px-4 py-2 text-[0.75rem] font-bold uppercase tracking-wider text-white shadow-xl shadow-red-600/20">
+                <Flame className="size-4 fill-white" />
+                Restam apenas 3 vitalícios
+              </div>
+
+              <span className="metal-pill absolute -top-3.5 left-8 flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#08090B] shadow-[0_10px_24px_-10px_rgba(255,255,255,0.5)]">
                 <Sparkles className="size-3" strokeWidth={2.5} />
                 Mais escolhido
               </span>
@@ -161,17 +199,39 @@ export function Planos() {
                 {vitalicio.chamada}
               </p>
 
+              <div className="mt-6 flex flex-col gap-2">
+                <div className="flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-[0.7rem] font-bold uppercase tracking-wider text-red-500">
+                  <span className="size-1.5 rounded-full bg-red-500 animate-pulse" />
+                  SUPER DESCONTO DE 1 ANO — ANIVERSÁRIO DA PLATAFORMA
+                </div>
+                
+                <div className="flex items-center gap-2 px-1 text-[0.75rem] font-medium text-red-500/80">
+                  <Clock className="size-3.5" />
+                  OFERTA TERMINA EM: <span className="font-mono">{timer}</span>
+                </div>
+              </div>
+
               <div className="mt-7 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-                <p className="flex items-baseline gap-2">
-                  <span className="font-display text-[1.5rem] text-stone">
-                    R$
-                  </span>
-                  <span className="metal-text font-display text-[4.2rem] font-semibold leading-none tracking-[-0.04em] sm:text-[4.8rem]">
-                    {vitalicio.preco}
-                  </span>
-                </p>
+                <div>
+                  <p className="text-[1.1rem] font-medium text-red-500 line-through decoration-2 opacity-80">
+                    R$ {vitalicio.precoAntigo}
+                  </p>
+                  <p className="flex items-baseline gap-2">
+                    {vitalicio.parcelas && (
+                      <span className="font-display text-[1.4rem] text-blue-400 font-medium">
+                        {vitalicio.parcelas}
+                      </span>
+                    )}
+                    <span className="font-display text-[1.5rem] text-stone">
+                      R$
+                    </span>
+                    <span className="metal-text font-display text-[4.2rem] font-semibold leading-none tracking-[-0.04em] sm:text-[4.8rem]">
+                      {vitalicio.preco}
+                    </span>
+                  </p>
+                </div>
                 <div className="pb-1.5">
-                  <p className="text-[0.86rem] text-stone">
+                  <p className="text-[0.86rem] uppercase tracking-widest text-blue-400 font-bold">
                     {vitalicio.periodo}
                   </p>
                 </div>
