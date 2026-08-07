@@ -261,9 +261,21 @@ export function Quiz() {
     const pid = await autosave(proximo, s);
     
     if (pid) {
-      const p = await loadProject(pid);
-      if (p) {
-        setProjetoCarregado(p);
+      try {
+        const p = await loadProject(pid);
+        if (p) {
+          setProjetoCarregado(p);
+        } else {
+          // Fallback se falhar em carregar após salvar
+          setProjetoCarregado({
+            id: pid,
+            status: s,
+            current_step: proximo,
+            properties: [{ modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, cidade, entregaveis }]
+          });
+        }
+      } catch (err) {
+        console.error("Erro ao carregar projeto após save:", err);
       }
     } else if (!projetoCarregado) {
       // Fallback para não travar a UI caso o salvamento falhe
@@ -312,7 +324,7 @@ export function Quiz() {
   return (
     <div className="space-y-8">
       {gerando && <TelaGeracao aoTerminar={() => { setGerando(false); setPasso(3); }} />}
-      {(passo === 3 && projetoCarregado) && (
+      {(passo === 3) && (
         <div className="fixed inset-0 z-50 bg-ink overflow-y-auto p-4 sm:p-8">
           <div className="max-w-4xl mx-auto space-y-8">
             <header className="flex items-center justify-between">
@@ -324,10 +336,18 @@ export function Quiz() {
                 <ArrowLeft className="size-4" /> Voltar
               </button>
             </header>
-            <SalaProducao 
-              projeto={projetoCarregado} 
-              aoConcluir={() => setConcluido(true)} 
-            />
+            
+            {projetoCarregado ? (
+              <SalaProducao 
+                projeto={projetoCarregado} 
+                aoConcluir={() => setConcluido(true)} 
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-stone">
+                <Loader2 className="size-8 animate-spin mb-4" />
+                <p>Carregando ferramentas de produção...</p>
+              </div>
+            )}
           </div>
         </div>
       )}
