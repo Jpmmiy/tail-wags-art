@@ -111,7 +111,8 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button 
                 onClick={async () => {
-                  await navigator.clipboard.writeText(promptVideo(respostas));
+                  const prompt = promptVideo(respostas);
+                  await navigator.clipboard.writeText(prompt);
                   toast.success("Roteiro copiado! Abrindo Google Flow...");
                   setTimeout(() => {
                     window.open('https://labs.google/flow', '_blank');
@@ -119,7 +120,7 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
                 }}
                 className="flex items-center justify-center gap-2 bg-chrome text-black py-3 rounded-xl text-sm font-bold hover:scale-[1.02] transition-all"
               >
-                <Clapperboard className="size-4" /> Gerar no Google Flow
+                <Clapperboard className="size-4" /> Ir para Google Flow
               </button>
               <button 
                 onClick={() => copiar(promptVideo(respostas), "Prompt de vídeo")}
