@@ -54,11 +54,8 @@ function AuthPage() {
         });
         if (error) throw error;
         toast.success("Bem-vindo de volta!");
-        if (redirectUrl) {
-          window.location.href = redirectUrl;
-        } else {
-          navigate({ to: "/painel" });
-        }
+        // Usando reload para garantir que todos os contextos e middlewares capturem a nova sessão
+        window.location.href = redirectUrl || "/painel";
 
       } else {
         const { error } = await supabase.auth.signUp({
@@ -103,7 +100,7 @@ function AuthPage() {
           </h1>
           <p className="mt-3 text-stone">
             {isLogin
-              ? "o login nao ta indo"
+              ? "Acesse sua conta para gerenciar seus projetos."
               : "Crie sua conta Nexofly em poucos segundos."}
           </p>
         </div>
