@@ -521,6 +521,7 @@ function Onboarding({ onComplete }: { onComplete: () => void }) {
         await supabase
           .from("profiles")
           .update({ onboarding_completed: true } as any)
+
           .eq("id", session.user.id);
       }
       onComplete();
