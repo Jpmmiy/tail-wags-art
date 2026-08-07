@@ -490,13 +490,6 @@ export function Quiz() {
                                 onChange={(e) => setManualNome(e.target.value)}
                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50 text-sm"
                               />
-                              <input 
-                                type="text"
-                                placeholder="Link do anúncio/local (opcional)..."
-                                value={manualLink}
-                                onChange={(e) => setManualLink(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-bone focus:outline-none focus:ring-1 focus:ring-chrome/50 text-sm"
-                              />
                             </div>
 
                             <button 
