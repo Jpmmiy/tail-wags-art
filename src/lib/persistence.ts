@@ -177,7 +177,7 @@ export const saveDeliverable = async (projectId: string, shotData: any) => {
     deliverableId = existing.id;
     // Se o conteúdo mudou, salva uma versão antes de atualizar
     if (existing.conteudo !== shotData.conteudo) {
-      await (supabase.from("deliverable_versions") as any).insert({
+      await (supabase.from("deliverable_versions" as any) as any).insert({
         deliverable_id: existing.id,
         conteudo: existing.conteudo,
       });
