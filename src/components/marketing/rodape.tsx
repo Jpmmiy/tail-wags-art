@@ -57,9 +57,9 @@ const COLUNAS = [
   {
     titulo: "Legal",
     itens: [
-      { rotulo: "Termos de uso", href: "#" },
-      { rotulo: "Privacidade", href: "#" },
-      { rotulo: "Reembolso", href: "#" },
+      { rotulo: "Termos de uso", href: "/termos" },
+      { rotulo: "Privacidade", href: "/privacidade" },
+      { rotulo: "Reembolso", href: "/termos#reembolso" },
     ],
   },
 ];
