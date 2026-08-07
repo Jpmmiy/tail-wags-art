@@ -3,6 +3,8 @@ import { nomePais, nomeRegiao } from "@/lib/locais";
 import type { CorpoBusca, ImovelEncontrado } from "@/lib/imoveis-tipos";
 import { calculateScore } from "@/config/scoring";
 import { supabase } from "@/integrations/supabase/client";
+import { checkAiLimits, trackAiUsageStart, trackAiUsageEnd } from "@/lib/ai-control.server";
+
 
 const CAMPOS = [
   "places.id",
@@ -40,6 +42,38 @@ function json(dados: unknown, status = 200) {
   });
 }
 
+async function fetchPlacesPreview(corpo: any, key: string) {
+  const paisNome = nomePais(corpo.pais);
+  const uf = corpo.regiao ? nomeRegiao(corpo.pais, corpo.regiao) : paisNome;
+  const citySearch = await fetchPlaces(
+    "https://places.googleapis.com/v1/places:searchText",
+    {
+      textQuery: `${corpo.cidade}, ${uf}, ${paisNome}`,
+      maxResultCount: 1,
+      languageCode: "pt-BR",
+    },
+    key
+  );
+  return citySearch.places?.[0];
+}
+
+async function checkIsCached(cityPlaceId: string | undefined, corpo: any) {
+  if (!cityPlaceId) return false;
+  const { data: cache } = await supabase
+    .from("radar_cache")
+    .select("id, criado_em")
+    .eq("cidade_place_id", cityPlaceId)
+    .eq("modalidade", corpo.modalidade)
+    .maybeSingle();
+
+  if (cache && cache.criado_em) {
+    const dias = (Date.now() - new Date(cache.criado_em).getTime()) / (1000 * 60 * 60 * 24);
+    return dias < 7;
+  }
+  return false;
+}
+
+
 async function fetchPlaces(url: string, body: any, key: string) {
   const r = await fetch(url, {
     method: "POST",
@@ -61,6 +95,14 @@ export const Route = createFileRoute("/api/imoveis")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          return json({ erro: "Você precisa estar logado para usar o Radar." }, 401);
+        }
+
+        const requestId = request.headers.get("x-request-id");
+        if (!requestId) return json({ erro: "Request ID ausente." }, 400);
+
         let corpo: CorpoBusca & { forceRefresh?: boolean };
         try {
           corpo = (await request.json()) as any;
@@ -72,28 +114,33 @@ export const Route = createFileRoute("/api/imoveis")({
           return json({ erro: "Informe pelo menos país e cidade." }, 400);
         }
 
+        const ip = request.headers.get("x-forwarded-for") || "unknown";
+
+        // Só verificamos limites se NÃO for cache
+        const citySearchPreview = await fetchPlacesPreview(corpo, process.env["GOOGLE_MAPS_API_KEY"]!);
+        const isCached = await checkIsCached(citySearchPreview?.id, corpo);
+
+        if (!isCached || corpo.forceRefresh) {
+          const limitCheck = await checkAiLimits(session.user.id, ip);
+          if (!limitCheck.allowed) {
+            return json({ erro: limitCheck.reason }, 429);
+          }
+          await trackAiUsageStart(session.user.id, requestId, "/api/imoveis", ip);
+        }
+
+
         const chave = process.env["GOOGLE_MAPS_API_KEY"];
         if (!chave) return json({ erro: "Chave não configurada." }, 500);
 
         const paisNome = nomePais(corpo.pais);
         const uf = corpo.regiao ? nomeRegiao(corpo.pais, corpo.regiao) : paisNome;
 
-        // 1. RESOLVER CIDADE
-        const citySearch = await fetchPlaces(
-          "https://places.googleapis.com/v1/places:searchText",
-          {
-            textQuery: `${corpo.cidade}, ${uf}, ${paisNome}`,
-            maxResultCount: 1,
-            languageCode: "pt-BR",
-          },
-          chave
-        );
-
-        const cityPlace = citySearch.places?.[0];
+        const cityPlace = citySearchPreview || await fetchPlacesPreview(corpo, chave);
         if (!cityPlace) return json({ erro: "Cidade não encontrada." }, 404);
 
         const cityPlaceId = cityPlace.id;
         const cityLocation = cityPlace.location;
+
 
         // 2. CHECK CACHE
         if (!corpo.forceRefresh) {
@@ -224,7 +271,13 @@ export const Route = createFileRoute("/api/imoveis")({
           console.error("Cache save error:", e);
         }
 
+        if (!isCached || corpo.forceRefresh) {
+          // Cada chamada ao Radar consome aprox. 10 tokens por imóvel retornado p/ processamento interno (estimativa)
+          await trackAiUsageEnd(requestId, 100, imoveis.length * 10, JSON.stringify({ total: imoveis.length }));
+        }
+
         return json({ fonte: "google", imoveis, total: imoveis.length });
+
       },
     },
   },
