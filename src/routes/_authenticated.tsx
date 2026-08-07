@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { supabase } from '@/integrations/supabase/client'
+import { syncProjectsOnLogin } from '@/lib/persistence'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
@@ -12,6 +13,10 @@ export const Route = createFileRoute('/_authenticated')({
         } 
       })
     }
+
+    // Sincroniza rascunhos anônimos e recupera último ID no primeiro load autenticado
+    await syncProjectsOnLogin(session.user.id);
+
     return { session }
   },
   component: () => <Outlet />,
