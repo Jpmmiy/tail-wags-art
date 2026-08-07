@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Copy, Check, RefreshCw, Square, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
+
 import { LogoMark } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";

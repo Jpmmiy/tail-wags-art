@@ -22,6 +22,8 @@ import {
   type Respostas 
 } from "@/lib/gerador";
 import { saveProjectStep } from "@/lib/persistence";
+import { supabase } from "@/integrations/supabase/client";
+
 
 interface SalaProducaoProps {
   projeto: any;
