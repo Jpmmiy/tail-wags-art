@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermosRouteImport } from './routes/termos'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
@@ -29,6 +31,16 @@ import { Route as AuthenticatedPainelCriarRouteImport } from './routes/_authenti
 import { Route as AuthenticatedPainelCreditosRouteImport } from './routes/_authenticated/painel/creditos'
 import { Route as AuthenticatedPainelContaRouteImport } from './routes/_authenticated/painel/conta'
 
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ObrigadoRoute = ObrigadoRouteImport.update({
   id: '/obrigado',
   path: '/obrigado',
@@ -138,6 +150,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/obrigado': typeof ObrigadoRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/painel': typeof AuthenticatedPainelRouteWithChildren
   '/projetos': typeof AuthenticatedProjetosRoute
   '/api/imoveis': typeof ApiImoveisRoute
@@ -158,6 +172,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/obrigado': typeof ObrigadoRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/projetos': typeof AuthenticatedProjetosRoute
   '/api/imoveis': typeof ApiImoveisRoute
   '/api/mentor': typeof ApiMentorRoute
@@ -179,6 +195,8 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/obrigado': typeof ObrigadoRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRouteWithChildren
   '/_authenticated/projetos': typeof AuthenticatedProjetosRoute
   '/api/imoveis': typeof ApiImoveisRoute
@@ -201,6 +219,8 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/obrigado'
+    | '/privacidade'
+    | '/termos'
     | '/painel'
     | '/projetos'
     | '/api/imoveis'
@@ -221,6 +241,8 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/obrigado'
+    | '/privacidade'
+    | '/termos'
     | '/projetos'
     | '/api/imoveis'
     | '/api/mentor'
@@ -241,6 +263,8 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/obrigado'
+    | '/privacidade'
+    | '/termos'
     | '/_authenticated/painel'
     | '/_authenticated/projetos'
     | '/api/imoveis'
@@ -263,6 +287,8 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   ObrigadoRoute: typeof ObrigadoRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
+  TermosRoute: typeof TermosRoute
   ApiImoveisRoute: typeof ApiImoveisRoute
   ApiMentorRoute: typeof ApiMentorRoute
   ApiPublicWebhookRoute: typeof ApiPublicWebhookRoute
@@ -270,6 +296,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/obrigado': {
       id: '/obrigado'
       path: '/obrigado'
@@ -454,6 +494,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   ObrigadoRoute: ObrigadoRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
+  TermosRoute: TermosRoute,
   ApiImoveisRoute: ApiImoveisRoute,
   ApiMentorRoute: ApiMentorRoute,
   ApiPublicWebhookRoute: ApiPublicWebhookRoute,
