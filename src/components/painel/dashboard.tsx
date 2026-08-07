@@ -486,15 +486,127 @@ function Atividade({ d }: { d: Painel }) {
   );
 }
 
+/* -------------------------------------------------------------- onboarding */
+
+function Onboarding({ onComplete }: { onComplete: () => void }) {
+  const [passo, setPasso] = useState(0);
+
+  const passos = [
+    {
+      titulo: "Boas-vindas à Nexofly",
+      desc: "O cérebro operacional para quem vende marketing imobiliário. Vamos transformar imóveis em ativos de alta conversão.",
+      icone: Wand2,
+    },
+    {
+      titulo: "O Fluxo Inteligente",
+      desc: "1. Encontre oportunidades no Radar. 2. Personalize a estratégia. 3. Gere entregáveis de elite (vídeos, sites e propostas).",
+      icone: Activity,
+    },
+    {
+      titulo: "Sempre em Mãos",
+      desc: "Seus rascunhos são salvos automaticamente. Você pode continuar de onde parou a qualquer momento pelo painel.",
+      icone: Clock3,
+    },
+  ];
+
+  const atual = passos[passo];
+  const Icone = atual.icone;
+
+  const proximo = async () => {
+    if (passo < passos.length - 1) {
+      setPasso(passo + 1);
+    } else {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await supabase
+          .from("profiles")
+          .update({ onboarding_completed: true } as any)
+          .eq("id", session.user.id);
+      }
+      onComplete();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] grid place-items-center bg-ink/90 p-6 backdrop-blur-md">
+      <div className="glass-deep max-w-md overflow-hidden rounded-3xl p-8 text-center ring-1 ring-white/10">
+        <div className="mx-auto mb-6 grid size-16 place-items-center rounded-2xl bg-chrome/10 text-chrome">
+          <Icone className="size-8" />
+        </div>
+        <h2 className="font-display text-2xl font-bold text-bone">{atual.titulo}</h2>
+        <p className="mt-4 text-[0.95rem] leading-relaxed text-stone">{atual.desc}</p>
+
+        <div className="mt-8 flex items-center justify-between">
+          <div className="flex gap-1.5">
+            {passos.map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "h-1 rounded-full transition-all",
+                  i === passo ? "w-6 bg-chrome" : "w-1.5 bg-white/10"
+                )}
+              />
+            ))}
+          </div>
+          <button
+            onClick={proximo}
+            className="metal-pill px-6 py-2.5 text-sm font-bold text-black"
+          >
+            {passo === passos.length - 1 ? "Começar agora" : "Continuar"}
+          </button>
+        </div>
+
+        <button
+          onClick={onComplete}
+          className="mt-6 text-[0.82rem] text-stone/60 hover:text-stone"
+        >
+          Pular introdução
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* -------------------------------------------------------------- dashboard */
 
 export function Dashboard() {
   const { ligado: demo, dados } = useDemo();
-  const d = demo ? dados : ZERADO;
+  const [mostrarOnboarding, setMostrarOnboarding] = useState(false);
+  
+  const { data: projects, isLoading } = useQuery({
+    queryKey: ['projects'],
+    queryFn: listProjects,
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return null;
+      const { data } = await supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("id", session.user.id)
+        .single();
+      return data;
+    }
+  });
+
+  useEffect(() => {
+    if (profile && profile.onboarding_completed === false) {
+      setMostrarOnboarding(true);
+    }
+  }, [profile]);
+
+  const p = demo ? dados : ZERADO;
+  const temProjetos = (projects && projects.length > 0) || demo;
+  const projetoAtivo = projects?.[0]; // O mais recente devido ao order no listProjects
 
   return (
-    <div className="space-y-5">
-      <header className="flex flex-wrap items-end justify-between gap-4">
+    <div className="space-y-6">
+      {mostrarOnboarding && <Onboarding onComplete={() => setMostrarOnboarding(false)} />}
+
+      <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
             <p className="eyebrow">Painel</p>
@@ -505,34 +617,89 @@ export function Dashboard() {
             )}
           </div>
           <h1 className="mt-2 font-display text-3xl font-semibold text-bone sm:text-4xl">
-            {demo ? "Sua operação hoje." : "Sua conta está pronta."}
+            {temProjetos ? "Sua operação hoje." : "Boas-vindas, vamos começar?"}
           </h1>
-          <p className="mt-1.5 text-[0.95rem] text-stone">
-            {demo
-              ? "Números de exemplo, ligados nas Configurações."
-              : "Os números começam a aparecer com a primeira entrega."}
-          </p>
         </div>
 
         <Link
           href="/painel/criar"
-          className="metal-pill inline-flex h-11 items-center gap-2 rounded-xl px-5 text-[0.88rem] font-semibold text-[#08090B] shadow-[0_10px_26px_-12px_rgba(255,255,255,0.32)] transition-transform hover:-translate-y-0.5"
+          className="metal-pill flex items-center gap-2 px-6 py-3 text-sm font-bold text-black"
         >
-          <Wand2 className="size-4" strokeWidth={2} />
-          Nova entrega
+          <Plus className="size-4" /> Novo Projeto
         </Link>
-
-
       </header>
 
-      <Faturamento d={d} />
+      {/* Estado: Continuar de onde parou */}
+      {!demo && projetoAtivo && projetoAtivo.status !== 'concluido' && (
+        <section className="glass-deep rim-lit overflow-hidden rounded-3xl p-1 px-1">
+          <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-5">
+              <div className="grid size-14 place-items-center rounded-2xl bg-chrome/10 text-chrome">
+                <Play className="size-6 fill-chrome" />
+              </div>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-stone">Continuar de onde parou</p>
+                <h3 className="mt-1 font-display text-xl font-bold text-bone">
+                  {projetoAtivo.properties?.[0]?.nome || "Projeto sem nome"}
+                </h3>
+                <div className="mt-1.5 flex items-center gap-3 text-sm text-stone">
+                   <span className="flex items-center gap-1.5">
+                     <span className="size-1.5 rounded-full bg-chrome" />
+                     Passo {projetoAtivo.current_step + 1}
+                   </span>
+                   {projetoAtivo.properties?.[0]?.opportunity_score && (
+                     <span className="flex items-center gap-1 text-orange-400">
+                       <Flame className="size-3 fill-orange-400" />
+                       {projetoAtivo.properties[0].opportunity_score}
+                     </span>
+                   )}
+                </div>
+              </div>
+            </div>
+            <Link
+              href="/painel/criar"
+              onClick={() => setCurrentProjectId(projetoAtivo.id)}
+              className="flex items-center justify-center gap-2 rounded-xl bg-white/5 px-8 py-4 text-sm font-bold text-bone ring-1 ring-white/10 transition-all hover:bg-white/10"
+            >
+              Retomar agora <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        </section>
+      )}
 
-      <div className="grid gap-4 xl:grid-cols-[1.75fr_1fr]">
-        <Fluxo d={d} />
-        <Distribuicao d={d} />
-      </div>
+      {/* Estado: Sem projetos (Zero State) */}
+      {!temProjetos && !isLoading && (
+        <section className="glass flex min-h-[400px] flex-col items-center justify-center rounded-3xl border-dashed border-white/10 p-12 text-center">
+          <div className="grid size-20 place-items-center rounded-3xl bg-white/5 text-stone">
+            <Wand2 className="size-10" />
+          </div>
+          <h2 className="mt-8 font-display text-2xl font-semibold text-bone">
+            Pronto para o seu primeiro projeto?
+          </h2>
+          <p className="mt-4 max-w-sm text-stone">
+            Encontre imóveis com baixo desempenho visual e crie entregáveis que vendem em minutos.
+          </p>
+          <Link
+            href="/painel/criar"
+            className="metal-pill mt-8 flex items-center gap-2 px-10 py-4 text-base font-bold text-black"
+          >
+            Iniciar meu primeiro projeto <Plus className="size-5" />
+          </Link>
+        </section>
+      )}
 
-      <Atividade d={d} />
+      {/* Métricas: Só aparecem se houver projetos ou no modo demo */}
+      {temProjetos && (
+        <>
+          <Faturamento d={p} />
+          <div className="grid gap-5 lg:grid-cols-2">
+            <Fluxo d={p} />
+            <Distribuicao d={p} />
+            <Atividade d={p} />
+          </div>
+        </>
+      )}
     </div>
   );
 }
+
