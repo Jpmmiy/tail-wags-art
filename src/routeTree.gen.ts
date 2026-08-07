@@ -18,17 +18,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiMentorRouteImport } from './routes/api/mentor'
 import { Route as ApiImoveisRouteImport } from './routes/api/imoveis'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
-import { Route as AuthenticatedPainelIndexRouteImport } from './routes/_authenticated/painel/index'
+import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as ApiPublicWebhookRouteImport } from './routes/api/public/webhook'
 import { Route as ApiPublicProtocoloRouteImport } from './routes/api/public/protocolo'
 import { Route as AuthenticatedProjetoIdRouteImport } from './routes/_authenticated/projeto.$id'
-import { Route as AuthenticatedPainelProjetosRouteImport } from './routes/_authenticated/painel/projetos'
-import { Route as AuthenticatedPainelPresenteRouteImport } from './routes/_authenticated/painel/presente'
-import { Route as AuthenticatedPainelPortfolioRouteImport } from './routes/_authenticated/painel/portfolio'
-import { Route as AuthenticatedPainelMentorRouteImport } from './routes/_authenticated/painel/mentor'
-import { Route as AuthenticatedPainelCriarRouteImport } from './routes/_authenticated/painel/criar'
-import { Route as AuthenticatedPainelCreditosRouteImport } from './routes/_authenticated/painel/creditos'
-import { Route as AuthenticatedPainelContaRouteImport } from './routes/_authenticated/painel/conta'
 
 const TermosRoute = TermosRouteImport.update({
   id: '/termos',
@@ -74,12 +67,11 @@ const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   path: '/perfil',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedPainelIndexRoute =
-  AuthenticatedPainelIndexRouteImport.update({
-    id: '/painel/',
-    path: '/painel/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
+const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const ApiPublicWebhookRoute = ApiPublicWebhookRouteImport.update({
   id: '/api/public/webhook',
   path: '/api/public/webhook',
@@ -95,48 +87,6 @@ const AuthenticatedProjetoIdRoute = AuthenticatedProjetoIdRouteImport.update({
   path: '/projeto/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedPainelProjetosRoute =
-  AuthenticatedPainelProjetosRouteImport.update({
-    id: '/painel/projetos',
-    path: '/painel/projetos',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedPainelPresenteRoute =
-  AuthenticatedPainelPresenteRouteImport.update({
-    id: '/painel/presente',
-    path: '/painel/presente',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedPainelPortfolioRoute =
-  AuthenticatedPainelPortfolioRouteImport.update({
-    id: '/painel/portfolio',
-    path: '/painel/portfolio',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedPainelMentorRoute =
-  AuthenticatedPainelMentorRouteImport.update({
-    id: '/painel/mentor',
-    path: '/painel/mentor',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedPainelCriarRoute =
-  AuthenticatedPainelCriarRouteImport.update({
-    id: '/painel/criar',
-    path: '/painel/criar',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedPainelCreditosRoute =
-  AuthenticatedPainelCreditosRouteImport.update({
-    id: '/painel/creditos',
-    path: '/painel/creditos',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedPainelContaRoute =
-  AuthenticatedPainelContaRouteImport.update({
-    id: '/painel/conta',
-    path: '/painel/conta',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -144,20 +94,13 @@ export interface FileRoutesByFullPath {
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/termos': typeof TermosRoute
+  '/painel': typeof AuthenticatedPainelRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/api/imoveis': typeof ApiImoveisRoute
   '/api/mentor': typeof ApiMentorRoute
-  '/painel/conta': typeof AuthenticatedPainelContaRoute
-  '/painel/creditos': typeof AuthenticatedPainelCreditosRoute
-  '/painel/criar': typeof AuthenticatedPainelCriarRoute
-  '/painel/mentor': typeof AuthenticatedPainelMentorRoute
-  '/painel/portfolio': typeof AuthenticatedPainelPortfolioRoute
-  '/painel/presente': typeof AuthenticatedPainelPresenteRoute
-  '/painel/projetos': typeof AuthenticatedPainelProjetosRoute
   '/projeto/$id': typeof AuthenticatedProjetoIdRoute
   '/api/public/protocolo': typeof ApiPublicProtocoloRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
-  '/painel/': typeof AuthenticatedPainelIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -165,20 +108,13 @@ export interface FileRoutesByTo {
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/termos': typeof TermosRoute
+  '/painel': typeof AuthenticatedPainelRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/api/imoveis': typeof ApiImoveisRoute
   '/api/mentor': typeof ApiMentorRoute
-  '/painel/conta': typeof AuthenticatedPainelContaRoute
-  '/painel/creditos': typeof AuthenticatedPainelCreditosRoute
-  '/painel/criar': typeof AuthenticatedPainelCriarRoute
-  '/painel/mentor': typeof AuthenticatedPainelMentorRoute
-  '/painel/portfolio': typeof AuthenticatedPainelPortfolioRoute
-  '/painel/presente': typeof AuthenticatedPainelPresenteRoute
-  '/painel/projetos': typeof AuthenticatedPainelProjetosRoute
   '/projeto/$id': typeof AuthenticatedProjetoIdRoute
   '/api/public/protocolo': typeof ApiPublicProtocoloRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
-  '/painel': typeof AuthenticatedPainelIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -188,20 +124,13 @@ export interface FileRoutesById {
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/termos': typeof TermosRoute
+  '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/api/imoveis': typeof ApiImoveisRoute
   '/api/mentor': typeof ApiMentorRoute
-  '/_authenticated/painel/conta': typeof AuthenticatedPainelContaRoute
-  '/_authenticated/painel/creditos': typeof AuthenticatedPainelCreditosRoute
-  '/_authenticated/painel/criar': typeof AuthenticatedPainelCriarRoute
-  '/_authenticated/painel/mentor': typeof AuthenticatedPainelMentorRoute
-  '/_authenticated/painel/portfolio': typeof AuthenticatedPainelPortfolioRoute
-  '/_authenticated/painel/presente': typeof AuthenticatedPainelPresenteRoute
-  '/_authenticated/painel/projetos': typeof AuthenticatedPainelProjetosRoute
   '/_authenticated/projeto/$id': typeof AuthenticatedProjetoIdRoute
   '/api/public/protocolo': typeof ApiPublicProtocoloRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
-  '/_authenticated/painel/': typeof AuthenticatedPainelIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -211,20 +140,13 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/privacidade'
     | '/termos'
+    | '/painel'
     | '/perfil'
     | '/api/imoveis'
     | '/api/mentor'
-    | '/painel/conta'
-    | '/painel/creditos'
-    | '/painel/criar'
-    | '/painel/mentor'
-    | '/painel/portfolio'
-    | '/painel/presente'
-    | '/painel/projetos'
     | '/projeto/$id'
     | '/api/public/protocolo'
     | '/api/public/webhook'
-    | '/painel/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -232,20 +154,13 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/privacidade'
     | '/termos'
+    | '/painel'
     | '/perfil'
     | '/api/imoveis'
     | '/api/mentor'
-    | '/painel/conta'
-    | '/painel/creditos'
-    | '/painel/criar'
-    | '/painel/mentor'
-    | '/painel/portfolio'
-    | '/painel/presente'
-    | '/painel/projetos'
     | '/projeto/$id'
     | '/api/public/protocolo'
     | '/api/public/webhook'
-    | '/painel'
   id:
     | '__root__'
     | '/'
@@ -254,20 +169,13 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/privacidade'
     | '/termos'
+    | '/_authenticated/painel'
     | '/_authenticated/perfil'
     | '/api/imoveis'
     | '/api/mentor'
-    | '/_authenticated/painel/conta'
-    | '/_authenticated/painel/creditos'
-    | '/_authenticated/painel/criar'
-    | '/_authenticated/painel/mentor'
-    | '/_authenticated/painel/portfolio'
-    | '/_authenticated/painel/presente'
-    | '/_authenticated/painel/projetos'
     | '/_authenticated/projeto/$id'
     | '/api/public/protocolo'
     | '/api/public/webhook'
-    | '/_authenticated/painel/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -348,11 +256,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPerfilRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/painel/': {
-      id: '/_authenticated/painel/'
+    '/_authenticated/painel': {
+      id: '/_authenticated/painel'
       path: '/painel'
-      fullPath: '/painel/'
-      preLoaderRoute: typeof AuthenticatedPainelIndexRouteImport
+      fullPath: '/painel'
+      preLoaderRoute: typeof AuthenticatedPainelRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/api/public/webhook': {
@@ -376,82 +284,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjetoIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/painel/projetos': {
-      id: '/_authenticated/painel/projetos'
-      path: '/painel/projetos'
-      fullPath: '/painel/projetos'
-      preLoaderRoute: typeof AuthenticatedPainelProjetosRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/painel/presente': {
-      id: '/_authenticated/painel/presente'
-      path: '/painel/presente'
-      fullPath: '/painel/presente'
-      preLoaderRoute: typeof AuthenticatedPainelPresenteRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/painel/portfolio': {
-      id: '/_authenticated/painel/portfolio'
-      path: '/painel/portfolio'
-      fullPath: '/painel/portfolio'
-      preLoaderRoute: typeof AuthenticatedPainelPortfolioRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/painel/mentor': {
-      id: '/_authenticated/painel/mentor'
-      path: '/painel/mentor'
-      fullPath: '/painel/mentor'
-      preLoaderRoute: typeof AuthenticatedPainelMentorRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/painel/criar': {
-      id: '/_authenticated/painel/criar'
-      path: '/painel/criar'
-      fullPath: '/painel/criar'
-      preLoaderRoute: typeof AuthenticatedPainelCriarRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/painel/creditos': {
-      id: '/_authenticated/painel/creditos'
-      path: '/painel/creditos'
-      fullPath: '/painel/creditos'
-      preLoaderRoute: typeof AuthenticatedPainelCreditosRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/painel/conta': {
-      id: '/_authenticated/painel/conta'
-      path: '/painel/conta'
-      fullPath: '/painel/conta'
-      preLoaderRoute: typeof AuthenticatedPainelContaRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
-  AuthenticatedPainelContaRoute: typeof AuthenticatedPainelContaRoute
-  AuthenticatedPainelCreditosRoute: typeof AuthenticatedPainelCreditosRoute
-  AuthenticatedPainelCriarRoute: typeof AuthenticatedPainelCriarRoute
-  AuthenticatedPainelMentorRoute: typeof AuthenticatedPainelMentorRoute
-  AuthenticatedPainelPortfolioRoute: typeof AuthenticatedPainelPortfolioRoute
-  AuthenticatedPainelPresenteRoute: typeof AuthenticatedPainelPresenteRoute
-  AuthenticatedPainelProjetosRoute: typeof AuthenticatedPainelProjetosRoute
   AuthenticatedProjetoIdRoute: typeof AuthenticatedProjetoIdRoute
-  AuthenticatedPainelIndexRoute: typeof AuthenticatedPainelIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
-  AuthenticatedPainelContaRoute: AuthenticatedPainelContaRoute,
-  AuthenticatedPainelCreditosRoute: AuthenticatedPainelCreditosRoute,
-  AuthenticatedPainelCriarRoute: AuthenticatedPainelCriarRoute,
-  AuthenticatedPainelMentorRoute: AuthenticatedPainelMentorRoute,
-  AuthenticatedPainelPortfolioRoute: AuthenticatedPainelPortfolioRoute,
-  AuthenticatedPainelPresenteRoute: AuthenticatedPainelPresenteRoute,
-  AuthenticatedPainelProjetosRoute: AuthenticatedPainelProjetosRoute,
   AuthenticatedProjetoIdRoute: AuthenticatedProjetoIdRoute,
-  AuthenticatedPainelIndexRoute: AuthenticatedPainelIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
