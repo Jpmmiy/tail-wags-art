@@ -48,8 +48,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
   fetchSettings: async () => {
     set({ loading: true });
     try {
-      const { data, error } = await supabase
-        .from('app_settings')
+      const { data, error } = await (supabase.from('app_settings') as any)
         .select('value')
         .eq('key', SETTINGS_KEY)
         .single();
@@ -74,7 +73,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     const current = get();
     const newValue = { ...current, enabled };
     set({ enabled });
-    await supabase.from('app_settings').upsert({ key: SETTINGS_KEY, value: newValue });
+    await (supabase.from('app_settings') as any).upsert({ key: SETTINGS_KEY, value: newValue });
   },
 
   addSale: async (sale: Omit<FakeSale, 'id'>) => {
@@ -82,7 +81,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     const newSale = { ...sale, id: Math.random().toString(36).substr(2, 9) };
     const newSales = [...current.sales, newSale];
     set({ sales: newSales });
-    await supabase.from('app_settings').upsert({ 
+    await (supabase.from('app_settings') as any).upsert({ 
       key: SETTINGS_KEY, 
       value: { ...current, sales: newSales } 
     });
@@ -92,7 +91,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     const current = get();
     const newSales = current.sales.filter((s) => s.id !== id);
     set({ sales: newSales });
-    await supabase.from('app_settings').upsert({ 
+    await (supabase.from('app_settings') as any).upsert({ 
       key: SETTINGS_KEY, 
       value: { ...current, sales: newSales } 
     });
@@ -102,7 +101,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     const current = get();
     const newTriggers = { ...current.triggers, ...triggers };
     set({ triggers: newTriggers });
-    await supabase.from('app_settings').upsert({ 
+    await (supabase.from('app_settings') as any).upsert({ 
       key: SETTINGS_KEY, 
       value: { ...current, triggers: newTriggers } 
     });
@@ -112,7 +111,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     const current = get();
     const newOverrides = { ...current.overrides, [key]: value };
     set({ overrides: newOverrides });
-    await supabase.from('app_settings').upsert({ 
+    await (supabase.from('app_settings') as any).upsert({ 
       key: SETTINGS_KEY, 
       value: { ...current, overrides: newOverrides } 
     });
