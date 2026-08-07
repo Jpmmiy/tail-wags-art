@@ -29,11 +29,12 @@ export const Route = createFileRoute('/_authenticated')({
     // Sincroniza rascunhos anônimos e recupera último ID no primeiro load autenticado
     await syncProjectsOnLogin(session.user.id);
 
-    if (location.pathname === '/painel') {
-      throw redirect({ to: '/painel' });
-    }
-
+    // Redireciona de /painel (que é uma rota de layout) para /painel/ (o dashboard real)
+    // No TanStack Router, se _authenticated/painel.tsx existe, ele atende /painel
+    // Mas se o usuário entrar em /_authenticated, redirecionamos para o painel.
+    
     return { session, profile }
+
   },
   component: () => <Outlet />,
 })
