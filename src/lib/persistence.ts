@@ -208,17 +208,3 @@ export const syncProjectsOnLogin = async (userId: string) => {
     setCurrentProjectId(latestId);
   }
 };
-
-export const getUserProfile = async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.user) return null;
-
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", session.user.id)
-    .single();
-
-  if (error) return null;
-  return data;
-};
