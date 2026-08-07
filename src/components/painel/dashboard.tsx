@@ -33,9 +33,10 @@ const MESES = [
 
 const TIPOS = [
   { id: "fotos", rotulo: "Fotos tratadas", icone: ImageIcon },
-  { id: "video", rotulo: "Vídeos", icone: Clapperboard },
+  { id: "video", rotulo: "Materiais", icone: Clapperboard },
   { id: "site", rotulo: "Sites", icone: LayoutTemplate },
   { id: "abordagem", rotulo: "Propostas", icone: MessageSquare },
+
 ] as const;
 
 const brl = (n: number) =>
@@ -442,10 +443,11 @@ function Atividade({ d, projects }: { d: Painel; projects?: any[] }) {
   const itensAtividade = projects ? projects.map(p => {
     const statusMap: Record<string, string> = {
       'rascunho': 'Radar de oportunidade iniciado',
-      'aguardando_resposta': 'Briefing em andamento',
-      'em_producao': 'Material gerado na Sala de Produção',
+      'aguardando_resposta': 'Perfil do imóvel em andamento',
+      'em_producao': 'Materiais gerados',
       'concluido': 'Projeto finalizado'
     };
+
     
     return {
       texto: `${p.properties?.[0]?.nome || p.name || 'Novo Projeto'} · ${statusMap[p.status] || 'Atualizado'}`,

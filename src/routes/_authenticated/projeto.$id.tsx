@@ -136,15 +136,18 @@ function ProjetoDetalhesPage() {
           <div className="md:col-span-2 space-y-6">
             <section className="space-y-4">
               <h2 className="text-lg font-medium text-bone flex items-center gap-2">
-                <Clapperboard className="size-5 text-chrome" /> Entregáveis Gerados
+                <Clapperboard className="size-5 text-chrome" /> Materiais Gerados
               </h2>
+
               
               <div className="grid gap-4">
                 {deliverables.length === 0 ? (
                   <div className="glass p-12 text-center rounded-2xl">
-                    <p className="text-stone">Nenhum entregável gerado ainda.</p>
+                    <p className="text-stone">Nenhum material gerado ainda.</p>
+
                   </div>
                 ) : (
+
                   deliverables.map((d: any) => (
                     <div key={d.id} className="glass rounded-2xl p-6 space-y-4 border border-white/5 hover:border-white/10 transition-colors">
                       <div className="flex items-center justify-between">
@@ -201,7 +204,7 @@ function ProjetoDetalhesPage() {
 
           <aside className="space-y-6">
             <section className="glass rounded-2xl p-6 space-y-4">
-              <h3 className="font-medium text-bone">Proposta Comercial</h3>
+              <h3 className="font-medium text-bone">Proposta</h3>
               {precos ? (
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-2">
@@ -214,7 +217,7 @@ function ProjetoDetalhesPage() {
                     onClick={() => setConteudoEditado(whatsMessage(project, profile))}
                     className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-green-500/10 text-green-400 border border-green-500/20 text-sm font-bold hover:bg-green-500/20 transition-all"
                   >
-                    <MessageSquare className="size-4" /> Mensagem WhatsApp
+                    <MessageSquare className="size-4" /> Script para WhatsApp
                   </button>
                 </div>
               ) : (

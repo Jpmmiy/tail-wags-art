@@ -117,7 +117,7 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
               </div>
               <div>
                 <h3 className="text-bone font-medium">Vídeo curto</h3>
-                <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Roteiro para Google Flow</p>
+                <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Roteiro para Materiais Gerados</p>
               </div>
             </div>
             <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
@@ -138,6 +138,7 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
                 className="flex items-center justify-center gap-2 bg-chrome text-black py-3 rounded-xl text-sm font-bold hover:scale-[1.02] transition-all"
               >
                 <Clapperboard className="size-4" /> Ir para Google Flow
+
               </button>
               <button 
                 onClick={() => copiar(promptVideo(respostas), "Prompt de vídeo")}
@@ -210,8 +211,11 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
                 <MessageSquare className="size-5" />
               </div>
               <div>
-                <h3 className="text-bone font-medium">Proposta comercial</h3>
-                <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Abordagem de fechamento</p>
+                <h3 className="text-bone font-medium">Script para WhatsApp</h3>
+                <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Documento de Proposta</p>
+
+
+
               </div>
             </div>
             <div className="p-4 bg-black/40 rounded-2xl border border-white/10 border-l-2 border-l-chrome">
@@ -224,10 +228,11 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
                 onClick={() => copiar(abordagem(respostas), "Proposta")}
                 className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 py-3 rounded-xl text-sm text-bone transition-all"
               >
-                <Copy className="size-4" /> Copiar proposta
+                <Copy className="size-4" /> Copiar script
+
               </button>
               <a 
-                href={`mailto:?subject=Proposta comercial - ${respostas.imovel.nome}&body=${encodeURIComponent(abordagem(respostas))}`}
+                href={`mailto:?subject=Proposta - ${respostas.imovel.nome}&body=${encodeURIComponent(abordagem(respostas))}`}
                 className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 py-3 rounded-xl text-sm text-bone transition-all"
               >
                 <Mail className="size-4" /> Enviar por e-mail

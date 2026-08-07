@@ -55,7 +55,7 @@ import { cn } from "@/lib/utils";
 import { saveProjectStep, loadProject, setCurrentProjectId, getCurrentProjectId } from "@/lib/persistence";
 import { toast } from "sonner";
 
-const TITULOS = ["Radar de Oportunidades", "Personalização", "Fechamento"];
+const TITULOS = ["Radar de Oportunidades", "Perfil do Imóvel", "Proposta"];
 
 const MODALIDADES = [
   { id: "temporada" as const, icone: Home, titulo: "Airbnb e temporada", desc: "Pousadas, chalés e casas anunciadas por diária." },
@@ -66,7 +66,7 @@ const PACOTE_CONFIG = [
   { id: "fotos", rotulo: "Fotos tratadas", icone: ImageIcon },
   { id: "video", rotulo: "Vídeo curto", icone: Clapperboard },
   { id: "site", rotulo: "Site com reserva direta", icone: LayoutTemplate },
-  { id: "abordagem", rotulo: "Proposta", icone: MessageSquare },
+  { id: "abordagem", rotulo: "Script para WhatsApp", icone: MessageSquare },
 ];
 
 function Progresso({ passo }: { passo: number }) {
@@ -351,7 +351,7 @@ export function Quiz() {
       if (!escolhido && !manualNome) erros.push("Selecione ou insira um imóvel");
     }
     if (p === 1) {
-      if (entregaveis.length === 0) erros.push("Selecione pelo menos um entregável");
+      if (entregaveis.length === 0) erros.push("Selecione pelo menos um material");
       if (!publico) erros.push("Selecione o público-alvo");
     }
     setErrosValidacao(erros);
@@ -540,7 +540,7 @@ export function Quiz() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-display font-semibold text-bone">Fluxo de Vídeos</h3>
-                  <p className="text-sm text-stone mt-1">Roteiros profissionais para Airbnb e handoff direto para Google Flow.</p>
+                  <p className="text-sm text-stone mt-1">Roteiros profissionais para Airbnb e handoff direto para Materiais Gerados.</p>
                 </div>
                 <ChevronRight className="size-6 text-stone group-hover:text-chrome transition-colors" />
               </div>
@@ -771,7 +771,8 @@ export function Quiz() {
           
           <div className="space-y-6">
             <div className="space-y-3">
-              <label className="text-sm font-medium text-bone">O que vamos entregar para o cliente?</label>
+              <label className="text-sm font-medium text-bone">Quais materiais vamos entregar para o cliente?</label>
+
               <div className="grid grid-cols-2 gap-4">
                 {PACOTE_CONFIG.map(p => (
                     <button 
@@ -887,9 +888,10 @@ export function Quiz() {
 
                 <div className="flex items-center justify-between group border-t border-white/5 pt-4">
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-stone">Pacote de Entregáveis</p>
+                    <p className="text-[10px] uppercase font-bold text-stone">Materiais Selecionados</p>
                     <p className="text-bone font-medium">{entregaveis.map(e => PACOTE_CONFIG.find(p => p.id === e)?.rotulo).join(", ")}</p>
                   </div>
+
                   <button onClick={() => { setPasso(1); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
                 </div>
 
@@ -933,7 +935,7 @@ export function Quiz() {
             {/* BLOCO 1 — WHATSAPP */}
             <div className="glass p-6 rounded-2xl border-chrome/20 rim-lit">
                 <h3 className="text-bone font-medium flex items-center gap-2 mb-4">
-                    <MessageCircle className="size-4 text-chrome" /> Abordagem WhatsApp
+                    <MessageCircle className="size-4 text-chrome" /> Script para WhatsApp
                 </h3>
                 <div className="p-4 bg-white/[0.03] rounded-xl text-[0.9rem] text-bone italic border-l-2 border-chrome whitespace-pre-wrap">
                     {whatsMessage}
@@ -967,8 +969,9 @@ export function Quiz() {
                     <Clapperboard className="size-5" />
                   </div>
                   <div>
-                    <h3 className="text-bone font-medium text-lg">Handoff para Produção</h3>
+                    <h3 className="text-bone font-medium text-lg">Handoff para Materiais Gerados</h3>
                     <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Técnica Frames-to-Video no Google Flow</p>
+
                   </div>
                 </div>
                 
@@ -1032,9 +1035,10 @@ export function Quiz() {
                          
                          <button 
                            onClick={async () => {
-                             const confirm = window.confirm("Deseja regerar os entregáveis com as novas configurações? Isso atualizará os prompts.");
+                             const confirm = window.confirm("Deseja regerar os materiais com as novas configurações? Isso atualizará os prompts.");
                              if (confirm) {
                                await autosave(2, 'em_producao');
+
                                setEditandoConcluido(false);
                                toast.success("Estratégia atualizada!");
                              }
