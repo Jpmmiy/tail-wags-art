@@ -23,6 +23,8 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const navigate = useNavigate();
+  const { redirect: redirectUrl } = Route.useSearch();
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Efeito de brilho que segue o cursor (padrão Nexofly)
