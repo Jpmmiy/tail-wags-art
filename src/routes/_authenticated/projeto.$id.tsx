@@ -144,6 +144,7 @@ function ProjetoDetalhesPage() {
                 {deliverables.length === 0 ? (
                   <div className="glass p-12 text-center rounded-2xl">
                     <p className="text-stone">Nenhum material gerado ainda.</p>
+
                   </div>
                 ) : (
 

@@ -117,7 +117,7 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
               </div>
               <div>
                 <h3 className="text-bone font-medium">Vídeo curto</h3>
-                <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Roteiro para Google Flow</p>
+                <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Roteiro para Materiais Gerados</p>
               </div>
             </div>
             <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
@@ -138,6 +138,7 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
                 className="flex items-center justify-center gap-2 bg-chrome text-black py-3 rounded-xl text-sm font-bold hover:scale-[1.02] transition-all"
               >
                 <Clapperboard className="size-4" /> Ir para Google Flow
+
               </button>
               <button 
                 onClick={() => copiar(promptVideo(respostas), "Prompt de vídeo")}
