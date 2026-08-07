@@ -107,7 +107,7 @@ function Membros() {
   );
 }
 
-export const Route = createFileRoute("/painel/membros")({
+export const Route = createFileRoute("/_authenticated/painel/membros")({
   head: () => ({
     meta: [
       { title: "Área de membros · Nexofly" },

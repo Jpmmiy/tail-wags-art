@@ -5,10 +5,15 @@ import { Logo } from "@/components/brand/logo";
 import { ArrowLeft, Loader2, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { z } from "zod";
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: z.object({
+    redirect: z.string().optional(),
+  }),
   component: AuthPage,
 });
+
 
 function AuthPage() {
   const isLogin = true;
@@ -18,6 +23,8 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const navigate = useNavigate();
+  const { redirect: redirectUrl } = Route.useSearch();
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Efeito de brilho que segue o cursor (padrão Nexofly)
@@ -47,7 +54,12 @@ function AuthPage() {
         });
         if (error) throw error;
         toast.success("Bem-vindo de volta!");
-        navigate({ to: "/painel" });
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
+        } else {
+          navigate({ to: "/painel" });
+        }
+
       } else {
         const { error } = await supabase.auth.signUp({
           email,

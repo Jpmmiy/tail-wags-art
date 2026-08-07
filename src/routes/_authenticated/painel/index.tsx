@@ -7,7 +7,7 @@ function Painel() {
   return <Dashboard />;
 }
 
-export const Route = createFileRoute("/painel/")({
+export const Route = createFileRoute("/_authenticated/painel/")({
   head: () => ({
     meta: [
       { title: "Painel · Nexofly" },

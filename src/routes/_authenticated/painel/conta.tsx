@@ -7,7 +7,7 @@ function ContaPage() {
   return <Conta />;
 }
 
-export const Route = createFileRoute("/painel/conta")({
+export const Route = createFileRoute("/_authenticated/painel/conta")({
   head: () => ({
     meta: [
       { title: "Configurações · Nexofly" },

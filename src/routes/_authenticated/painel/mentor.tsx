@@ -7,7 +7,7 @@ function MentorPage() {
   return <Mentor />;
 }
 
-export const Route = createFileRoute("/painel/mentor")({
+export const Route = createFileRoute("/_authenticated/painel/mentor")({
   head: () => ({
     meta: [
       { title: "Mentor Nexofly · Nexofly" },

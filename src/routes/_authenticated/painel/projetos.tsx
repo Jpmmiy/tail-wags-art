@@ -7,7 +7,7 @@ function ProjetosPage() {
   return <Projetos />;
 }
 
-export const Route = createFileRoute("/painel/projetos")({
+export const Route = createFileRoute("/_authenticated/painel/projetos")({
   head: () => ({
     meta: [
       { title: "Projetos · Nexofly" },

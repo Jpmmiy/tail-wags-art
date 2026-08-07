@@ -131,16 +131,22 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session?.user) {
         syncProjectsOnLogin(session.user.id);
       }
+      
+      if (event === "SIGNED_OUT") {
+        router.invalidate();
+        router.navigate({ to: "/auth" });
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -150,4 +156,5 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+
 

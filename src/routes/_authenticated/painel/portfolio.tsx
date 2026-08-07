@@ -75,7 +75,7 @@ function Portfolio() {
   );
 }
 
-export const Route = createFileRoute("/painel/portfolio")({
+export const Route = createFileRoute("/_authenticated/painel/portfolio")({
   head: () => ({
     meta: [
       { title: "Portfólio · Nexofly" },
