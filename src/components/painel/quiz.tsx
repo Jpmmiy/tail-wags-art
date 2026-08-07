@@ -312,6 +312,25 @@ export function Quiz() {
   return (
     <div className="space-y-8">
       {gerando && <TelaGeracao aoTerminar={() => { setGerando(false); setPasso(3); }} />}
+      {(passo === 3 && projetoCarregado) && (
+        <div className="fixed inset-0 z-50 bg-ink overflow-y-auto p-4 sm:p-8">
+          <div className="max-w-4xl mx-auto space-y-8">
+            <header className="flex items-center justify-between">
+              <h1 className="font-display text-3xl font-semibold text-bone">Sala de Produção</h1>
+              <button 
+                onClick={() => setPasso(2)} 
+                className="flex items-center gap-2 text-stone hover:text-bone transition-colors"
+              >
+                <ArrowLeft className="size-4" /> Voltar
+              </button>
+            </header>
+            <SalaProducao 
+              projeto={projetoCarregado} 
+              aoConcluir={() => setConcluido(true)} 
+            />
+          </div>
+        </div>
+      )}
       <header>
         <h1 className="font-display text-3xl font-semibold text-bone">{TITULOS[passo]}</h1>
       </header>
