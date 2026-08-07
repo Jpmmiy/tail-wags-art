@@ -136,8 +136,9 @@ function ProjetoDetalhesPage() {
           <div className="md:col-span-2 space-y-6">
             <section className="space-y-4">
               <h2 className="text-lg font-medium text-bone flex items-center gap-2">
-                <Clapperboard className="size-5 text-chrome" /> Entregáveis Gerados
+                <Clapperboard className="size-5 text-chrome" /> Materiais Gerados
               </h2>
+
               
               <div className="grid gap-4">
                 {deliverables.length === 0 ? (
