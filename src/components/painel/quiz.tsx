@@ -271,18 +271,66 @@ export function Quiz() {
 
 
   const autosave = async (step: number, status: any = 'rascunho') => {
+    setSalvando(true);
+    setErroSalvamento(false);
+    console.log("Saving project step:", step, "Status:", status);
+    
     // Se for o passo de geração (agora passo 2, indo para fechamento)
     const finalStatus = step === 2 ? 'em_producao' : status;
-    const pid = await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis, objetivo, objetivoVideoTipo, possuiDrone }, finalStatus);
-    if (pid) setCurrentProjectId(pid);
-    return pid;
+    
+    try {
+      const pid = await saveProjectStep(step, { 
+        modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis, objetivo, objetivoVideoTipo, possuiDrone 
+      }, finalStatus);
+      
+      if (pid) {
+        setCurrentProjectId(pid);
+        setUltimoSalvo(new Date());
+      } else {
+        throw new Error("Falha ao obter ID do projeto");
+      }
+      return pid;
+    } catch (err) {
+      console.error("Erro no autosave:", err);
+      setErroSalvamento(true);
+      toast.error("Erro ao salvar rascunho. Verifique sua conexão.");
+      return null;
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  const validarPasso = (p: number) => {
+    const erros: string[] = [];
+    if (p === 0) {
+      if (!modalidade) erros.push("Selecione a modalidade do imóvel");
+      if (!cidade) erros.push("Selecione a cidade");
+      if (!escolhido && !manualNome) erros.push("Selecione ou insira um imóvel");
+    }
+    if (p === 1) {
+      if (entregaveis.length === 0) erros.push("Selecione pelo menos um entregável");
+      if (!publico) erros.push("Selecione o público-alvo");
+    }
+    setErrosValidacao(erros);
+    return erros.length === 0;
   };
 
   const avancar = async (s: any = 'rascunho') => {
+    if (!validarPasso(passo)) {
+      errosValidacao.forEach(e => toast.error(e));
+      return;
+    }
+
     const proximo = passo + 1;
     
-    // Mostra feedback visual
-    if (proximo === 2) {
+    // Antes da geração final (indo para o passo 2), forçamos a revisão
+    if (proximo === 2 && !revisando && !editandoConcluido) {
+      setRevisando(true);
+      return;
+    }
+
+    // Mostra feedback visual se estiver indo para a geração
+    if (proximo === 2 && !editandoConcluido) {
       setGerando(true);
       return; 
     }
@@ -290,16 +338,21 @@ export function Quiz() {
     try {
       const pid = await autosave(proximo, s);
       
-      // Se temos um projeto, recarregamos para garantir que a SalaProducao tenha tudo
       if (pid) {
         const p = await loadProject(pid);
         if (p) setProjetoCarregado(p);
+        setPasso(proximo);
+        setRevisando(false);
       }
-
-      setPasso(proximo);
     } catch (err) {
       console.error("Erro ao avançar:", err);
-      toast.error("Não foi possível salvar seu progresso. Tente novamente.");
+    }
+  };
+
+  const voltar = () => {
+    if (passo > -1) {
+      setPasso(passo - 1);
+      setRevisando(false);
     }
   };
 
@@ -323,7 +376,7 @@ export function Quiz() {
       console.error("Erro ao finalizar geração:", err);
     }
 
-    // Fallback absoluto: se o banco falhar, monta o objeto na memória e avança para não travar
+    // Fallback absoluto
     setProjetoCarregado({
       id: getCurrentProjectId() || 'temp-' + Date.now(),
       status: 'em_producao',
@@ -332,6 +385,7 @@ export function Quiz() {
     });
     setPasso(proximoPasso);
   };
+
 
 
   const nomeExibicao = useMemo(() => {
