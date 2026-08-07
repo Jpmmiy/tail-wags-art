@@ -103,7 +103,7 @@ function AuthPage() {
           </h1>
           <p className="mt-3 text-stone">
             {isLogin
-              ? "Acesse sua conta para gerenciar seus projetos."
+              ? "o login nao ta indo"
               : "Crie sua conta Nexofly em poucos segundos."}
           </p>
         </div>
