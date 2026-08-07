@@ -820,7 +820,7 @@ export function Quiz() {
                 <button 
                     onClick={() => { 
                         autosave(passo, 'aguardando_resposta'); 
-                        window.location.href='/projetos'; 
+                        window.location.href='/painel/projetos'; 
                     }} 
                     className="w-full py-3 rounded-2xl text-stone hover:text-bone transition-all text-xs"
                 >
@@ -835,8 +835,12 @@ export function Quiz() {
 
       {concluido && (
         <TelaConcluida 
-          aoVoltar={() => window.location.href = '/projetos'} 
-          aoNovo={() => window.location.href = '/'} 
+          aoVoltar={() => window.location.href = '/painel/projetos'} 
+          aoNovo={() => {
+            setCurrentProjectId(null);
+            window.location.href = '/painel/criar';
+          }} 
+
         />
       )}
     </div>
