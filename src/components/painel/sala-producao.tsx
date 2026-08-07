@@ -43,8 +43,16 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
     publico: dados.publico || 'casais',
     comodos: dados.comodos || [],
     entregaveis: entregaveisAtivos,
-    notas: {}
+    objetivo: dados.objetivo || null,
+    objetivoVideoTipo: dados.objetivoVideoTipo || 'dinamico',
+    possuiDrone: dados.possuiDrone || false,
+    videoVertical: dados.videoVertical !== undefined ? dados.videoVertical : true,
+    cidade: dados.cidade || '',
+    paisId: dados.paisId || 'BR',
+    regiaoId: dados.regiaoId || '',
+    notas: dados.notas || {}
   }), [dados, entregaveisAtivos]);
+
 
   const concluirProjeto = async () => {
     setConcluindo(true);
