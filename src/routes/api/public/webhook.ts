@@ -29,7 +29,7 @@ export const Route = createFileRoute('/api/public/webhook')({
             const email = data.customer.email;
             const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-            const { error: authError } = await supabaseAdmin.auth.admin.createUser({
+            const { data: userCreated, error: authError } = await supabaseAdmin.auth.admin.createUser({
               email: email,
               password: '12345678',
               email_confirm: true,
@@ -45,8 +45,17 @@ export const Route = createFileRoute('/api/public/webhook')({
               } else {
                 console.error(`[Webhook] Erro Auth: ${authError.message}`);
               }
-            } else {
+            } else if (userCreated?.user) {
               console.log(`[Webhook] Usuário criado: ${email}`);
+              // Garante que o usuário tenha a role 'user' se a tabela existir
+              try {
+                await supabaseAdmin.from('user_roles').insert({
+                  user_id: userCreated.user.id,
+                  role: 'user'
+                });
+              } catch (e) {
+                console.log('[Webhook] Tabela user_roles não encontrada ou erro ao inserir role.');
+              }
             }
           }
 
