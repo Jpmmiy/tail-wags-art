@@ -124,6 +124,15 @@ export function Quiz() {
   const [projetoCarregado, setProjetoCarregado] = useState<any>(null);
   const [concluido, setConcluido] = useState(false);
 
+  // Novos estados de usabilidade
+  const [salvando, setSalvando] = useState(false);
+  const [ultimoSalvo, setUltimoSalvo] = useState<Date | null>(null);
+  const [erroSalvamento, setErroSalvamento] = useState(false);
+  const [revisando, setRevisando] = useState(false);
+  const [editandoConcluido, setEditandoConcluido] = useState(false);
+  const [errosValidacao, setErrosValidacao] = useState<string[]>([]);
+
+
   const resultadosFiltrados = useMemo(() => {
     let base = [...resultados];
     
@@ -239,16 +248,30 @@ export function Quiz() {
   useEffect(() => {
     const resumeProject = async () => {
       const pid = getCurrentProjectId();
-      console.log("Attempting to resume project:", pid);
       if (pid) {
         try {
           const p = await loadProject(pid);
-          console.log("Project loaded:", p);
           if (p) {
-            setPasso(p.current_step || 0);
-            setModalidade(p.modalidade as Modalidade);
+            setPasso(p.current_step ?? 0);
+            const props = p.properties?.[0] || {};
+            setModalidade(props.modalidade || p.modalidade);
+            setEscolhido(props.escolhido);
+            setPublico(props.publico || "casais");
+            setEntregaveis(props.entregaveis || ["video", "abordagem"]);
+            setDiaria(props.diaria || "250");
+            setEstilo(props.estilo || "aconchegante");
+            setCidade(props.cidade || "");
+            setPaisId(props.paisId || "BR");
+            setRegiaoId(props.regiaoId || "");
+            setObjetivo(props.objetivo);
+            setObjetivoVideoTipo(props.objetivoVideoTipo || "dinamico");
+            setPossuiDrone(props.possuiDrone || false);
+            setVideoVertical(props.videoVertical !== undefined ? props.videoVertical : true);
+            
             setProjetoCarregado(p);
-            if (p.status === 'concluido') setConcluido(true);
+            if (p.status === 'concluido' || p.status === 'em_producao') {
+              setConcluido(true);
+            }
           }
         } catch (err) { 
           console.error("Error loading project in useEffect:", err); 
@@ -256,24 +279,73 @@ export function Quiz() {
       }
     };
 
+
     resumeProject();
   }, []);
 
 
 
   const autosave = async (step: number, status: any = 'rascunho') => {
+    setSalvando(true);
+    setErroSalvamento(false);
+    console.log("Saving project step:", step, "Status:", status);
+    
     // Se for o passo de geração (agora passo 2, indo para fechamento)
     const finalStatus = step === 2 ? 'em_producao' : status;
-    const pid = await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis, objetivo, objetivoVideoTipo, possuiDrone }, finalStatus);
-    if (pid) setCurrentProjectId(pid);
-    return pid;
+    
+    try {
+      const pid = await saveProjectStep(step, { 
+        modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis, objetivo, objetivoVideoTipo, possuiDrone 
+      }, finalStatus);
+      
+      if (pid) {
+        setCurrentProjectId(pid);
+        setUltimoSalvo(new Date());
+      } else {
+        throw new Error("Falha ao obter ID do projeto");
+      }
+      return pid;
+    } catch (err) {
+      console.error("Erro no autosave:", err);
+      setErroSalvamento(true);
+      toast.error("Erro ao salvar rascunho. Verifique sua conexão.");
+      return null;
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  const validarPasso = (p: number) => {
+    const erros: string[] = [];
+    if (p === 0) {
+      if (!modalidade) erros.push("Selecione a modalidade do imóvel");
+      if (!cidade) erros.push("Selecione a cidade");
+      if (!escolhido && !manualNome) erros.push("Selecione ou insira um imóvel");
+    }
+    if (p === 1) {
+      if (entregaveis.length === 0) erros.push("Selecione pelo menos um entregável");
+      if (!publico) erros.push("Selecione o público-alvo");
+    }
+    setErrosValidacao(erros);
+    return erros.length === 0;
   };
 
   const avancar = async (s: any = 'rascunho') => {
+    if (!validarPasso(passo)) {
+      errosValidacao.forEach(e => toast.error(e));
+      return;
+    }
+
     const proximo = passo + 1;
     
-    // Mostra feedback visual
-    if (proximo === 2) {
+    // Antes da geração final (indo para o passo 2), forçamos a revisão
+    if (proximo === 2 && !revisando && !editandoConcluido) {
+      setRevisando(true);
+      return;
+    }
+
+    // Mostra feedback visual se estiver indo para a geração
+    if (proximo === 2 && !editandoConcluido) {
       setGerando(true);
       return; 
     }
@@ -281,16 +353,21 @@ export function Quiz() {
     try {
       const pid = await autosave(proximo, s);
       
-      // Se temos um projeto, recarregamos para garantir que a SalaProducao tenha tudo
       if (pid) {
         const p = await loadProject(pid);
         if (p) setProjetoCarregado(p);
+        setPasso(proximo);
+        setRevisando(false);
       }
-
-      setPasso(proximo);
     } catch (err) {
       console.error("Erro ao avançar:", err);
-      toast.error("Não foi possível salvar seu progresso. Tente novamente.");
+    }
+  };
+
+  const voltar = () => {
+    if (passo > -1) {
+      setPasso(passo - 1);
+      setRevisando(false);
     }
   };
 
@@ -314,7 +391,7 @@ export function Quiz() {
       console.error("Erro ao finalizar geração:", err);
     }
 
-    // Fallback absoluto: se o banco falhar, monta o objeto na memória e avança para não travar
+    // Fallback absoluto
     setProjetoCarregado({
       id: getCurrentProjectId() || 'temp-' + Date.now(),
       status: 'em_producao',
@@ -323,6 +400,7 @@ export function Quiz() {
     });
     setPasso(proximoPasso);
   };
+
 
 
   const nomeExibicao = useMemo(() => {
@@ -360,10 +438,39 @@ export function Quiz() {
       {gerando && <TelaGeracao aoTerminar={finalizarGeracao} />}
       {/* A Sala de Produção foi removida como tela independente e integrada ao Fechamento */}
 
-      <header>
-        <h1 className="font-display text-3xl font-semibold text-bone">{TITULOS[passo]}</h1>
+      <header className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          {passo > -1 && !concluido && (
+            <button onClick={voltar} className="size-10 rounded-xl bg-white/5 border border-white/10 grid place-items-center text-stone hover:text-bone transition-colors">
+              <ArrowLeft className="size-5" />
+            </button>
+          )}
+          <h1 className="font-display text-3xl font-semibold text-bone">{TITULOS[passo]}</h1>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          {salvando && (
+            <div className="flex items-center gap-2 text-stone text-[0.8rem]">
+              <Loader2 className="size-3 animate-spin" />
+              <span>Salvando...</span>
+            </div>
+          )}
+          {!salvando && ultimoSalvo && (
+            <div className="text-stone/60 text-[0.7rem] flex items-center gap-1.5">
+              <div className="size-1.5 rounded-full bg-chrome/50" />
+              Salvo às {ultimoSalvo.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </div>
+          )}
+          {erroSalvamento && (
+            <button onClick={() => autosave(passo)} className="text-red-400 text-[0.8rem] flex items-center gap-1.5 hover:underline">
+              <RotateCcw className="size-3" />
+              Falha ao salvar. Tentar novamente?
+            </button>
+          )}
+        </div>
       </header>
       {passo >= 0 && <Progresso passo={passo} />}
+
 
 
 
@@ -718,7 +825,68 @@ export function Quiz() {
         </div>
       )}
 
+      {revisando && (
+        <div className="fixed inset-0 z-[110] grid place-items-center bg-ink/90 p-6 backdrop-blur-md">
+          <div className="glass-deep max-w-2xl w-full overflow-hidden rounded-3xl p-8 ring-1 ring-white/10 space-y-8">
+            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+              <h2 className="font-display text-2xl font-bold text-bone">Revisão Final</h2>
+              <button onClick={() => setRevisando(false)} className="text-stone hover:text-bone text-sm">Cancelar</button>
+            </div>
+
+            <div className="grid gap-6 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between group">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-stone">Imóvel Selecionado</p>
+                    <p className="text-bone font-medium">{nomeExibicao}</p>
+                  </div>
+                  <button onClick={() => { setPasso(0); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
+                </div>
+
+                <div className="flex items-center justify-between group border-t border-white/5 pt-4">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-stone">Pacote de Entregáveis</p>
+                    <p className="text-bone font-medium">{entregaveis.map(e => PACOTE_CONFIG.find(p => p.id === e)?.rotulo).join(", ")}</p>
+                  </div>
+                  <button onClick={() => { setPasso(1); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
+                </div>
+
+                <div className="flex items-center justify-between group border-t border-white/5 pt-4">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-stone">Público-alvo & Estilo</p>
+                    <p className="text-bone font-medium capitalize">{publico} • {objetivoVideoTipo}</p>
+                  </div>
+                  <button onClick={() => { setPasso(1); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
+                </div>
+
+                <div className="flex items-center justify-between group border-t border-white/5 pt-4">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-stone">Recursos</p>
+                    <p className="text-bone font-medium">{possuiDrone ? "Com Drone" : "Sem Drone"} • {videoVertical ? "Vertical" : "Horizontal"}</p>
+                  </div>
+                  <button onClick={() => { setPasso(1); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-white/5 flex flex-col gap-4">
+              <button 
+                onClick={() => {
+                  setRevisando(false);
+                  setGerando(true);
+                }}
+                className="metal-pill w-full py-5 rounded-2xl text-black font-bold text-xl hover:scale-[1.02] transition-all shadow-2xl shadow-chrome/20 flex items-center justify-center gap-3"
+              >
+                <Sparkles className="size-5" /> Confirmar e Gerar
+              </button>
+              <p className="text-center text-[0.7rem] text-stone">Ao clicar em gerar, os créditos de IA serão utilizados.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {passo === 2 && (
+
         <div className="space-y-8 motion-safe:animate-rise pb-12">
             {/* BLOCO 1 — WHATSAPP */}
             <div className="glass p-6 rounded-2xl border-chrome/20 rim-lit">
@@ -776,6 +944,67 @@ export function Quiz() {
                       } as any)}
                     </p>
                   </div>
+                  
+                  {/* Edição de Concluído */}
+                  <div className="pt-6 border-t border-white/5">
+                    {!editandoConcluido ? (
+                      <button 
+                        onClick={() => setEditandoConcluido(true)}
+                        className="text-stone hover:text-chrome text-xs font-bold flex items-center gap-2 transition-colors mx-auto"
+                      >
+                        <PenLine className="size-3" /> Editar respostas deste projeto
+                      </button>
+                    ) : (
+                      <div className="space-y-6 motion-safe:animate-rise">
+                         <div className="flex items-center justify-between">
+                            <h4 className="text-bone font-medium text-sm">Ajustar Estratégia</h4>
+                            <button onClick={() => setEditandoConcluido(false)} className="text-stone text-xs">Fechar</button>
+                         </div>
+                         
+                         <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                               <label className="text-[10px] uppercase font-bold text-stone">Estilo</label>
+                               <select 
+                                 value={objetivoVideoTipo}
+                                 onChange={(e) => setObjetivoVideoTipo(e.target.value as any)}
+                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-bone"
+                               >
+                                  <option value="dinamico">Dinâmico</option>
+                                  <option value="cinematografico">Cinematográfico</option>
+                                  <option value="institucional">Institucional</option>
+                               </select>
+                            </div>
+                            <div className="space-y-2">
+                               <label className="text-[10px] uppercase font-bold text-stone">Público</label>
+                               <select 
+                                 value={publico}
+                                 onChange={(e) => setPublico(e.target.value)}
+                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-bone"
+                               >
+                                  <option value="casais">Casais</option>
+                                  <option value="famílias">Famílias</option>
+                                  <option value="trabalho">Trabalho</option>
+                               </select>
+                            </div>
+                         </div>
+                         
+                         <button 
+                           onClick={async () => {
+                             const confirm = window.confirm("Deseja regerar os entregáveis com as novas configurações? Isso atualizará os prompts.");
+                             if (confirm) {
+                               await autosave(2, 'em_producao');
+                               setEditandoConcluido(false);
+                               toast.success("Estratégia atualizada!");
+                             }
+                           }}
+                           className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-bone text-xs font-bold hover:bg-white/10 transition-all"
+                         >
+                           Salvar Alterações
+                         </button>
+                      </div>
+                    )}
+                  </div>
+
 
                   <div className="flex flex-col gap-3">
                     <button 
