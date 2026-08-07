@@ -5,7 +5,7 @@ import { Folder } from "lucide-react";
 const TITULO = "Quiz · Nexofly";
 const DESCRICAO = "Gere materiais de marketing para imóveis.";
 
-export const Route = createFileRoute("/painel/criar")({
+export const Route = createFileRoute("/_authenticated/painel/criar")({
   head: () => ({
     meta: [
       { title: TITULO },

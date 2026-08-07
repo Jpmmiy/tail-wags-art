@@ -2,7 +2,7 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 import { Sidebar } from "@/components/painel/sidebar";
 
-export const Route = createFileRoute("/painel")({
+export const Route = createFileRoute("/_authenticated/painel")({
   head: () => ({
     meta: [
       { title: "Painel · Nexofly" },

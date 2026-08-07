@@ -7,7 +7,7 @@ function CreditosPage() {
   return <Creditos />;
 }
 
-export const Route = createFileRoute("/painel/creditos")({
+export const Route = createFileRoute("/_authenticated/painel/creditos")({
   head: () => ({
     meta: [
       { title: "Créditos infinitos · Nexofly" },

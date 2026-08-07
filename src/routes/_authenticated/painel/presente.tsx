@@ -7,7 +7,7 @@ function PresentePage() {
   return <Presente />;
 }
 
-export const Route = createFileRoute("/painel/presente")({
+export const Route = createFileRoute("/_authenticated/painel/presente")({
   head: () => ({
     meta: [
       { title: "Presente · Nexofly" },

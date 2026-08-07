@@ -146,7 +146,7 @@ function Premiacoes() {
   );
 }
 
-export const Route = createFileRoute("/painel/premiacoes")({
+export const Route = createFileRoute("/_authenticated/painel/premiacoes")({
   head: () => ({
     meta: [
       { title: "Premiações · Nexofly" },
