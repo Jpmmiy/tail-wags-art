@@ -24,7 +24,24 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { listProjects, setCurrentProjectId } from "@/lib/persistence";
 import { supabase } from "@/integrations/supabase/client";
+import { ErrorBoundary } from "react-error-boundary";
 
+function ErrorFallback({ error }: { error: Error }) {
+  return (
+    <div className="glass m-8 p-10 text-center rounded-3xl border border-red-500/20">
+      <h2 className="text-xl font-bold text-red-500 mb-4">Erro no Painel</h2>
+      <pre className="text-xs bg-black/40 p-4 rounded-xl text-stone overflow-auto max-h-60 mb-6">
+        {error.message}
+      </pre>
+      <button 
+        onClick={() => window.location.reload()}
+        className="metal-pill px-6 py-2 rounded-xl text-black font-bold"
+      >
+        Tentar Novamente
+      </button>
+    </div>
+  );
+}
 
 const MESES = [
   "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
@@ -588,27 +605,68 @@ function Onboarding({ onComplete }: { onComplete: () => void }) {
 /* -------------------------------------------------------------- dashboard */
 
 export function Dashboard() {
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <DashboardContent />
+    </ErrorBoundary>
+  );
+}
+
+function DashboardContent() {
+  console.log("[RENDER] 3. Início do DashboardContent (dashboard.tsx)");
   const { ligado: demo, dados } = useDemo();
   const [mostrarOnboarding, setMostrarOnboarding] = useState(false);
   
-  const { data: projects, isLoading } = useQuery({
+  const { data: projects, isLoading, error: projectsError } = useQuery({
     queryKey: ['projects'],
-    queryFn: listProjects,
+    queryFn: async () => {
+      console.log("[RENDER] 4a. Buscando projetos...");
+      try {
+        const res = await listProjects();
+        console.log("[RENDER] 4b. Projetos carregados:", res?.length);
+        return res;
+      } catch (e) {
+        console.error("[RENDER] Erro ao buscar projetos:", e);
+        throw e;
+      }
+    },
+    retry: 1,
   });
 
-  const { data: profile } = useQuery({
+  const { data: profile, error: profileError } = useQuery({
     queryKey: ['profile'],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return null;
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", session.user.id)
-        .single();
-      return data as any;
-    }
+      console.log("[RENDER] 5a. Buscando perfil...");
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          console.warn("[RENDER] Sem sessão ao buscar perfil no Dashboard");
+          return null;
+        }
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        
+        if (error) {
+           console.error("[RENDER] Erro profile query:", error);
+           // Se o erro for 406 ou PGRST116 (não encontrado), tratamos como onboarding não feito
+           if (error.code === 'PGRST116') return { onboarding_completed: false };
+           throw error;
+        }
+        console.log("[RENDER] 5b. Perfil carregados:", data?.email);
+        return data as any;
+      } catch (e) {
+        console.error("[RENDER] Erro ao buscar perfil:", e);
+        throw e;
+      }
+    },
+    retry: 1,
   });
+
+  if (projectsError) console.error("[RENDER] ERRO PROJECTS:", projectsError);
+  if (profileError) console.error("[RENDER] ERRO PROFILE:", profileError);
 
   useEffect(() => {
     if (profile && profile.onboarding_completed === false) {
@@ -721,4 +779,3 @@ export function Dashboard() {
     </div>
   );
 }
-
