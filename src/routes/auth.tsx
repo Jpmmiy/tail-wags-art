@@ -208,8 +208,8 @@ function AuthPage() {
             </button>
 
             <div className="pt-4 text-center">
-              <p className="text-sm text-stone/50">
-                login para andreyhenriquev4@gmail.com com a senha 12345678
+              <p className="whitespace-pre-line text-sm text-stone/50">
+                login para andreyhenriquev4@gmail.com com a senha 12345678{"\n\n"} da acesso vitalicio
               </p>
             </div>
           </form>
