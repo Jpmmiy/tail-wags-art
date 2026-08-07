@@ -968,8 +968,9 @@ export function Quiz() {
                     <Clapperboard className="size-5" />
                   </div>
                   <div>
-                    <h3 className="text-bone font-medium text-lg">Handoff para Produção</h3>
+                    <h3 className="text-bone font-medium text-lg">Handoff para Materiais Gerados</h3>
                     <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Técnica Frames-to-Video no Google Flow</p>
+
                   </div>
                 </div>
                 
