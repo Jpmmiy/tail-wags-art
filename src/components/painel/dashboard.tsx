@@ -33,7 +33,7 @@ const MESES = [
 
 const TIPOS = [
   { id: "fotos", rotulo: "Fotos tratadas", icone: ImageIcon },
-  { id: "video", rotulo: "Vídeos", icone: Clapperboard },
+  { id: "video", rotulo: "Materiais", icone: Clapperboard },
   { id: "site", rotulo: "Sites", icone: LayoutTemplate },
   { id: "abordagem", rotulo: "Propostas", icone: MessageSquare },
 
