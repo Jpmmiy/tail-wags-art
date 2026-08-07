@@ -149,7 +149,8 @@ export const PLANOS = [
   {
     id: "mensal",
     nome: "Plano Mensal",
-    preco: "247,00",
+    preco: "169,00",
+    precoAntigo: "247,00",
     periodo: "/mês",
     chamada: "Acesso completo ao Nexofly por mês",
     destaque: false,
@@ -169,8 +170,10 @@ export const PLANOS = [
   {
     id: "vitalicio",
     nome: "Plano Acesso Pra Sempre (vitalício)",
-    preco: "497,00",
-    periodo: "pagamento único",
+    preco: "26,53",
+    precoAntigo: "497,00",
+    parcelas: "12x",
+    periodo: "no cartão",
     chamada: "Pague uma única vez (acesso pra sempre)",
     destaque: true,
     inclui: [
