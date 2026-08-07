@@ -50,15 +50,16 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
   console.log("Saving project step:", step, "Status:", status);
   const sessionId = getSessionId();
   
-  // Fonte da verdade: tenta pegar do localStorage primeiro, mas valida se existe no banco depois se necessário
-  let projectId = getCurrentProjectId();
-  
   const { data: { session } } = await supabase.auth.getSession();
   const user = session?.user;
 
-  // Se não tem ID no localstorage e está logado, tenta recuperar o último do banco
-  if (!projectId && user) {
+  // Fonte da verdade: prioriza o ID do banco se estiver logado
+  let projectId = null;
+  
+  if (user) {
     projectId = await getLatestProjectId();
+  } else {
+    projectId = getCurrentProjectId();
   }
 
   let currentProjectId = projectId;
