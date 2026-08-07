@@ -229,7 +229,7 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
 
               </button>
               <a 
-                href={`mailto:?subject=Proposta comercial - ${respostas.imovel.nome}&body=${encodeURIComponent(abordagem(respostas))}`}
+                href={`mailto:?subject=Proposta - ${respostas.imovel.nome}&body=${encodeURIComponent(abordagem(respostas))}`}
                 className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 py-3 rounded-xl text-sm text-bone transition-all"
               >
                 <Mail className="size-4" /> Enviar por e-mail
