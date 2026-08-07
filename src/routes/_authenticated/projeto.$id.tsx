@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { loadProject, saveDeliverable, getUserProfile } from '@/lib/persistence';
+import { generateProposalPDF } from '@/lib/pdf-generator';
 import { 
+
   ArrowLeft, 
   Copy, 
   Check, 
