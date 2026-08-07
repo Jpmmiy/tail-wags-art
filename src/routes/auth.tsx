@@ -72,16 +72,19 @@ function AuthPage() {
 
         toast.success("Bem-vindo de volta!");
         
+        // Sincroniza explicitamente o cookie para garantir que o middleware do TanStack Start veja a sessão
+        const key = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
+        document.cookie = `${key}=${encodeURIComponent(JSON.stringify(data.session))}; path=/; max-age=3600; SameSite=Lax`;
+
         const targetUrl = redirectUrl || "/painel";
-        console.log("Redirecionando via window.location para garantir limpeza de estado:", targetUrl);
+        console.log("Redirecionando para:", targetUrl);
         
-        // Invalida o cache do roteador antes de sair
         await router.invalidate();
         
-        // Pequeno atraso para o toast e logs terminarem
+        // Pequeno atraso para o toast ser visível e o cookie persistir
         setTimeout(() => {
           window.location.href = targetUrl;
-        }, 100);
+        }, 150);
       } else {
         const { error } = await supabase.auth.signUp({
           email,
