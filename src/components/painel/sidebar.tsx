@@ -1,4 +1,5 @@
 "use client";
+
 import { Link } from "@/components/ui/link";
 import { usePathname } from "@/components/ui/link";
 import { useState } from "react";
@@ -9,6 +10,8 @@ import {
   Bot,
   GalleryVerticalEnd,
   Infinity as Infinito,
+  GraduationCap,
+  Trophy,
   Gift,
   Settings,
   Menu,
@@ -16,9 +19,6 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
-
 
 /** Agrupado por intenção: trabalhar, crescer, conta. */
 const GRUPOS = [
@@ -26,20 +26,22 @@ const GRUPOS = [
     titulo: "Trabalho",
     itens: [
       { href: "/painel", rotulo: "Painel", icone: LayoutDashboard },
-      { href: "/painel/projetos", rotulo: "Meus Projetos", icone: FolderKanban },
+      { href: "/painel/projetos", rotulo: "Projetos", icone: FolderKanban },
       { href: "/painel/portfolio", rotulo: "Portfólio", icone: GalleryVerticalEnd },
     ],
   },
   {
     titulo: "Recursos",
     itens: [
-      { href: "/painel/creditos", rotulo: "Créditos Nexofly", icone: Infinito },
+      { href: "/painel/creditos", rotulo: "Créditos infinitos", icone: Infinito },
       { href: "/painel/mentor", rotulo: "Mentor Nexofly", icone: Bot },
+      { href: "/painel/membros", rotulo: "Área de membros", icone: GraduationCap },
     ],
   },
   {
     titulo: "Conta",
     itens: [
+      { href: "/painel/premiacoes", rotulo: "Premiações", icone: Trophy },
       { href: "/painel/presente", rotulo: "Presente", icone: Gift },
       { href: "/painel/conta", rotulo: "Configurações", icone: Settings },
     ],
@@ -48,20 +50,6 @@ const GRUPOS = [
 
 function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
   const caminho = usePathname();
-  const { data: profile } = useQuery({
-    queryKey: ['profile-sidebar'],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return null;
-      const { data } = await supabase.from("profiles").select("tier").eq("id", session.user.id).single();
-      return data;
-    }
-  });
-
-  const tier = profile?.tier || "free";
-  const labelPlano = tier === 'vitalicio' ? "Plano Vitalício" : tier === 'pro' ? "Plano Pro" : "Plano Gratuito";
-  const labelCreditos = tier === 'vitalicio' ? "Créditos Infinitos" : "Créditos Limitados";
-  const descPlano = tier === 'vitalicio' ? "Acesso liberado. Sem renovação." : tier === 'pro' ? "Assinatura ativa." : "Acesso limitado.";
 
   return (
     <div className="flex h-full flex-col gap-6 p-4">
@@ -77,12 +65,11 @@ function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
       <Link
         href="/painel/criar"
         onClick={aoNavegar}
-        className="group relative flex h-11 items-center justify-center gap-2 overflow-hidden rounded-xl metal-pill text-[0.88rem] font-semibold text-[#08090B] shadow-[0_20px_40px_-12px_rgba(255,255,255,0.4)] transition-all hover:-translate-y-1 active:scale-95"
+        className="group relative flex h-11 items-center justify-center gap-2 overflow-hidden rounded-xl metal-pill text-[0.88rem] font-semibold text-[#08090B] shadow-[0_10px_26px_-12px_rgba(255,255,255,0.32)] transition-transform hover:-translate-y-0.5"
       >
-        <Wand2 className="size-4" strokeWidth={2.5} />
-        Criar novo projeto
+        <Wand2 className="size-4" strokeWidth={2} />
+        Nova entrega
       </Link>
-
 
       <nav
         aria-label="Seções da plataforma"
@@ -96,7 +83,6 @@ function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
             <ul className="space-y-0.5">
               {grupo.itens.map((item) => {
                 const Icone = item.icone;
-                const rotulo = item.href === "/painel/creditos" ? labelCreditos : item.rotulo;
                 const ativo =
                   item.href === "/painel"
                     ? caminho === "/painel"
@@ -124,7 +110,7 @@ function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
                         className={cn("size-4 shrink-0", ativo && "text-chrome")}
                         strokeWidth={1.8}
                       />
-                      {rotulo}
+                      {item.rotulo}
                     </Link>
                   </li>
                 );
@@ -136,10 +122,10 @@ function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
 
       <div className="rounded-xl border border-chrome/20 bg-chrome/[0.06] p-4">
         <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-chrome-hi">
-          {labelPlano}
+          Plano vitalício
         </p>
         <p className="mt-1.5 text-[0.8rem] leading-relaxed text-stone">
-          {descPlano}
+          Acesso liberado. Sem renovação.
         </p>
       </div>
     </div>

@@ -26,34 +26,6 @@ export const setCurrentProjectId = (id: string | null) => {
 };
 
 /**
- * Recupera o perfil do usuário atual e garante que a sessão está ativa
- */
-export const getUserProfile = async () => {
-  const { data: { session: activeSession }, error: sessionError } = await supabase.auth.getSession();
-  
-  let currentUserId = activeSession?.user.id;
-
-  // Tenta renovar se houver erro ou se não houver usuário
-  if (sessionError || !currentUserId) {
-    const { data: refresh, error: refreshError } = await supabase.auth.refreshSession();
-    if (!refreshError && refresh.session) {
-      currentUserId = refresh.session.user.id;
-    }
-  }
-  
-  if (!currentUserId) return null;
-
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", currentUserId)
-    .single();
-    
-  if (error) return null;
-  return data;
-};
-
-/**
  * Recupera o último projeto modificado do usuário logado ou da sessão
  */
 export const getLatestProjectId = async () => {
@@ -75,26 +47,16 @@ export const getLatestProjectId = async () => {
 };
 
 export const saveProjectStep = async (step: number, data: any, status: 'rascunho' | 'aguardando_resposta' | 'em_producao' | 'concluido' = 'rascunho') => {
-  // Garantia de Sessão Ativa
-  const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
-  let activeUser = currentSession?.user;
-
-  if (sessionError || !activeUser) {
-    const { data: refresh, error: refreshError } = await supabase.auth.refreshSession();
-    if (refreshError) {
-      // Se falhar o refresh, precisamos avisar a UI para salvar localmente e pedir login
-      throw new Error("SESSÃO_EXPIRADA");
-    }
-    activeUser = refresh.session?.user;
-  }
-
   console.log("Saving project step:", step, "Status:", status);
   const sessionId = getSessionId();
   
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user;
+
   // Fonte da verdade: prioriza o ID do banco se estiver logado
   let projectId = null;
   
-  if (activeUser) {
+  if (user) {
     projectId = await getLatestProjectId();
   } else {
     projectId = getCurrentProjectId();
@@ -105,12 +67,11 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
   try {
     if (step === 1 && data.escolhido) {
       const projectData: any = {
-        user_id: activeUser?.id || null,
+        user_id: user?.id || null,
         session_id: sessionId,
         modalidade: data.modalidade,
         current_step: step,
         status: status,
-        name: data.escolhido.nome || data.manualNome,
         objetivo: data.objetivo || null,
         updated_at: new Date().toISOString(),
       };
@@ -148,7 +109,6 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
       const { error: updateError } = await (supabase.from("projects") as any).update({ 
         current_step: step,
         status: status,
-        name: data.name || data.manualNome,
         objetivo: data.objetivo || null,
         updated_at: new Date().toISOString()
       }).eq("id", currentProjectId);
@@ -174,50 +134,22 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
 };
 
 export const saveDeliverable = async (projectId: string, shotData: any) => {
-  // Busca se já existe o entregável para manter versões
-  const { data: existing } = await (supabase.from("deliverables") as any)
-    .select("id, conteudo")
-    .eq("project_id", projectId)
-    .eq("shot_number", shotData.shot_number)
-    .eq("tipo", shotData.tipo)
-    .maybeSingle();
-
-  const deliverableData: any = {
+  const { error } = await (supabase.from("deliverables") as any).upsert({
     project_id: projectId,
     shot_number: shotData.shot_number,
-    conteudo: shotData.conteudo,
-    tipo: shotData.tipo,
+    prompt_pt: shotData.prompt_pt,
+    prompt_en: shotData.prompt_en,
+    idioma_escolhido: shotData.idioma_escolhido,
     modo: shotData.modo,
     creditos: shotData.creditos,
     gerado: shotData.gerado,
-  };
+    gerado_em: shotData.gerado_em
+  });
 
-  let deliverableId;
-
-  if (existing) {
-    deliverableId = existing.id;
-    // Se o conteúdo mudou, salva uma versão antes de atualizar
-    if (existing.conteudo !== shotData.conteudo) {
-      await (supabase.from("deliverable_versions" as any) as any).insert({
-        deliverable_id: existing.id,
-        conteudo: existing.conteudo,
-      });
-    }
-    
-    const { error } = await (supabase.from("deliverables") as any)
-      .update(deliverableData)
-      .eq("id", existing.id);
-    if (error) throw error;
-  } else {
-    const { data, error } = await (supabase.from("deliverables") as any)
-      .insert(deliverableData)
-      .select("id")
-      .single();
-    if (error) throw error;
-    deliverableId = data.id;
+  if (error) {
+    console.error("Error saving deliverable:", error);
+    throw error;
   }
-
-  return deliverableId;
 };
 
 export const loadProject = async (id: string) => {
@@ -233,13 +165,6 @@ export const loadProject = async (id: string) => {
     .single();
 
   if (error) return null;
-
-  // Carrega o perfil do dono do projeto para a proposta
-  if (project.user_id) {
-    const { data: profile } = await supabase.from("profiles").select("*").eq("id", project.user_id).single();
-    project.user_profile = profile;
-  }
-
   return project;
 };
 
@@ -267,25 +192,19 @@ export const listProjects = async () => {
 
 export const syncProjectsOnLogin = async (userId: string) => {
   const sessionId = getSessionId();
-  console.log("[AUTH] Iniciando syncProjectsOnLogin para:", userId);
   
-  try {
-    // 1. Migra projetos anônimos da sessão para o usuário
-    const { error } = await (supabase
-      .from("projects") as any)
-      .update({ user_id: userId })
-      .eq("session_id", sessionId)
-      .is("user_id", null);
-    
-    if (error) console.error("[AUTH] Erro ao sincronizar projetos:", error);
+  // 1. Migra projetos anônimos da sessão para o usuário
+  const { error } = await (supabase
+    .from("projects") as any)
+    .update({ user_id: userId })
+    .eq("session_id", sessionId)
+    .is("user_id", null);
+  
+  if (error) console.error("Error syncing projects:", error);
 
-    // 2. Tenta recuperar o ID do rascunho mais recente do usuário e salvar no localStorage
-    const latestId = await getLatestProjectId();
-    if (latestId) {
-      setCurrentProjectId(latestId);
-    }
-    console.log("[AUTH] syncProjectsOnLogin concluído.");
-  } catch (e) {
-    console.error("[AUTH] Falha crítica em syncProjectsOnLogin (não bloqueante):", e);
+  // 2. Tenta recuperar o ID do rascunho mais recente do usuário e salvar no localStorage
+  const latestId = await getLatestProjectId();
+  if (latestId) {
+    setCurrentProjectId(latestId);
   }
 };

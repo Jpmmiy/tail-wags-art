@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, useEffect } from "react";
+import { useId } from "react";
 import { Link } from "@/components/ui/link";
 import {
   Wand2,
@@ -14,35 +14,9 @@ import {
   Clapperboard,
   LayoutTemplate,
   MessageSquare,
-  Plus,
-  ArrowRight,
-  Play,
-  Flame,
 } from "lucide-react";
 import { useDemo, mesCorrente, ZERADO, type Painel } from "@/lib/demo";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { listProjects, setCurrentProjectId } from "@/lib/persistence";
-import { supabase } from "@/integrations/supabase/client";
-import { ErrorBoundary, FallbackProps } from "react-error-boundary";
-
-function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
-  const errorMessage = error instanceof Error ? error.message : String(error);
-  return (
-    <div className="glass m-8 p-10 text-center rounded-3xl border border-red-500/20">
-      <h2 className="text-xl font-bold text-red-500 mb-4">Erro no Painel</h2>
-      <pre className="text-xs bg-black/40 p-4 rounded-xl text-stone overflow-auto max-h-60 mb-6">
-        {errorMessage}
-      </pre>
-      <button 
-        onClick={() => resetErrorBoundary ? resetErrorBoundary() : window.location.reload()}
-        className="metal-pill px-6 py-2 rounded-xl text-black font-bold"
-      >
-        Tentar Novamente
-      </button>
-    </div>
-  );
-}
 
 const MESES = [
   "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
@@ -51,10 +25,9 @@ const MESES = [
 
 const TIPOS = [
   { id: "fotos", rotulo: "Fotos tratadas", icone: ImageIcon },
-  { id: "video", rotulo: "Materiais", icone: Clapperboard },
+  { id: "video", rotulo: "Vídeos", icone: Clapperboard },
   { id: "site", rotulo: "Sites", icone: LayoutTemplate },
   { id: "abordagem", rotulo: "Propostas", icone: MessageSquare },
-
 ] as const;
 
 const brl = (n: number) =>
@@ -457,23 +430,7 @@ function Distribuicao({ d }: { d: Painel }) {
 
 /* --------------------------------------------------------------- atividade */
 
-function Atividade({ d, projects }: { d: Painel; projects?: any[] }) {
-  const itensAtividade = projects ? projects.map(p => {
-    const statusMap: Record<string, string> = {
-      'rascunho': 'Radar de oportunidade iniciado',
-      'aguardando_resposta': 'Perfil do imóvel em andamento',
-      'em_producao': 'Materiais gerados',
-      'concluido': 'Projeto finalizado'
-    };
-
-    
-    return {
-      texto: `${p.properties?.[0]?.nome || p.name || 'Novo Projeto'} · ${statusMap[p.status] || 'Atualizado'}`,
-      quando: new Date(p.updated_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-      valor: null
-    };
-  }).slice(0, 5) : d.atividade;
-
+function Atividade({ d }: { d: Painel }) {
   return (
     <section className="glass flex flex-col rounded-2xl p-6 sm:p-7">
       <header className="flex items-center justify-between gap-3">
@@ -483,7 +440,7 @@ function Atividade({ d, projects }: { d: Painel; projects?: any[] }) {
         <Activity className="size-4 text-stone/45" strokeWidth={1.7} />
       </header>
 
-      {itensAtividade.length === 0 ? (
+      {d.atividade.length === 0 ? (
         <div className="mt-6 flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-white/10 px-6 py-12 text-center">
           <span className="grid size-10 place-items-center rounded-xl bg-white/5 text-stone">
             <Activity className="size-4" strokeWidth={1.8} />
@@ -497,7 +454,7 @@ function Atividade({ d, projects }: { d: Painel; projects?: any[] }) {
         </div>
       ) : (
         <ul className="mt-5 divide-y divide-white/6">
-          {itensAtividade.map((a, i) => (
+          {d.atividade.map((a, i) => (
             <li
               key={i}
               className="flex items-center justify-between gap-4 py-3.5"
@@ -521,170 +478,15 @@ function Atividade({ d, projects }: { d: Painel; projects?: any[] }) {
   );
 }
 
-/* -------------------------------------------------------------- onboarding */
-
-function Onboarding({ onComplete }: { onComplete: () => void }) {
-  const [passo, setPasso] = useState(0);
-
-  const passos = [
-    {
-      titulo: "Boas-vindas à Nexofly",
-      desc: "O cérebro operacional para quem vende marketing imobiliário. Vamos transformar imóveis em ativos de alta conversão.",
-      icone: Wand2,
-    },
-    {
-      titulo: "O Fluxo Inteligente",
-      desc: "1. Encontre oportunidades no Radar. 2. Personalize a estratégia. 3. Gere entregáveis de elite (vídeos, sites e propostas).",
-      icone: Activity,
-    },
-    {
-      titulo: "Sempre em Mãos",
-      desc: "Seus rascunhos são salvos automaticamente. Você pode continuar de onde parou a qualquer momento pelo painel.",
-      icone: Clock3,
-    },
-  ];
-
-  const atual = passos[passo];
-  const Icone = atual.icone;
-
-  const proximo = async () => {
-    if (passo < passos.length - 1) {
-      setPasso(passo + 1);
-    } else {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        await supabase
-          .from("profiles")
-          .update({ onboarding_completed: true } as any)
-
-          .eq("id", session.user.id);
-      }
-      onComplete();
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-[100] grid place-items-center bg-ink/90 p-6 backdrop-blur-md">
-      <div className="glass-deep max-w-md overflow-hidden rounded-3xl p-8 text-center ring-1 ring-white/10">
-        <div className="mx-auto mb-6 grid size-16 place-items-center rounded-2xl bg-chrome/10 text-chrome">
-          <Icone className="size-8" />
-        </div>
-        <h2 className="font-display text-2xl font-bold text-bone">{atual.titulo}</h2>
-        <p className="mt-4 text-[0.95rem] leading-relaxed text-stone">{atual.desc}</p>
-
-        <div className="mt-8 flex items-center justify-between">
-          <div className="flex gap-1.5">
-            {passos.map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "h-1 rounded-full transition-all",
-                  i === passo ? "w-6 bg-chrome" : "w-1.5 bg-white/10"
-                )}
-              />
-            ))}
-          </div>
-          <button
-            onClick={proximo}
-            className="metal-pill px-6 py-2.5 text-sm font-bold text-black"
-          >
-            {passo === passos.length - 1 ? "Começar agora" : "Continuar"}
-          </button>
-        </div>
-
-        <button
-          onClick={onComplete}
-          className="mt-6 text-[0.82rem] text-stone/60 hover:text-stone"
-        >
-          Pular introdução
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /* -------------------------------------------------------------- dashboard */
 
 export function Dashboard() {
-  return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <DashboardContent />
-    </ErrorBoundary>
-  );
-}
-
-function DashboardContent() {
-  console.log("[RENDER] 3. Início do DashboardContent (dashboard.tsx)");
   const { ligado: demo, dados } = useDemo();
-  const [mostrarOnboarding, setMostrarOnboarding] = useState(false);
-  
-  const { data: projects, isLoading, error: projectsError } = useQuery({
-    queryKey: ['projects'],
-    queryFn: async () => {
-      console.log("[RENDER] 4a. Buscando projetos...");
-      try {
-        const res = await listProjects();
-        console.log("[RENDER] 4b. Projetos carregados:", res?.length);
-        return res;
-      } catch (e) {
-        console.error("[RENDER] Erro ao buscar projetos:", e);
-        throw e;
-      }
-    },
-    retry: 1,
-  });
-
-  const { data: profile, error: profileError } = useQuery({
-    queryKey: ['profile'],
-    queryFn: async () => {
-      console.log("[RENDER] 5a. Buscando perfil...");
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          console.warn("[RENDER] Sem sessão ao buscar perfil no Dashboard");
-          return null;
-        }
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-        
-        if (error) {
-           console.error("[RENDER] Erro profile query:", error);
-           // Se o erro for 406 ou PGRST116 (não encontrado), tratamos como onboarding não feito
-           if (error.code === 'PGRST116') return { onboarding_completed: false };
-           throw error;
-        }
-        console.log("[RENDER] 5b. Perfil carregados:", data?.email);
-        return data as any;
-      } catch (e) {
-        console.error("[RENDER] Erro ao buscar perfil:", e);
-        throw e;
-      }
-    },
-    retry: 1,
-  });
-
-  if (projectsError) console.error("[RENDER] ERRO PROJECTS:", projectsError);
-  if (profileError) console.error("[RENDER] ERRO PROFILE:", profileError);
-
-  useEffect(() => {
-    if (profile && profile.onboarding_completed === false) {
-      setMostrarOnboarding(true);
-    }
-  }, [profile]);
-
-
-  const p = demo ? dados : ZERADO;
-  const temProjetos = (projects && projects.length > 0) || demo;
-  const projetoAtivo = projects?.[0]; // O mais recente devido ao order no listProjects
+  const d = demo ? dados : ZERADO;
 
   return (
-    <div className="space-y-6">
-      {mostrarOnboarding && <Onboarding onComplete={() => setMostrarOnboarding(false)} />}
-
-      <header className="flex flex-wrap items-center justify-between gap-4">
+    <div className="space-y-5">
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
             <p className="eyebrow">Painel</p>
@@ -695,88 +497,34 @@ function DashboardContent() {
             )}
           </div>
           <h1 className="mt-2 font-display text-3xl font-semibold text-bone sm:text-4xl">
-            {temProjetos ? "Sua operação hoje." : "Boas-vindas, vamos começar?"}
+            {demo ? "Sua operação hoje." : "Sua conta está pronta."}
           </h1>
+          <p className="mt-1.5 text-[0.95rem] text-stone">
+            {demo
+              ? "Números de exemplo, ligados nas Configurações."
+              : "Os números começam a aparecer com a primeira entrega."}
+          </p>
         </div>
 
         <Link
           href="/painel/criar"
-          className="metal-pill flex items-center gap-2 px-6 py-3 text-sm font-bold text-black"
+          className="metal-pill inline-flex h-11 items-center gap-2 rounded-xl px-5 text-[0.88rem] font-semibold text-[#08090B] shadow-[0_10px_26px_-12px_rgba(255,255,255,0.32)] transition-transform hover:-translate-y-0.5"
         >
-          <Plus className="size-4" /> Novo Projeto
+          <Wand2 className="size-4" strokeWidth={2} />
+          Nova entrega
         </Link>
+
+
       </header>
 
-      {/* Estado: Continuar de onde parou */}
-      {!demo && projetoAtivo && projetoAtivo.status !== 'concluido' && (
-        <section className="glass-deep rim-lit overflow-hidden rounded-3xl p-1 px-1">
-          <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-5">
-              <div className="grid size-14 place-items-center rounded-2xl bg-chrome/10 text-chrome">
-                <Play className="size-6 fill-chrome" />
-              </div>
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-widest text-stone">Continuar de onde parou</p>
-                <h3 className="mt-1 font-display text-xl font-bold text-bone">
-                  {projetoAtivo.properties?.[0]?.nome || "Projeto sem nome"}
-                </h3>
-                <div className="mt-1.5 flex items-center gap-3 text-sm text-stone">
-                   <span className="flex items-center gap-1.5">
-                     <span className="size-1.5 rounded-full bg-chrome" />
-                     Passo {projetoAtivo.current_step + 1}
-                   </span>
-                   {projetoAtivo.properties?.[0]?.opportunity_score && (
-                     <span className="flex items-center gap-1 text-orange-400">
-                       <Flame className="size-3 fill-orange-400" />
-                       {projetoAtivo.properties[0].opportunity_score}
-                     </span>
-                   )}
-                </div>
-              </div>
-            </div>
-            <Link
-              href="/painel/criar"
-              onClick={() => setCurrentProjectId(projetoAtivo.id)}
-              className="flex items-center justify-center gap-2 rounded-xl bg-white/5 px-8 py-4 text-sm font-bold text-bone ring-1 ring-white/10 transition-all hover:bg-white/10"
-            >
-              Retomar agora <ArrowRight className="size-4" />
-            </Link>
-          </div>
-        </section>
-      )}
+      <Faturamento d={d} />
 
-      {/* Estado: Sem projetos (Zero State) */}
-      {!temProjetos && !isLoading && (
-        <section className="glass flex min-h-[400px] flex-col items-center justify-center rounded-3xl border-dashed border-white/10 p-12 text-center">
-          <div className="grid size-20 place-items-center rounded-3xl bg-white/5 text-stone">
-            <Wand2 className="size-10" />
-          </div>
-          <h2 className="mt-8 font-display text-2xl font-semibold text-bone">
-            Pronto para o seu primeiro projeto?
-          </h2>
-          <p className="mt-4 max-w-sm text-stone">
-            Encontre imóveis com baixo desempenho visual e crie entregáveis que vendem em minutos.
-          </p>
-          <Link
-            href="/painel/criar"
-            className="metal-pill mt-8 flex items-center gap-2 px-10 py-4 text-base font-bold text-black"
-          >
-            Iniciar meu primeiro projeto <Plus className="size-5" />
-          </Link>
-        </section>
-      )}
+      <div className="grid gap-4 xl:grid-cols-[1.75fr_1fr]">
+        <Fluxo d={d} />
+        <Distribuicao d={d} />
+      </div>
 
-      {/* Métricas: Só aparecem se houver projetos ou no modo demo */}
-      {temProjetos && (
-        <>
-          {demo && <Faturamento d={p} />}
-          <div className="grid gap-5 lg:grid-cols-2">
-            {demo && <Fluxo d={p} />}
-            <Distribuicao d={p} />
-            <Atividade d={p} projects={demo ? undefined : projects} />
-          </div>
-        </>
-      )}
+      <Atividade d={d} />
     </div>
   );
 }

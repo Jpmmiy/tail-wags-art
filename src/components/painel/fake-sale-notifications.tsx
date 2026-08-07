@@ -1,30 +1,13 @@
-import { useEffect, useState } from 'react';
-import { FakeSale } from '@/lib/protocolo';
+import { useEffect } from 'react';
+import { useProtocoloStore, FakeSale } from '@/lib/protocolo';
 import { toast } from 'sonner';
 
 export const FakeSaleNotifications = () => {
-  const [data, setData] = useState<{ enabled: boolean; sales: FakeSale[]; triggers: any } | null>(null);
+  const { enabled, sales, triggers, fetchSettings } = useProtocoloStore();
 
   useEffect(() => {
-    // PASSO 3 — CONSUMINDO ROTA PÚBLICA
-    const fetchPublicProtocolo = async () => {
-      try {
-        const r = await fetch('/api/public/protocolo');
-        if (r.ok) {
-          const d = await r.json();
-          setData(d);
-        }
-      } catch (err) {
-        console.error('Erro ao buscar notificações:', err);
-      }
-    };
-    fetchPublicProtocolo();
-  }, []);
-
-  const enabled = data?.enabled ?? false;
-  const sales = data?.sales ?? [];
-  const triggers = data?.triggers ?? { onLoad: true };
-
+    fetchSettings();
+  }, [fetchSettings]);
 
   useEffect(() => {
     if (!enabled || sales.length === 0 || !triggers.onLoad) return;

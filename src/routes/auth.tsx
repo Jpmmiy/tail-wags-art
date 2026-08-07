@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate, useRouter, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/brand/logo";
@@ -11,13 +11,6 @@ export const Route = createFileRoute("/auth")({
   validateSearch: z.object({
     redirect: z.string().optional(),
   }),
-  beforeLoad: async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      console.log("Sessão detectada em /auth via beforeLoad, redirecionando...");
-      throw redirect({ to: "/painel" });
-    }
-  },
   component: AuthPage,
 });
 
@@ -30,22 +23,9 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const navigate = useNavigate();
-  const router = useRouter();
   const { redirect: redirectUrl } = Route.useSearch();
 
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Redirecionamento preventivo caso a sessão apareça
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        console.log("Sessão detectada no useEffect de /auth, redirecionando...");
-        window.location.assign("/painel");
-      }
-    };
-    checkSession();
-  }, []);
 
   // Efeito de brilho que segue o cursor (padrão Nexofly)
   useEffect(() => {
@@ -64,42 +44,22 @@ function AuthPage() {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loading) return;
     setLoading(true);
 
-    console.log("[AUTH] 1. antes de chamar signInWithPassword para:", email);
-    
     try {
       if (isLogin) {
-        console.log("[AUTH] Chamando signInWithPassword...");
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        
-        console.log("[AUTH] 2. logo depois de signInWithPassword. data:", !!data.session, "error:", error?.message);
-
-        if (error) {
-          console.error("Erro no Supabase auth:", error);
-          throw error;
-        }
-
-        if (!data.session) {
-          console.error("Sessão não retornada após login bem-sucedido");
-          throw new Error("Sessão não iniciada. Verifique suas credenciais.");
-        }
-
+        if (error) throw error;
         toast.success("Bem-vindo de volta!");
-        
-        // Sincroniza explicitamente o cookie para TanStack Start
-        const key = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
-        document.cookie = `${key}=${encodeURIComponent(JSON.stringify(data.session))}; path=/; max-age=3600; SameSite=Lax`;
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
+        } else {
+          navigate({ to: "/painel" });
+        }
 
-        const targetUrl = redirectUrl || "/painel";
-        console.log("[AUTH] 7. Invalidando router e navegando para:", targetUrl);
-        
-        await router.invalidate();
-        navigate({ to: targetUrl });
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -115,7 +75,6 @@ function AuthPage() {
         toast.success("Conta criada! Verifique seu e-mail para confirmar.");
       }
     } catch (error: any) {
-      console.error("Catch handleAuth:", error);
       toast.error(error.message || "Erro na autenticação");
     } finally {
       setLoading(false);
@@ -158,13 +117,7 @@ function AuthPage() {
             }}
           />
 
-          <form 
-            onSubmit={(e) => {
-              console.log("Formulário submetido via onSubmit nativo");
-              handleAuth(e);
-            }} 
-            className="relative space-y-5"
-          >
+          <form onSubmit={handleAuth} className="relative space-y-5">
             {!isLogin && (
               <div className="space-y-2">
                 <label className="eyebrow ml-1" htmlFor="name">
@@ -193,13 +146,11 @@ function AuthPage() {
                 <Mail className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-stone/40 transition-colors group-focus-within:text-chrome" />
                 <input
                   id="email"
-                  name="email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="nome@empresa.com"
-                  autoComplete="username"
                   className="w-full rounded-2xl border border-white/8 bg-white/[0.03] py-3.5 pl-11 pr-4 text-bone placeholder:text-stone/30 outline-none transition-all focus:border-chrome/40 focus:bg-white/[0.06] focus:ring-1 focus:ring-chrome/20"
                 />
               </div>
@@ -220,13 +171,11 @@ function AuthPage() {
                 <Lock className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-stone/40 transition-colors group-focus-within:text-chrome" />
                 <input
                   id="password"
-                  name="password"
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  autoComplete="current-password"
                   className="w-full rounded-2xl border border-white/8 bg-white/[0.03] py-3.5 pl-11 pr-12 text-bone placeholder:text-stone/30 outline-none transition-all focus:border-chrome/40 focus:bg-white/[0.06] focus:ring-1 focus:ring-chrome/20"
                 />
                 <button
@@ -240,7 +189,6 @@ function AuthPage() {
             </div>
 
             <button
-              id="submit-auth"
               type="submit"
               disabled={loading}
               className={cn(
@@ -260,6 +208,9 @@ function AuthPage() {
             </button>
 
             <div className="pt-4 text-center">
+              <p className="text-sm text-stone/50">
+                Acesso restrito a membros autorizados.
+              </p>
             </div>
           </form>
         </div>
