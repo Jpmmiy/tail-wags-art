@@ -73,13 +73,15 @@ function AuthPage() {
         toast.success("Bem-vindo de volta!");
         
         const targetUrl = redirectUrl || "/painel";
-        console.log("Redirecionando para:", targetUrl);
+        console.log("Redirecionando via window.location para garantir limpeza de estado:", targetUrl);
         
-        // Invalida o roteador para recarregar matchers de rota e beforeLoad
+        // Invalida o cache do roteador antes de sair
         await router.invalidate();
         
-        // Navegação forçada para garantir que saia da tela de auth
-        window.location.assign(targetUrl);
+        // Pequeno atraso para o toast e logs terminarem
+        setTimeout(() => {
+          window.location.href = targetUrl;
+        }, 100);
       } else {
         const { error } = await supabase.auth.signUp({
           email,
