@@ -5,10 +5,15 @@ import { Logo } from "@/components/brand/logo";
 import { ArrowLeft, Loader2, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { z } from "zod";
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: z.object({
+    redirect: z.string().optional(),
+  }),
   component: AuthPage,
 });
+
 
 function AuthPage() {
   const isLogin = true;
