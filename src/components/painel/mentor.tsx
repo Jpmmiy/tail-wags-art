@@ -226,7 +226,7 @@ export function Mentor() {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-9rem)] flex-col">
+    <div className="flex h-full flex-col p-4 sm:p-0">
       <header className="shrink-0 pb-5">
         <div className="flex items-center gap-3">
           <span className="glass grid size-10 place-items-center rounded-xl">
