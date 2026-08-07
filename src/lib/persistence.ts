@@ -191,21 +191,35 @@ export const listProjects = async () => {
 };
 
 export const syncProjectsOnLogin = async (userId: string) => {
+  console.log("[AUTH] syncProjectsOnLogin starting for user:", userId);
   const sessionId = getSessionId();
   
-  // 1. Migra projetos anônimos da sessão para o usuário
-  const { error } = await (supabase
-    .from("projects") as any)
-    .update({ user_id: userId })
-    .eq("session_id", sessionId)
-    .is("user_id", null);
-  
-  if (error) console.error("Error syncing projects:", error);
+  try {
+    // 1. Migra projetos anônimos da sessão para o usuário
+    console.log("[AUTH] syncProjectsOnLogin: migrating anonymous projects...");
+    const { error } = await (supabase
+      .from("projects") as any)
+      .update({ user_id: userId })
+      .eq("session_id", sessionId)
+      .is("user_id", null);
+    
+    if (error) {
+      console.error("[AUTH] syncProjectsOnLogin: Migration error:", error);
+    } else {
+      console.log("[AUTH] syncProjectsOnLogin: Migration successful");
+    }
 
-  // 2. Tenta recuperar o ID do rascunho mais recente do usuário e salvar no localStorage
-  const latestId = await getLatestProjectId();
-  if (latestId) {
-    setCurrentProjectId(latestId);
+    // 2. Tenta recuperar o ID do rascunho mais recente do usuário e salvar no localStorage
+    console.log("[AUTH] syncProjectsOnLogin: fetching latest project ID...");
+    const latestId = await getLatestProjectId();
+    if (latestId) {
+      console.log("[AUTH] syncProjectsOnLogin: Found latest ID:", latestId);
+      setCurrentProjectId(latestId);
+    } else {
+      console.log("[AUTH] syncProjectsOnLogin: No previous projects found");
+    }
+  } catch (err) {
+    console.error("[AUTH] syncProjectsOnLogin: Critical sync error:", err);
   }
 };
 

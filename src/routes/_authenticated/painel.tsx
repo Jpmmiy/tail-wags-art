@@ -24,6 +24,7 @@ export const Route = createFileRoute("/_authenticated/painel")({
 });
 
 function PainelLayout() {
+  console.log("[RENDER] 2: PainelLayout component");
   return (
     <div className="min-h-dvh bg-ink">
       <Sidebar />

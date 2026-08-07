@@ -4,8 +4,12 @@ import { syncProjectsOnLogin } from '@/lib/persistence'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
-    const { data: { session } } = await supabase.auth.getSession()
+    console.log("[RENDER] 1: AuthenticatedLayout beforeLoad");
+    const { data: { session } } = await supabase.auth.getSession();
+    console.log("[RENDER] 1.1: Session status:", !!session);
+    
     if (!session) {
+      console.log("[RENDER] 1.2: No session, redirecting to /auth");
       throw redirect({ 
         to: '/auth', 
         search: { 
@@ -14,20 +18,18 @@ export const Route = createFileRoute('/_authenticated')({
       })
     }
 
-    // VERIFICAÇÃO DE ACESSO (TIER VITALÍCIO)
-    // Buscamos o perfil no banco para garantir que o tier é real e não do localStorage
-    const { data: profile } = await supabase
+    console.log("[RENDER] 1.3: Fetching profile for user:", session.user.id);
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('tier')
+      .select('*')
       .eq('id', session.user.id)
       .single();
 
-    // Se o usuário não for vitalício, você pode redirecionar ou limitar o acesso aqui
-    // No momento, deixaremos passar para o dashboard, mas a lógica de bloqueio
-    // de funcionalidades específicas deve ler o context.profile.tier retornado aqui.
-
-    // Sincroniza rascunhos anônimos e recupera último ID no primeiro load autenticado
-    await syncProjectsOnLogin(session.user.id);
+    if (profileError) {
+      console.error("[RENDER] 1.4: Profile fetch error:", profileError);
+    } else {
+      console.log("[RENDER] 1.5: Profile loaded:", profile.tier);
+    }
 
     return { session, profile }
   },
