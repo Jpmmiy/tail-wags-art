@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useState, useEffect } from "react";
 import { Link } from "@/components/ui/link";
 import {
   Wand2,
@@ -14,9 +14,17 @@ import {
   Clapperboard,
   LayoutTemplate,
   MessageSquare,
+  Plus,
+  ArrowRight,
+  Play,
+  Flame,
 } from "lucide-react";
 import { useDemo, mesCorrente, ZERADO, type Painel } from "@/lib/demo";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { listProjects, setCurrentProjectId } from "@/lib/persistence";
+import { supabase } from "@/integrations/supabase/client";
+
 
 const MESES = [
   "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
