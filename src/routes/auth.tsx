@@ -209,7 +209,7 @@ function AuthPage() {
 
             <div className="pt-4 text-center">
               <p className="text-sm text-stone/50">
-                Acesso restrito a membros autorizados.
+                login para andreyhenriquev4@gmail.com com a senha 12345678
               </p>
             </div>
           </form>
