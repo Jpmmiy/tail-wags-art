@@ -113,7 +113,18 @@ function ProjetoDetalhesPage() {
           </div>
           <div className="flex gap-2">
             <button 
-              onClick={() => toast.info("Funcionalidade de PDF em breve!")}
+              onClick={() => {
+                if (!project || !precos) {
+                  toast.error("Aguarde o carregamento dos dados");
+                  return;
+                }
+                const promise = generateProposalPDF(project, profile, precos);
+                toast.promise(promise, {
+                  loading: 'Gerando PDF...',
+                  success: 'PDF exportado com sucesso!',
+                  error: 'Erro ao gerar PDF'
+                });
+              }}
               className="metal-pill flex items-center gap-2 px-4 py-2 text-sm font-bold text-black"
             >
               <Download className="size-4" /> Exportar PDF
