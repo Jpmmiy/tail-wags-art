@@ -25,12 +25,41 @@ export const setCurrentProjectId = (id: string | null) => {
   else localStorage.removeItem(PROJECT_KEY);
 };
 
+/**
+ * Recupera o último projeto modificado do usuário logado ou da sessão
+ */
+export const getLatestProjectId = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  const sessionId = getSessionId();
+  
+  let query = supabase.from("projects").select("id").order("updated_at", { ascending: false }).limit(1);
+  
+  if (session?.user) {
+    query = query.eq("user_id", session.user.id);
+  } else {
+    query = query.eq("session_id", sessionId);
+  }
+  
+  const { data, error } = await query;
+  if (error || !data || data.length === 0) return null;
+  
+  return data[0].id;
+};
+
 export const saveProjectStep = async (step: number, data: any, status: 'rascunho' | 'aguardando_resposta' | 'em_producao' | 'concluido' = 'rascunho') => {
   console.log("Saving project step:", step, "Status:", status);
   const sessionId = getSessionId();
-  const projectId = getCurrentProjectId();
+  
+  // Fonte da verdade: tenta pegar do localStorage primeiro, mas valida se existe no banco depois se necessário
+  let projectId = getCurrentProjectId();
+  
   const { data: { session } } = await supabase.auth.getSession();
   const user = session?.user;
+
+  // Se não tem ID no localstorage e está logado, tenta recuperar o último do banco
+  if (!projectId && user) {
+    projectId = await getLatestProjectId();
+  }
 
   let currentProjectId = projectId;
 
@@ -76,12 +105,14 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
       });
 
     } else if (currentProjectId) {
-      await (supabase.from("projects") as any).update({ 
+      const { error: updateError } = await (supabase.from("projects") as any).update({ 
         current_step: step,
         status: status,
         objetivo: data.objetivo || null,
         updated_at: new Date().toISOString()
       }).eq("id", currentProjectId);
+
+      if (updateError) throw updateError;
 
       if (step === 2) {
         await (supabase.from("briefings") as any).upsert({
@@ -160,6 +191,8 @@ export const listProjects = async () => {
 
 export const syncProjectsOnLogin = async (userId: string) => {
   const sessionId = getSessionId();
+  
+  // 1. Migra projetos anônimos da sessão para o usuário
   const { error } = await (supabase
     .from("projects") as any)
     .update({ user_id: userId })
@@ -167,4 +200,10 @@ export const syncProjectsOnLogin = async (userId: string) => {
     .is("user_id", null);
   
   if (error) console.error("Error syncing projects:", error);
+
+  // 2. Tenta recuperar o ID do rascunho mais recente do usuário e salvar no localStorage
+  const latestId = await getLatestProjectId();
+  if (latestId) {
+    setCurrentProjectId(latestId);
+  }
 };
