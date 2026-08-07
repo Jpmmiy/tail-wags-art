@@ -42,6 +42,7 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
         modalidade: data.modalidade,
         current_step: step,
         status: status,
+        objetivo: data.objetivo || null,
         updated_at: new Date().toISOString(),
       };
 
@@ -78,6 +79,7 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
       await (supabase.from("projects") as any).update({ 
         current_step: step,
         status: status,
+        objetivo: data.objetivo || null,
         updated_at: new Date().toISOString()
       }).eq("id", currentProjectId);
 

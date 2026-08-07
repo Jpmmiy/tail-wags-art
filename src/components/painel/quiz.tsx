@@ -253,57 +253,57 @@ export function Quiz() {
 
 
   const autosave = async (step: number, status: any = 'rascunho') => {
-    return await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis }, status);
+    // Se for o passo de geração, forçamos o status para garantir carregamento na SalaProducao
+    const finalStatus = step === 3 ? 'em_producao' : status;
+    const pid = await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis, objetivo }, finalStatus);
+    if (pid) setCurrentProjectId(pid);
+    return pid;
   };
-
-
 
   const avancar = async (s: any = 'rascunho') => {
     const proximo = passo + 1;
     
-    // Autosave antes de mudar o passo para garantir que o projeto existe no banco
-    let pid = await autosave(proximo, s);
-    
-    // Garantia de persistência local caso o retorno do saveProjectStep falhe ou demore
-    if (!pid) {
-      pid = getCurrentProjectId();
+    // Mostra feedback visual
+    if (proximo === 3) {
+      setGerando(true);
+      return; // O avanço real acontece no aoTerminar da TelaGeracao
     }
+
+    const pid = await autosave(proximo, s);
     
+    // Se temos um projeto, recarregamos para garantir que a SalaProducao tenha tudo
     if (pid) {
-      try {
-        const p = await loadProject(pid);
-        if (p) {
-          setProjetoCarregado(p);
-        } else {
-          // Fallback se falhar em carregar após salvar
-          setProjetoCarregado({
-            id: pid,
-            status: s,
-            current_step: proximo,
-            properties: [{ modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, cidade, entregaveis }]
-          });
-        }
-      } catch (err) {
-        console.error("Erro ao carregar projeto após save:", err);
-        // Fallback para não travar a UI
-        setProjetoCarregado({
-          id: pid,
-          status: s,
-          current_step: proximo,
-          properties: [{ modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, cidade, entregaveis }]
-        });
-      }
-    } else if (projetoCarregado || (escolhido && passo >= 0)) {
-      // Se não temos PID mas temos dados locais, criamos um objeto temporário para a SalaProducao
-      setProjetoCarregado({
-        id: getCurrentProjectId() || 'temp-' + Date.now(),
-        status: s,
-        current_step: proximo,
-        properties: [{ modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, cidade, entregaveis }]
-      });
+      const p = await loadProject(pid);
+      if (p) setProjetoCarregado(p);
     }
 
     setPasso(proximo);
+  };
+
+  const finalizarGeracao = async () => {
+    setGerando(false);
+    const proximoPasso = 3;
+    
+    // Forçamos o salvamento como 'em_producao' para liberar os cards
+    const pid = await autosave(proximoPasso, 'em_producao');
+    
+    if (pid) {
+      const p = await loadProject(pid);
+      if (p) {
+        setProjetoCarregado(p);
+        setPasso(proximoPasso);
+        return;
+      }
+    }
+
+    // Fallback absoluto: se o banco falhar, monta o objeto na memória
+    setProjetoCarregado({
+      id: getCurrentProjectId() || 'temp-' + Date.now(),
+      status: 'em_producao',
+      current_step: proximoPasso,
+      properties: [{ modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, cidade, entregaveis, objetivo }]
+    });
+    setPasso(proximoPasso);
   };
 
 
@@ -339,7 +339,7 @@ export function Quiz() {
 
   return (
     <div className="space-y-8">
-      {gerando && <TelaGeracao aoTerminar={() => { setGerando(false); avancar('aguardando_resposta'); }} />}
+      {gerando && <TelaGeracao aoTerminar={finalizarGeracao} />}
       {(passo === 3) && (
         <div className="fixed inset-0 z-50 bg-ink overflow-y-auto p-4 sm:p-8">
           <div className="max-w-4xl mx-auto space-y-8">
