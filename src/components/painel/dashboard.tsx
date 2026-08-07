@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useEffect } from "react";
 import { Link } from "@/components/ui/link";
 import {
   Wand2,
@@ -481,8 +481,15 @@ function Atividade({ d }: { d: Painel }) {
 /* -------------------------------------------------------------- dashboard */
 
 export function Dashboard() {
+  console.log("[RENDER] 3: Dashboard component start");
   const { ligado: demo, dados } = useDemo();
+  
+  useEffect(() => {
+    console.log("[RENDER] 4: Dashboard mounted (useEffect)");
+  }, []);
+
   const d = demo ? dados : ZERADO;
+  console.log("[RENDER] 5: Rendering Dashboard with demo:", demo);
 
   return (
     <div className="space-y-5">

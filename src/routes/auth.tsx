@@ -45,21 +45,27 @@ function AuthPage() {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    console.log("[AUTH] Login attempt started for:", email);
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (error) throw error;
-        toast.success("Bem-vindo de volta!");
-        if (redirectUrl) {
-          window.location.href = redirectUrl;
-        } else {
-          navigate({ to: "/painel" });
-        }
+        
+        console.log("[AUTH] signInWithPassword response:", { 
+          success: !!data.user, 
+          error: error?.message 
+        });
 
+        if (error) throw error;
+        
+        toast.success("Bem-vindo de volta!");
+        
+        console.log("[AUTH] Invalidating router and navigating...");
+        await navigate({ to: "/painel/" });
+        // Removido window.location.href para evitar concorrência com o router
       } else {
         const { error } = await supabase.auth.signUp({
           email,

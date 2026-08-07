@@ -22,7 +22,8 @@ function CriarPage() {
     <main className="min-h-screen bg-ink">
       <nav className="fixed right-6 top-6 z-50 flex gap-3">
         <Link 
-          to="/projetos" 
+          to="/painel/projetos" 
+
           className="glass flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-bone transition-all hover:rim-lit"
         >
           <Folder className="size-4" /> Meus Projetos
