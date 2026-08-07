@@ -115,7 +115,7 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
                   await navigator.clipboard.writeText(prompt);
                   toast.success("Roteiro copiado! Abrindo Google Flow...");
                   setTimeout(() => {
-                    window.open('https://labs.google/flow', '_blank');
+                    window.open('https://labs.google/flow/chat', '_blank');
                   }, 800);
                 }}
                 className="flex items-center justify-center gap-2 bg-chrome text-black py-3 rounded-xl text-sm font-bold hover:scale-[1.02] transition-all"
