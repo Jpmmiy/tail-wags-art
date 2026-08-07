@@ -438,7 +438,22 @@ function Distribuicao({ d }: { d: Painel }) {
 
 /* --------------------------------------------------------------- atividade */
 
-function Atividade({ d }: { d: Painel }) {
+function Atividade({ d, projects }: { d: Painel; projects?: any[] }) {
+  const itensAtividade = projects ? projects.map(p => {
+    const statusMap: Record<string, string> = {
+      'rascunho': 'Radar de oportunidade iniciado',
+      'aguardando_resposta': 'Briefing em andamento',
+      'em_producao': 'Material gerado na Sala de Produção',
+      'concluido': 'Projeto finalizado'
+    };
+    
+    return {
+      texto: `${p.properties?.[0]?.nome || p.name || 'Novo Projeto'} · ${statusMap[p.status] || 'Atualizado'}`,
+      quando: new Date(p.updated_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+      valor: null
+    };
+  }).slice(0, 5) : d.atividade;
+
   return (
     <section className="glass flex flex-col rounded-2xl p-6 sm:p-7">
       <header className="flex items-center justify-between gap-3">
@@ -448,7 +463,7 @@ function Atividade({ d }: { d: Painel }) {
         <Activity className="size-4 text-stone/45" strokeWidth={1.7} />
       </header>
 
-      {d.atividade.length === 0 ? (
+      {itensAtividade.length === 0 ? (
         <div className="mt-6 flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-white/10 px-6 py-12 text-center">
           <span className="grid size-10 place-items-center rounded-xl bg-white/5 text-stone">
             <Activity className="size-4" strokeWidth={1.8} />
@@ -462,7 +477,7 @@ function Atividade({ d }: { d: Painel }) {
         </div>
       ) : (
         <ul className="mt-5 divide-y divide-white/6">
-          {d.atividade.map((a, i) => (
+          {itensAtividade.map((a, i) => (
             <li
               key={i}
               className="flex items-center justify-between gap-4 py-3.5"
