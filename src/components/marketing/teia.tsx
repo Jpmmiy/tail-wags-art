@@ -108,7 +108,7 @@ const PONTES: [string, string][] = [
 ];
 
 const porId = (id: string) => NOS.find((n) => n.id === id)!;
-const CICLO = 2600;
+const CICLO = 3500;
 
 export function Teia() {
   const [ativo, setAtivo] = useState<string>("imagem");
@@ -128,7 +128,7 @@ export function Teia() {
 
   useEffect(() => {
     if (pausado || !visivel) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || window.matchMedia("(hover: none)").matches) return;
     const t = setTimeout(() => {
       const i = NOS.findIndex((n) => n.id === ativo);
       setAtivo(NOS[(i + 1) % NOS.length].id);
