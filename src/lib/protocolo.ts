@@ -34,8 +34,8 @@ interface ProtocoloState {
 
 const SETTINGS_KEY = 'protocolo_config';
 
-// Cast para evitar erros de tipo já que a tabela foi criada via migração SQL
-const getTable = () => (supabase as any).from('app_settings');
+const getTable = () => supabase.from('app_settings');
+
 
 export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
   enabled: false,
@@ -51,6 +51,8 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
   fetchSettings: async () => {
     set({ loading: true });
     try {
+      // Admins usam a rota direta (que passa pelo RLS de admin)
+      // Visitantes usariam o endpoint público, mas o store é usado no Admin
       const { data, error } = await getTable()
         .select('value')
         .eq('key', SETTINGS_KEY)
@@ -58,6 +60,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
 
       if (data?.value) {
         const val = data.value as any;
+
         set({
           enabled: val.enabled ?? false,
           sales: val.sales ?? [],
