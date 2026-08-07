@@ -46,7 +46,7 @@ function TermosPage() {
                 </p>
               </section>
 
-              <section>
+              <section id="reembolso">
                 <h2 className="text-bone text-xl font-semibold">3. Assinatura e Reembolso</h2>
                 <p>
                   O acesso à plataforma é realizado mediante assinatura mensal ou vitalícia conforme os planos vigentes. 
@@ -76,10 +76,11 @@ function TermosPage() {
                 <p>
                   Fica eleito o foro da comarca de [PREENCHER: Cidade/Estado] para dirimir quaisquer controvérsias oriundas deste contrato.
                 </p>
-              </div>
-            </Reveal>
-          </div>
-        </main>
+              </section>
+            </div>
+          </Reveal>
+        </div>
+      </main>
       <Rodape />
     </div>
   );
