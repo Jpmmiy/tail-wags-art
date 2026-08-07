@@ -125,7 +125,7 @@ function ProjetoDetalhesPage() {
                   error: 'Erro ao gerar PDF'
                 });
               }}
-              className="metal-pill flex items-center gap-2 px-4 py-2 text-sm font-bold text-black"
+              className="metal-pill flex items-center gap-2 px-4 py-2 text-sm font-bold text-black disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Download className="size-4" /> Exportar PDF
             </button>
