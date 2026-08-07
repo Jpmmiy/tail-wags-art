@@ -258,7 +258,12 @@ export function Quiz() {
     const proximo = passo + 1;
     
     // Autosave antes de mudar o passo para garantir que o projeto existe no banco
-    const pid = await autosave(proximo, s);
+    let pid = await autosave(proximo, s);
+    
+    // Garantia de persistência local caso o retorno do saveProjectStep falhe ou demore
+    if (!pid) {
+      pid = getCurrentProjectId();
+    }
     
     if (pid) {
       try {
