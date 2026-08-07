@@ -1033,9 +1033,10 @@ export function Quiz() {
                          
                          <button 
                            onClick={async () => {
-                             const confirm = window.confirm("Deseja regerar os entregáveis com as novas configurações? Isso atualizará os prompts.");
+                             const confirm = window.confirm("Deseja regerar os materiais com as novas configurações? Isso atualizará os prompts.");
                              if (confirm) {
                                await autosave(2, 'em_producao');
+
                                setEditandoConcluido(false);
                                toast.success("Estratégia atualizada!");
                              }
