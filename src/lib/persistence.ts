@@ -26,6 +26,23 @@ export const setCurrentProjectId = (id: string | null) => {
 };
 
 /**
+ * Recupera o perfil do usuário atual
+ */
+export const getUserProfile = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) return null;
+  
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", session.user.id)
+    .single();
+    
+  if (error) return null;
+  return data;
+};
+
+/**
  * Recupera o último projeto modificado do usuário logado ou da sessão
  */
 export const getLatestProjectId = async () => {
@@ -72,6 +89,7 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
         modalidade: data.modalidade,
         current_step: step,
         status: status,
+        name: data.escolhido.nome || data.manualNome,
         objetivo: data.objetivo || null,
         updated_at: new Date().toISOString(),
       };
@@ -109,6 +127,7 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
       const { error: updateError } = await (supabase.from("projects") as any).update({ 
         current_step: step,
         status: status,
+        name: data.name || data.manualNome,
         objetivo: data.objetivo || null,
         updated_at: new Date().toISOString()
       }).eq("id", currentProjectId);
@@ -134,22 +153,50 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
 };
 
 export const saveDeliverable = async (projectId: string, shotData: any) => {
-  const { error } = await (supabase.from("deliverables") as any).upsert({
+  // Busca se já existe o entregável para manter versões
+  const { data: existing } = await (supabase.from("deliverables") as any)
+    .select("id, conteudo")
+    .eq("project_id", projectId)
+    .eq("shot_number", shotData.shot_number)
+    .eq("tipo", shotData.tipo)
+    .maybeSingle();
+
+  const deliverableData: any = {
     project_id: projectId,
     shot_number: shotData.shot_number,
-    prompt_pt: shotData.prompt_pt,
-    prompt_en: shotData.prompt_en,
-    idioma_escolhido: shotData.idioma_escolhido,
+    conteudo: shotData.conteudo,
+    tipo: shotData.tipo,
     modo: shotData.modo,
     creditos: shotData.creditos,
     gerado: shotData.gerado,
-    gerado_em: shotData.gerado_em
-  });
+  };
 
-  if (error) {
-    console.error("Error saving deliverable:", error);
-    throw error;
+  let deliverableId;
+
+  if (existing) {
+    deliverableId = existing.id;
+    // Se o conteúdo mudou, salva uma versão antes de atualizar
+    if (existing.conteudo !== shotData.conteudo) {
+      await (supabase.from("deliverable_versions" as any) as any).insert({
+        deliverable_id: existing.id,
+        conteudo: existing.conteudo,
+      });
+    }
+    
+    const { error } = await (supabase.from("deliverables") as any)
+      .update(deliverableData)
+      .eq("id", existing.id);
+    if (error) throw error;
+  } else {
+    const { data, error } = await (supabase.from("deliverables") as any)
+      .insert(deliverableData)
+      .select("id")
+      .single();
+    if (error) throw error;
+    deliverableId = data.id;
   }
+
+  return deliverableId;
 };
 
 export const loadProject = async (id: string) => {
@@ -165,6 +212,13 @@ export const loadProject = async (id: string) => {
     .single();
 
   if (error) return null;
+
+  // Carrega o perfil do dono do projeto para a proposta
+  if (project.user_id) {
+    const { data: profile } = await supabase.from("profiles").select("*").eq("id", project.user_id).single();
+    project.user_profile = profile;
+  }
+
   return project;
 };
 

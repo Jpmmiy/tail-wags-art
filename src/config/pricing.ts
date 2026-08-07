@@ -5,16 +5,17 @@ export const PRICING_BASE = {
   recorrencia: 250, // Valor mensal sugerido
 };
 
-export function calculatePricing(diaria: number, modalidade: "temporada" | "imobiliario", entregaveis: string[] = ["fotos", "video", "site", "abordagem"]) {
+export function calculatePricing(diaria: number, modalidade: "temporada" | "imobiliario", entregaveis: string[] = ["fotos", "video", "site", "abordagem"], customTable?: any) {
+  const table = customTable || PRICING_BASE;
   const multiplicador = modalidade === "temporada" 
     ? Math.max(1, diaria / 300) 
     : Math.max(1, diaria / 500000);
 
   const precos = {
-    fotos: Math.round(PRICING_BASE.fotos * multiplicador),
-    video: Math.round(PRICING_BASE.video * multiplicador),
-    site: Math.round(PRICING_BASE.site * multiplicador),
-    abordagem: 0 // Proposta geralmente inclusa ou brinde no essencial
+    fotos: Math.round(table.fotos * multiplicador),
+    video: Math.round(table.video * multiplicador),
+    site: Math.round(table.site * multiplicador),
+    abordagem: 0
   };
 
   const tem = (id: string) => entregaveis.includes(id);

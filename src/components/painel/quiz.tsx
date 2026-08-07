@@ -412,24 +412,27 @@ export function Quiz() {
 
   const whatsMessage = useMemo(() => {
     if (!escolhido) return "";
+    const businessName = (projetoCarregado?.user_profile as any)?.business_name || "Nexofly";
     const dadoReal = escolhido.nota 
       ? `${escolhido.nota} com ${escolhido.avaliacoes} avaliações` 
       : escolhido.avaliacoes 
         ? `${escolhido.avaliacoes} avaliações`
         : "o potencial de mercado";
     
-    return `Oi! Vi o anúncio do ${nomeExibicao} — ${dadoReal} mostra que é um excelente produto.\nReparei que o material visual ainda não acompanha esse nível, o que acaba segurando o clique de muitos interessados.\nMontei uma estratégia de renovação visual e um roteiro de vídeo curto para valorizar o imóvel. Sem compromisso.\nPosso te mandar os detalhes aqui?`;
-  }, [escolhido, nomeExibicao]);
+    return `Oi! Aqui é do ${businessName}. Vi o anúncio do ${nomeExibicao} — ${dadoReal} mostra que é um excelente produto.\nReparei que o material visual ainda não acompanha esse nível, o que acaba segurando o clique de muitos interessados.\nMontei uma estratégia de renovação visual para valorizar o imóvel. Posso te mandar os detalhes?`;
+  }, [escolhido, nomeExibicao, projetoCarregado]);
 
 
 
   const precos = useMemo(() => {
+    const table = (projetoCarregado?.user_profile as any)?.pricing_table;
     return calculatePricing(
       Number(modalidade === 'temporada' ? diaria : valorImobiliario), 
       modalidade || 'temporada',
-      entregaveis
+      entregaveis,
+      table
     );
-  }, [modalidade, diaria, valorImobiliario, entregaveis]);
+  }, [modalidade, diaria, valorImobiliario, entregaveis, projetoCarregado]);
 
 
 
