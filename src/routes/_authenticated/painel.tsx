@@ -1,36 +1,24 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router';
+import { getLatestProjectId, setCurrentProjectId } from '@/lib/persistence';
+import { Dashboard } from '@/components/painel/dashboard';
 
-import { Sidebar } from "@/components/painel/sidebar";
-
-export const Route = createFileRoute("/_authenticated/painel")({
-  head: () => ({
-    meta: [
-      { title: "Painel · Nexofly" },
-      {
-        name: "description",
-        content:
-          "Painel da Nexofly: crie entregas, acompanhe projetos e use o mentor de vendas.",
-      },
-      { property: "og:title", content: "Painel · Nexofly" },
-      {
-        property: "og:description",
-        content: "Crie entregas, acompanhe projetos e use o mentor de vendas.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
-  component: PainelLayout,
+export const Route = createFileRoute('/_authenticated/painel')({
+  beforeLoad: async () => {
+    const latestId = await getLatestProjectId();
+    if (latestId) {
+      setCurrentProjectId(latestId);
+    }
+  },
+  component: DashboardPage,
 });
 
-function PainelLayout() {
+function DashboardPage() {
   return (
-    <div className="min-h-dvh bg-ink">
-      <Sidebar />
-      <div className="lg:pl-[260px]">
-        <main className="mx-auto max-w-[74rem] px-5 py-8 lg:px-10 lg:py-10">
-          <Outlet />
-        </main>
+    <div className="min-h-screen bg-ink lg:pl-[260px]">
+      <div className="p-6 sm:p-12">
+        <div className="mx-auto max-w-7xl">
+          <Dashboard />
+        </div>
       </div>
     </div>
   );
