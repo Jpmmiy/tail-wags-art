@@ -212,7 +212,8 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
               </div>
               <div>
                 <h3 className="text-bone font-medium">Script para WhatsApp</h3>
-                <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Script para WhatsApp</p>
+                <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Documento de Proposta</p>
+
 
 
               </div>
