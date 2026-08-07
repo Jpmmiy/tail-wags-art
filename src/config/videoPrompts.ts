@@ -52,10 +52,20 @@ export function generateVideoPrompts(respostas: Respostas, vertical: boolean) {
 
   const selectedLight = (lights as any)[respostas.estilo] || lights.neutro;
 
+  // DIREÇÃO TÉCNICA BASEADA NO TIPO DE VÍDEO E DRONE
+  const movDestaqueEn = respostas.possuiDrone 
+    ? "DRONE SHOT: Aerial reveal starting from the surroundings and approaching the window in an orbital movement."
+    : "DOLLY SHOT: Smooth internal push-in focusing on finishing details.";
+    
+  const technicalEn = respostas.objetivoVideoTipo === 'cinematografico' 
+    ? "Cinematic rack focus, 60fps slow motion, shallow depth of field."
+    : respostas.objetivoVideoTipo === 'dinamico'
+    ? "Dynamic camera movements, natural light transitions, high energy."
+    : "Steady informative pans, constant eye-level height, clear visibility.";
+
   const atmospheres = [
     { pt: "cortina leve balançando na brisa", en: "light curtain swaying in the breeze" },
     { pt: "reflexo de luz se movendo lentamente sobre uma superfície", en: "light reflection slowly moving across a surface" },
-    { pt: "vapor subindo de uma xícara sobre a mesa", en: "steam rising from a cup on the table" },
     { pt: "folhagem externa se movendo suavemente", en: "outdoor foliage moving gently" },
     { pt: "luz mudando gradualmente de intensidade", en: "light gradually shifting in intensity" }
   ];
@@ -74,9 +84,28 @@ export function generateVideoPrompts(respostas: Respostas, vertical: boolean) {
   return VIDEO_SHOTS.map((shot, index) => {
     const atmosphere = atmospheres[index % atmospheres.length];
     
-    const templateEn = "Use the reference image as the first frame. Preserve the exact architecture, furniture, colors and straight-line geometry of the original image. {camera} Lighting: {light}, side incidence, soft elongated shadows. Atmosphere: {atmosphere}. Do not include: people, text, logos, watermarks, warped straight lines, layout or furniture changes, abrupt zoom, wall color changes. Ambient audio: {audio}. Duration: 8 seconds. Aspect ratio: {ratio}.";
+    // TEMPLATE ENRIQUECIDO COM DADOS DO BRIEFING
+    const templateEn = `[TECHNICAL DIRECTION: ${technicalEn}]
+[OPENING SHOT: ${index === 0 ? movDestaqueEn : "Continuation of flow"}]
+Use the reference image as the first frame. Preserve the exact architecture, furniture, colors and straight-line geometry of the original image. {camera} 
+Lighting: {light}, side incidence, soft elongated shadows. 
+Atmosphere: {atmosphere}. 
+Do not include: people, text, logos, watermarks, warped straight lines, layout or furniture changes, abrupt zoom, wall color changes. 
+Ambient audio: {audio}. 
+Duration: 8 seconds. 
+Aspect ratio: {ratio}.
+Context: ${respostas.imovel.score?.angulo || "Luxury real estate"}.`;
     
-    const templatePt = "Use a imagem de referência como o primeiro frame. Preserve a arquitetura exata, móveis, cores e a geometria de linhas retas da imagem original. {camera} Iluminação: {light}, incidência lateral, sombras suaves e alongadas. Atmosfera: {atmosphere}. Não inclua: pessoas, texto, logos, marcas d'água, linhas retas distorcidas, mudanças de layout ou móveis, zoom abrupto, mudanças na cor da parede. Áudio ambiente: {audio}. Duração: 8 segundos. Proporção: {ratio}.";
+    const templatePt = `[DIREÇÃO TÉCNICA: ${respostas.objetivoVideoTipo}]
+[MOVIMENTO INICIAL: ${index === 0 ? (respostas.possuiDrone ? "Aéreo/Drone" : "Dolly/Interno") : "Sequencial"}]
+Use a imagem de referência como o primeiro frame. Preserve a arquitetura exata, móveis, cores e a geometria de linhas retas da imagem original. {camera} 
+Iluminação: {light}, incidência lateral, sombras suaves e alongadas. 
+Atmosfera: {atmosphere}. 
+Não inclua: pessoas, texto, logos, marcas d'água, linhas retas distorcidas, mudanças de layout ou móveis, zoom abrupto, mudanças na cor da parede. 
+Áudio ambiente: {audio}. 
+Duração: 8 segundos. 
+Proporção: {ratio}.
+Ângulo: ${respostas.imovel.score?.angulo || "Valorização visual"}.`;
 
     const cameraEn = shot.camera_en.replace("{highlight}", highlight).replace("{detail}", detail);
     const cameraPt = shot.camera_pt.replace("{highlight}", highlight).replace("{detail}", detail);
@@ -104,3 +133,4 @@ export function generateVideoPrompts(respostas: Respostas, vertical: boolean) {
     };
   });
 }
+
