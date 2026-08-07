@@ -164,9 +164,10 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
                 onClick={async () => {
                   const prompt = promptSite(respostas);
                   await navigator.clipboard.writeText(prompt);
-                  toast.success("Briefing copiado! Abrindo Lovable...");
+                  toast.success("Prompt copiado! Abrindo Lovable...");
                   setTimeout(() => {
-                    window.open(`https://lovable.dev/new?prompt=${encodeURIComponent(prompt)}`, '_blank');
+                    // Abrimos o Lovable enviando o prompt na URL para criação direta
+                    window.open(`https://lovable.dev/projects/${import.meta.env.VITE_LOVABLE_PROJECT_ID || ''}?prompt=${encodeURIComponent(prompt)}`, '_blank');
                   }, 800);
                 }}
                 className="flex items-center justify-center gap-2 bg-chrome text-black py-3 rounded-xl text-sm font-bold hover:scale-[1.02] transition-all"

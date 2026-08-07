@@ -256,22 +256,26 @@ export function Quiz() {
 
   const avancar = async (s: any = 'rascunho') => {
     const proximo = passo + 1;
-    // Forçamos o estado local primeiro para feedback imediato
-    setPasso(proximo);
     
+    // Autosave antes de mudar o passo para garantir que o projeto existe no banco
     const pid = await autosave(proximo, s);
+    
     if (pid) {
       const p = await loadProject(pid);
-      setProjetoCarregado(p);
-    } else {
-      // Caso não tenhamos um projeto salvo no banco ainda (ex: primeira vez)
-      // criamos um objeto fake para o SalaProducao não travar se o fetch falhar
-      if (!projetoCarregado) {
-        setProjetoCarregado({
-          properties: [{ modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, cidade, entregaveis }]
-        });
+      if (p) {
+        setProjetoCarregado(p);
       }
+    } else if (!projetoCarregado) {
+      // Fallback para não travar a UI caso o salvamento falhe
+      setProjetoCarregado({
+        id: 'temp-' + Date.now(),
+        status: s,
+        current_step: proximo,
+        properties: [{ modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, cidade, entregaveis }]
+      });
     }
+
+    setPasso(proximo);
   };
 
 
