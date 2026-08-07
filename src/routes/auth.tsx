@@ -91,21 +91,15 @@ function AuthPage() {
 
         toast.success("Bem-vindo de volta!");
         
-        // Sincroniza explicitamente o cookie para garantir que o middleware do TanStack Start veja a sessão
+        // Sincroniza explicitamente o cookie para TanStack Start
         const key = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
         document.cookie = `${key}=${encodeURIComponent(JSON.stringify(data.session))}; path=/; max-age=3600; SameSite=Lax`;
 
         const targetUrl = redirectUrl || "/painel";
-        console.log("[AUTH] 7. na navegação pós-login para:", targetUrl);
+        console.log("[AUTH] 7. Invalidando router e navegando para:", targetUrl);
         
         await router.invalidate();
-        console.log("[AUTH] Router invalidado após login.");
-        
-        // Atraso mínimo e redirecionamento direto
-        setTimeout(() => {
-          console.log("[AUTH] Executando window.location.assign para:", targetUrl);
-          window.location.assign(targetUrl);
-        }, 100);
+        navigate({ to: targetUrl });
       } else {
         const { error } = await supabase.auth.signUp({
           email,

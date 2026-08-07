@@ -118,8 +118,8 @@ function ProjetosPage() {
                   </div>
 
                   <Link
-                    to="/painel/projeto/$id"
-                    params={{ id: p.id } as any}
+                    to="/painel/criar"
+                    onClick={() => setCurrentProjectId(p.id)}
                     className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-white/5 py-2.5 text-sm font-medium text-bone transition-colors group-hover:bg-chrome group-hover:text-black"
                   >
                     Abrir Projeto <ArrowRight className="size-4" />
