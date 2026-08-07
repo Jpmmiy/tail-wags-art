@@ -944,6 +944,67 @@ export function Quiz() {
                       } as any)}
                     </p>
                   </div>
+                  
+                  {/* Edição de Concluído */}
+                  <div className="pt-6 border-t border-white/5">
+                    {!editandoConcluido ? (
+                      <button 
+                        onClick={() => setEditandoConcluido(true)}
+                        className="text-stone hover:text-chrome text-xs font-bold flex items-center gap-2 transition-colors mx-auto"
+                      >
+                        <PenLine className="size-3" /> Editar respostas deste projeto
+                      </button>
+                    ) : (
+                      <div className="space-y-6 motion-safe:animate-rise">
+                         <div className="flex items-center justify-between">
+                            <h4 className="text-bone font-medium text-sm">Ajustar Estratégia</h4>
+                            <button onClick={() => setEditandoConcluido(false)} className="text-stone text-xs">Fechar</button>
+                         </div>
+                         
+                         <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                               <label className="text-[10px] uppercase font-bold text-stone">Estilo</label>
+                               <select 
+                                 value={objetivoVideoTipo}
+                                 onChange={(e) => setObjetivoVideoTipo(e.target.value as any)}
+                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-bone"
+                               >
+                                  <option value="dinamico">Dinâmico</option>
+                                  <option value="cinematografico">Cinematográfico</option>
+                                  <option value="institucional">Institucional</option>
+                               </select>
+                            </div>
+                            <div className="space-y-2">
+                               <label className="text-[10px] uppercase font-bold text-stone">Público</label>
+                               <select 
+                                 value={publico}
+                                 onChange={(e) => setPublico(e.target.value)}
+                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-bone"
+                               >
+                                  <option value="casais">Casais</option>
+                                  <option value="famílias">Famílias</option>
+                                  <option value="trabalho">Trabalho</option>
+                               </select>
+                            </div>
+                         </div>
+                         
+                         <button 
+                           onClick={async () => {
+                             const confirm = window.confirm("Deseja regerar os entregáveis com as novas configurações? Isso atualizará os prompts.");
+                             if (confirm) {
+                               await autosave(2, 'em_producao');
+                               setEditandoConcluido(false);
+                               toast.success("Estratégia atualizada!");
+                             }
+                           }}
+                           className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-bone text-xs font-bold hover:bg-white/10 transition-all"
+                         >
+                           Salvar Alterações
+                         </button>
+                      </div>
+                    )}
+                  </div>
+
 
                   <div className="flex flex-col gap-3">
                     <button 
