@@ -210,8 +210,9 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
                 <MessageSquare className="size-5" />
               </div>
               <div>
-                <h3 className="text-bone font-medium">Proposta comercial</h3>
-                <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Abordagem de fechamento</p>
+                <h3 className="text-bone font-medium">Proposta</h3>
+                <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Script para WhatsApp</p>
+
               </div>
             </div>
             <div className="p-4 bg-black/40 rounded-2xl border border-white/10 border-l-2 border-l-chrome">
