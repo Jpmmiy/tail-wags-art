@@ -100,6 +100,8 @@ export function Mentor() {
   }, []);
   const fim = useRef<HTMLDivElement>(null);
   const controle = useRef<AbortController | null>(null);
+  const currentRequestId = useRef<string | null>(null);
+
 
   useEffect(() => {
     const carregarHistorico = async () => {
@@ -129,10 +131,17 @@ export function Mentor() {
   }, [msgs]);
 
   /** Fala com /api/mentor e vai escrevendo conforme o modelo responde. */
-  const responder = async (historico: Msg[]) => {
-    const id = crypto.randomUUID();
-    setMsgs((m) => [...m, { id, de: "mentor", texto: "" }]);
+  const responder = async (historico: Msg[], existingRequestId?: string) => {
+    const id = existingRequestId || crypto.randomUUID();
+    currentRequestId.current = id;
+    
+    // Se for um novo ID (não retry), adiciona a mensagem vazia
+    if (!existingRequestId) {
+      setMsgs((m) => [...m, { id, de: "mentor", texto: "" }]);
+    }
+    
     setEscrevendo(true);
+
 
     const ctrl = new AbortController();
     controle.current = ctrl;
@@ -141,8 +150,12 @@ export function Mentor() {
     try {
       const r = await fetch("/api/mentor", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "x-request-id": id
+        },
         signal: ctrl.signal,
+
         body: JSON.stringify({
           historico: historico.map((m) => ({ de: m.de, texto: m.texto })),
         }),
@@ -166,13 +179,24 @@ export function Mentor() {
       }
     } catch (e) {
       if ((e as Error)?.name === "AbortError") {
-        // Cancelado pelo usuário: guarda o que já chegou, descarta o vazio.
         if (!acumulado) setMsgs((m) => m.filter((x) => x.id !== id));
         return;
       }
+
+      // PASSO 4 — RETRY INTELIGENTE
+      const erro = e as any;
+      const retryable = [429, 500, 502, 503, 504].includes(erro.status);
+      
+      if (retryable) {
+        toast.error("Conexão instável. Tentando novamente...");
+        await new Promise(res => setTimeout(res, 2000));
+        return responder(historico, id);
+      }
+
       const aviso =
         e instanceof Error ? e.message : "Não consegui responder agora por causa de uma falha na conexão.";
       setMsgs((m) => m.map((x) => (x.id === id ? { ...x, texto: `⚠️ ${aviso}` } : x)));
+
     } finally {
       setEscrevendo(false);
       controle.current = null;

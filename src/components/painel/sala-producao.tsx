@@ -47,6 +47,12 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
   const concluirProjeto = async () => {
     setConcluindo(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Sessão expirada. Faça login novamente.");
+        return;
+      }
+      
       await saveProjectStep(3, {}, 'concluido');
       aoConcluir();
       toast.success("Projeto finalizado com sucesso!");
@@ -56,6 +62,7 @@ export function SalaProducao({ projeto, aoConcluir }: SalaProducaoProps) {
       setConcluindo(false);
     }
   };
+
 
   const copiar = (texto: string, label: string) => {
     navigator.clipboard.writeText(texto);

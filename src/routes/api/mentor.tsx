@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { isMentorEnabled } from "@/lib/mentor-config";
+import { checkAiLimits, trackAiUsageStart, trackAiUsageEnd, getCachedAiResponse } from "@/lib/ai-control.server";
+
 
 const MODELO = "google/gemini-3-flash";
 
@@ -55,12 +57,44 @@ export const Route = createFileRoute("/api/mentor")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // PASSO 3 — ROTA AUTENTICADA
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          return json({ erro: "Você precisa estar logado para usar o Mentor." }, 401);
+        }
+
         if (!isMentorEnabled()) {
           return json(
             { erro: "O Mentor está em manutenção ou foi desativado temporariamente." },
             403,
           );
         }
+
+        const requestId = request.headers.get("x-request-id");
+        if (!requestId) return json({ erro: "Request ID ausente." }, 400);
+
+        // PASSO 4 — IDEMPOTÊNCIA
+        const cache = await getCachedAiResponse(requestId);
+        if (cache) {
+          if (cache.status === 'completed' && cache.response_cache) {
+            return new Response(cache.response_cache, {
+              headers: { "Content-Type": "text/plain; charset=utf-8" }
+            });
+          }
+          if (cache.status === 'processing') {
+            return json({ erro: "Geração em andamento. Aguarde." }, 202);
+          }
+        }
+
+        // PASSO 2 — LIMITES
+        const ip = request.headers.get("x-forwarded-for") || "unknown";
+        const limitCheck = await checkAiLimits(session.user.id, ip);
+        if (!limitCheck.allowed) {
+          return json({ erro: limitCheck.reason }, 429);
+        }
+
+        // PASSO 1 & 4 — GRAVAR INÍCIO
+        await trackAiUsageStart(session.user.id, requestId, "/api/mentor", ip);
 
         const chave = process.env["LOVABLE_API_KEY"];
         if (!chave) {
@@ -77,6 +111,7 @@ export const Route = createFileRoute("/api/mentor")({
         } catch {
           return json({ erro: "Corpo inválido." }, 400);
         }
+
 
         const mensagens = historico
           .filter((t) => t.texto.trim())
@@ -164,9 +199,13 @@ export const Route = createFileRoute("/api/mentor")({
             const { done, value } = await leitor.read();
             if (done) {
               await salvarRespostaMentor(acumuladoParaSalvar);
+              // PASSO 5 — VISIBILIDADE DE CUSTO
+              // Estimamos tokens (4 chars por token aprox.)
+              await trackAiUsageEnd(requestId, 1000, Math.ceil(acumuladoParaSalvar.length / 4), acumuladoParaSalvar);
               controlador.close();
               return;
             }
+
             resto += decoder.decode(value, { stream: true });
             const linhas = resto.split("\n");
             resto = linhas.pop() ?? "";
