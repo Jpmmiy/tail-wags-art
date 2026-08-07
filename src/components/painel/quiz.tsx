@@ -593,9 +593,8 @@ export function Quiz() {
       }
 
       {passo === 1 && escolhido && (
-
-        <div className="space-y-6">
-          <div className="glass p-6 rounded-2xl flex gap-6">
+        <div className="space-y-8 motion-safe:animate-rise pb-10">
+          <div className="glass p-6 rounded-2xl flex gap-6 rim-lit">
             {escolhido.primeiraFoto && <img src={`https://places.googleapis.com/v1/${escolhido.primeiraFoto}/media?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&maxWidthPx=200`} className="size-24 rounded-lg object-cover" />}
             <div>
                 <h2 className="text-xl font-semibold text-bone">{nomeExibicao}</h2>
@@ -605,28 +604,108 @@ export function Quiz() {
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
-            {PACOTE_CONFIG.map(p => (
-                <div key={p.id} onClick={() => entregaveis.includes(p.id) ? setEntregaveis(entregaveis.filter(x => x !== p.id)) : setEntregaveis([...entregaveis, p.id])} className={cn("p-4 rounded-xl border cursor-pointer", entregaveis.includes(p.id) ? "border-chrome bg-chrome/10" : "border-white/5")}>
-                    {p.rotulo}
-                </div>
-            ))}
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-bone">O que vamos entregar para o cliente?</label>
+              <div className="grid grid-cols-2 gap-4">
+                {PACOTE_CONFIG.map(p => (
+                    <button 
+                      key={p.id} 
+                      onClick={() => entregaveis.includes(p.id) ? setEntregaveis(entregaveis.filter(x => x !== p.id)) : setEntregaveis([...entregaveis, p.id])} 
+                      className={cn(
+                        "p-4 rounded-xl border text-left transition-all flex items-center gap-3", 
+                        entregaveis.includes(p.id) ? "border-chrome bg-chrome/10 text-chrome" : "border-white/5 text-stone hover:bg-white/5"
+                      )}
+                    >
+                        <p.icone className="size-4" />
+                        <span className="text-sm font-medium">{p.rotulo}</span>
+                    </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-bone">Estilo visual do vídeo</label>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { id: 'dinamico', label: 'Dinâmico' },
+                  { id: 'cinematografico', label: 'Cinematográfico' },
+                  { id: 'institucional', label: 'Institucional' }
+                ].map(o => (
+                    <button 
+                      key={o.id} 
+                      onClick={() => setObjetivoVideoTipo(o.id as any)} 
+                      className={cn(
+                        "p-3 rounded-xl border text-xs font-medium transition-all", 
+                        objetivoVideoTipo === o.id ? "border-chrome bg-chrome/10 text-chrome" : "border-white/10 text-stone hover:bg-white/5"
+                      )}
+                    >
+                      {o.label}
+                    </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-bone">Recursos disponíveis</label>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => setPossuiDrone(!possuiDrone)}
+                  className={cn(
+                    "flex-1 p-4 rounded-xl border text-left transition-all flex items-center justify-between",
+                    possuiDrone ? "border-chrome bg-chrome/10 text-chrome" : "border-white/10 text-stone hover:bg-white/5"
+                  )}
+                >
+                  <span className="text-sm">Possui Drone?</span>
+                  <div className={cn("size-5 rounded-md border flex items-center justify-center", possuiDrone ? "bg-chrome border-chrome text-black" : "border-white/20")}>
+                    {possuiDrone && <Check className="size-3" />}
+                  </div>
+                </button>
+                
+                <button 
+                  onClick={() => setVideoVertical(!videoVertical)}
+                  className={cn(
+                    "flex-1 p-4 rounded-xl border text-left transition-all flex items-center justify-between",
+                    videoVertical ? "border-chrome bg-chrome/10 text-chrome" : "border-white/10 text-stone hover:bg-white/5"
+                  )}
+                >
+                  <span className="text-sm">Formato Vertical?</span>
+                  <div className={cn("size-5 rounded-md border flex items-center justify-center", videoVertical ? "bg-chrome border-chrome text-black" : "border-white/20")}>
+                    {videoVertical && <Check className="size-3" />}
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-bone">Público-alvo principal</label>
+              <div className="grid grid-cols-3 gap-3">
+                {['Casais', 'Famílias', 'Trabalho'].map(p => (
+                    <button 
+                      key={p} 
+                      onClick={() => setPublico(p.toLowerCase())} 
+                      className={cn(
+                        "p-3 rounded-xl border text-xs font-medium transition-all", 
+                        publico === p.toLowerCase() ? "border-chrome bg-chrome/10 text-chrome" : "border-white/10 text-stone hover:bg-white/5"
+                      )}
+                    >
+                      {p}
+                    </button>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {['Casais', 'Famílias', 'Trabalho'].map(p => (
-                <button key={p} onClick={() => setPublico(p.toLowerCase())} className={cn("p-3 rounded-xl border", publico === p.toLowerCase() ? "border-chrome" : "border-white/10")}>{p}</button>
-            ))}
-          </div>
-
-          <button onClick={() => avancar()} className="metal-pill w-full py-4 rounded-2xl text-black font-bold">Gerar proposta</button>
+          <button onClick={() => avancar()} className="metal-pill w-full py-5 rounded-2xl text-black font-bold text-xl hover:scale-[1.02] transition-all shadow-2xl shadow-chrome/20">
+            Gerar minha estratégia
+          </button>
         </div>
       )}
 
       {passo === 2 && (
         <div className="space-y-8 motion-safe:animate-rise pb-12">
             {/* BLOCO 1 — WHATSAPP */}
-            <div className="glass p-6 rounded-2xl border-chrome/20">
+            <div className="glass p-6 rounded-2xl border-chrome/20 rim-lit">
                 <h3 className="text-bone font-medium flex items-center gap-2 mb-4">
                     <MessageCircle className="size-4 text-chrome" /> Abordagem WhatsApp
                 </h3>
@@ -654,30 +733,89 @@ export function Quiz() {
                 </div>
             </div>
 
+            {/* BLOCO 2 — PRODUÇÃO DE VÍDEO (INTEGRADO) */}
+            {entregaveis.includes('video') && (
+              <div className="glass p-6 rounded-2xl border-white/5 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-chrome/10 grid place-items-center text-chrome">
+                    <Clapperboard className="size-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-bone font-medium text-lg">Handoff para Produção</h3>
+                    <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Técnica Frames-to-Video no Google Flow</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4 pt-2">
+                  <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
+                    <p className="text-xs text-stone font-mono leading-relaxed line-clamp-3 italic">
+                      {promptVideo({ 
+                        modalidade: modalidade || 'temporada', 
+                        imovel: escolhido || {}, 
+                        estilo, 
+                        publico, 
+                        comodos, 
+                        entregaveis,
+                        notas: { objetivoVideoTipo, possuiDrone }
+                      } as any)}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <button 
+                      onClick={async () => {
+                        const prompt = promptVideo({ 
+                          modalidade: modalidade || 'temporada', 
+                          imovel: escolhido || {}, 
+                          estilo, 
+                          publico, 
+                          comodos, 
+                          entregaveis,
+                          notas: { objetivoVideoTipo, possuiDrone }
+                        } as any);
+                        await navigator.clipboard.writeText(prompt);
+                        toast.success("Roteiro copiado! Abrindo Google Flow...");
+                        setTimeout(() => {
+                          window.open('https://labs.google/flow', '_blank');
+                        }, 800);
+                      }}
+                      className="metal-pill w-full py-5 rounded-2xl font-bold text-black text-xl hover:scale-[1.02] transition-all flex flex-col items-center justify-center gap-1 shadow-2xl shadow-chrome/20"
+                    >
+                      <span>Finalizar meu vídeo profissional</span>
+                      <span className="text-[10px] uppercase tracking-widest opacity-70">Abrir Google Flow com prompt copiado</span>
+                    </button>
+                    
+                    <p className="text-[10px] text-stone text-center px-4">
+                      O prompt estruturado em 6 camadas será copiado automaticamente para você colar no campo de entrada do Google Flow.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* RODAPÉ DA ETAPA */}
-            <div className="flex flex-col gap-3 pt-4">
-                <button onClick={() => avancar('em_producao')} className="metal-pill w-full py-4 rounded-2xl font-bold text-black text-lg">
-                    Já fechei — ir para produção
+            <div className="flex flex-col gap-3 pt-4 border-t border-white/5">
+                <button 
+                  onClick={() => setConcluido(true)} 
+                  className="w-full py-4 rounded-2xl border border-chrome/30 text-chrome hover:bg-chrome/5 transition-all text-sm font-semibold"
+                >
+                    Marcar como concluído
                 </button>
                 <button 
                     onClick={() => { 
                         autosave(passo, 'aguardando_resposta'); 
                         window.location.href='/projetos'; 
                     }} 
-                    className="w-full py-3 rounded-2xl border border-white/10 text-stone hover:text-bone transition-all text-sm"
+                    className="w-full py-3 rounded-2xl text-stone hover:text-bone transition-all text-xs"
                 >
-                    Salvar e voltar depois
+                    Salvar e voltar aos projetos
                 </button>
             </div>
         </div>
       )}
 
-      {passo === 3 && projetoCarregado && !concluido && (
-        <SalaProducao 
-          projeto={projetoCarregado} 
-          aoConcluir={() => setConcluido(true)} 
-        />
-      )}
+      {/* A SalaProducao não é mais renderizada aqui, foi integrada à etapa 2 (passo final) */}
+
 
       {concluido && (
         <TelaConcluida 
