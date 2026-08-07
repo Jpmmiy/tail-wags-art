@@ -34,6 +34,9 @@ interface ProtocoloState {
 
 const SETTINGS_KEY = 'protocolo_config';
 
+// Cast para evitar erros de tipo já que a tabela foi criada via migração SQL
+const getTable = () => (supabase as any).from('app_settings');
+
 export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
   enabled: false,
   sales: [],
@@ -48,7 +51,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
   fetchSettings: async () => {
     set({ loading: true });
     try {
-      const { data, error } = await (supabase.from('app_settings') as any)
+      const { data, error } = await getTable()
         .select('value')
         .eq('key', SETTINGS_KEY)
         .single();
@@ -73,7 +76,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     const current = get();
     const newValue = { ...current, enabled };
     set({ enabled });
-    await (supabase.from('app_settings') as any).upsert({ key: SETTINGS_KEY, value: newValue });
+    await getTable().upsert({ key: SETTINGS_KEY, value: newValue });
   },
 
   addSale: async (sale: Omit<FakeSale, 'id'>) => {
@@ -81,7 +84,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     const newSale = { ...sale, id: Math.random().toString(36).substr(2, 9) };
     const newSales = [...current.sales, newSale];
     set({ sales: newSales });
-    await (supabase.from('app_settings') as any).upsert({ 
+    await getTable().upsert({ 
       key: SETTINGS_KEY, 
       value: { ...current, sales: newSales } 
     });
@@ -89,9 +92,9 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
 
   removeSale: async (id: string) => {
     const current = get();
-    const newSales = current.sales.filter((s) => s.id !== id);
+    const newSales = current.sales.filter((s: FakeSale) => s.id !== id);
     set({ sales: newSales });
-    await (supabase.from('app_settings') as any).upsert({ 
+    await getTable().upsert({ 
       key: SETTINGS_KEY, 
       value: { ...current, sales: newSales } 
     });
@@ -101,7 +104,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     const current = get();
     const newTriggers = { ...current.triggers, ...triggers };
     set({ triggers: newTriggers });
-    await (supabase.from('app_settings') as any).upsert({ 
+    await getTable().upsert({ 
       key: SETTINGS_KEY, 
       value: { ...current, triggers: newTriggers } 
     });
@@ -111,7 +114,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     const current = get();
     const newOverrides = { ...current.overrides, [key]: value };
     set({ overrides: newOverrides });
-    await (supabase.from('app_settings') as any).upsert({ 
+    await getTable().upsert({ 
       key: SETTINGS_KEY, 
       value: { ...current, overrides: newOverrides } 
     });
