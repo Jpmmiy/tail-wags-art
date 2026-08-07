@@ -771,7 +771,7 @@ export function Quiz() {
           
           <div className="space-y-6">
             <div className="space-y-3">
-              <label className="text-sm font-medium text-bone">O que vamos entregar para o cliente?</label>
+              <label className="text-sm font-medium text-bone">Quais materiais vamos entregar para o cliente?</label>
               <div className="grid grid-cols-2 gap-4">
                 {PACOTE_CONFIG.map(p => (
                     <button 
