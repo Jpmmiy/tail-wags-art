@@ -776,7 +776,7 @@ export function Quiz() {
                         await navigator.clipboard.writeText(prompt);
                         toast.success("Roteiro copiado! Abrindo Google Flow...");
                         setTimeout(() => {
-                  window.open('https://labs.google/flow', '_blank');
+                  window.open('https://labs.google/flow/chat', '_blank');
                         }, 800);
                       }}
                       className="metal-pill w-full py-5 rounded-2xl font-bold text-black text-xl hover:scale-[1.02] transition-all flex flex-col items-center justify-center gap-1 shadow-2xl shadow-chrome/20"
