@@ -708,11 +708,11 @@ export function Dashboard() {
       {/* Métricas: Só aparecem se houver projetos ou no modo demo */}
       {temProjetos && (
         <>
-          <Faturamento d={p} />
+          {demo && <Faturamento d={p} />}
           <div className="grid gap-5 lg:grid-cols-2">
-            <Fluxo d={p} />
+            {demo && <Fluxo d={p} />}
             <Distribuicao d={p} />
-            <Atividade d={p} />
+            <Atividade d={p} projects={demo ? undefined : projects} />
           </div>
         </>
       )}
