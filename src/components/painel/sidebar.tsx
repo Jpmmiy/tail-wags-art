@@ -26,7 +26,7 @@ const GRUPOS = [
     titulo: "Trabalho",
     itens: [
       { href: "/painel", rotulo: "Painel", icone: LayoutDashboard },
-      { href: "/painel/projetos", rotulo: "Projetos", icone: FolderKanban },
+      { href: "/painel/projetos", rotulo: "Meus Projetos", icone: FolderKanban },
       { href: "/painel/portfolio", rotulo: "Portfólio", icone: GalleryVerticalEnd },
     ],
   },
