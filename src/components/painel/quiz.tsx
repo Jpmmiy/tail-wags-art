@@ -438,10 +438,39 @@ export function Quiz() {
       {gerando && <TelaGeracao aoTerminar={finalizarGeracao} />}
       {/* A Sala de Produção foi removida como tela independente e integrada ao Fechamento */}
 
-      <header>
-        <h1 className="font-display text-3xl font-semibold text-bone">{TITULOS[passo]}</h1>
+      <header className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          {passo > -1 && !concluido && (
+            <button onClick={voltar} className="size-10 rounded-xl bg-white/5 border border-white/10 grid place-items-center text-stone hover:text-bone transition-colors">
+              <ArrowLeft className="size-5" />
+            </button>
+          )}
+          <h1 className="font-display text-3xl font-semibold text-bone">{TITULOS[passo]}</h1>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          {salvando && (
+            <div className="flex items-center gap-2 text-stone text-[0.8rem]">
+              <Loader2 className="size-3 animate-spin" />
+              <span>Salvando...</span>
+            </div>
+          )}
+          {!salvando && ultimoSalvo && (
+            <div className="text-stone/60 text-[0.7rem] flex items-center gap-1.5">
+              <div className="size-1.5 rounded-full bg-chrome/50" />
+              Salvo às {ultimoSalvo.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </div>
+          )}
+          {erroSalvamento && (
+            <button onClick={() => autosave(passo)} className="text-red-400 text-[0.8rem] flex items-center gap-1.5 hover:underline">
+              <RotateCcw className="size-3" />
+              Falha ao salvar. Tentar novamente?
+            </button>
+          )}
+        </div>
       </header>
       {passo >= 0 && <Progresso passo={passo} />}
+
 
 
 
