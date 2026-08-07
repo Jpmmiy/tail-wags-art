@@ -24,17 +24,18 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { listProjects, setCurrentProjectId } from "@/lib/persistence";
 import { supabase } from "@/integrations/supabase/client";
-import { ErrorBoundary } from "react-error-boundary";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 
-function ErrorFallback({ error }: { error: Error }) {
+function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+  const errorMessage = error instanceof Error ? error.message : String(error);
   return (
     <div className="glass m-8 p-10 text-center rounded-3xl border border-red-500/20">
       <h2 className="text-xl font-bold text-red-500 mb-4">Erro no Painel</h2>
       <pre className="text-xs bg-black/40 p-4 rounded-xl text-stone overflow-auto max-h-60 mb-6">
-        {error.message}
+        {errorMessage}
       </pre>
       <button 
-        onClick={() => window.location.reload()}
+        onClick={() => resetErrorBoundary ? resetErrorBoundary() : window.location.reload()}
         className="metal-pill px-6 py-2 rounded-xl text-black font-bold"
       >
         Tentar Novamente
