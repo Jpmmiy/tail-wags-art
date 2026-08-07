@@ -479,7 +479,6 @@ export function Quiz() {
 
                           <div className="space-y-4">
                             <div className="text-center">
-                              <h4 className="text-bone font-medium">2. Identifique o imóvel</h4>
                               <p className="text-xs text-stone">Cole os dados do imóvel que você escolheu:</p>
                             </div>
                             
