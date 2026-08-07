@@ -934,7 +934,7 @@ export function Quiz() {
             {/* BLOCO 1 — WHATSAPP */}
             <div className="glass p-6 rounded-2xl border-chrome/20 rim-lit">
                 <h3 className="text-bone font-medium flex items-center gap-2 mb-4">
-                    <MessageCircle className="size-4 text-chrome" /> Abordagem WhatsApp
+                    <MessageCircle className="size-4 text-chrome" /> Script para WhatsApp
                 </h3>
                 <div className="p-4 bg-white/[0.03] rounded-xl text-[0.9rem] text-bone italic border-l-2 border-chrome whitespace-pre-wrap">
                     {whatsMessage}
