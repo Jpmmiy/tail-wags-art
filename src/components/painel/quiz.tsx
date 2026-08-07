@@ -55,7 +55,7 @@ import { cn } from "@/lib/utils";
 import { saveProjectStep, loadProject, setCurrentProjectId, getCurrentProjectId } from "@/lib/persistence";
 import { toast } from "sonner";
 
-const TITULOS = ["Radar de Oportunidades", "Personalização", "Abordagem", "Sala de Produção"];
+const TITULOS = ["Radar de Oportunidades", "Personalização", "Fechamento"];
 
 const MODALIDADES = [
   { id: "temporada" as const, icone: Home, titulo: "Airbnb e temporada", desc: "Pousadas, chalés e casas anunciadas por diária." },
@@ -90,6 +90,8 @@ function Progresso({ passo }: { passo: number }) {
 
 export function Quiz() {
   const [passo, setPasso] = useState(-1);
+  const [objetivoVideoTipo, setObjetivoVideoTipo] = useState<"institucional" | "dinamico" | "cinematografico">("dinamico");
+  const [possuiDrone, setPossuiDrone] = useState<boolean>(false);
   const [objetivo, setObjetivo] = useState<"site" | "video" | "completo" | null>(null);
   const [modalidade, setModalidade] = useState<Modalidade | null>(null);
   const [escolhido, setEscolhido] = useState<ImovelEncontrado | null>(null);
@@ -253,9 +255,9 @@ export function Quiz() {
 
 
   const autosave = async (step: number, status: any = 'rascunho') => {
-    // Se for o passo de geração, forçamos o status para garantir carregamento na SalaProducao
-    const finalStatus = step === 3 ? 'em_producao' : status;
-    const pid = await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis, objetivo }, finalStatus);
+    // Se for o passo de geração (agora passo 2, indo para fechamento)
+    const finalStatus = step === 2 ? 'em_producao' : status;
+    const pid = await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis, objetivo, objetivoVideoTipo, possuiDrone }, finalStatus);
     if (pid) setCurrentProjectId(pid);
     return pid;
   };
@@ -264,9 +266,9 @@ export function Quiz() {
     const proximo = passo + 1;
     
     // Mostra feedback visual
-    if (proximo === 3) {
+    if (proximo === 2) {
       setGerando(true);
-      return; // O avanço real acontece no aoTerminar da TelaGeracao
+      return; 
     }
 
     const pid = await autosave(proximo, s);
@@ -282,7 +284,7 @@ export function Quiz() {
 
   const finalizarGeracao = async () => {
     setGerando(false);
-    const proximoPasso = 3;
+    const proximoPasso = 2;
     
     // Forçamos o salvamento como 'em_producao' para liberar os cards
     const pid = await autosave(proximoPasso, 'em_producao');
@@ -340,33 +342,8 @@ export function Quiz() {
   return (
     <div className="space-y-8">
       {gerando && <TelaGeracao aoTerminar={finalizarGeracao} />}
-      {(passo === 3) && (
-        <div className="fixed inset-0 z-50 bg-ink overflow-y-auto p-4 sm:p-8">
-          <div className="max-w-4xl mx-auto space-y-8">
-            <header className="flex items-center justify-between">
-              <h1 className="font-display text-3xl font-semibold text-bone">Sala de Produção</h1>
-              <button 
-                onClick={() => setPasso(2)} 
-                className="flex items-center gap-2 text-stone hover:text-bone transition-colors"
-              >
-                <ArrowLeft className="size-4" /> Voltar
-              </button>
-            </header>
-            
-            {projetoCarregado ? (
-              <SalaProducao 
-                projeto={projetoCarregado} 
-                aoConcluir={() => setConcluido(true)} 
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-stone">
-                <Loader2 className="size-8 animate-spin mb-4" />
-                <p>Carregando ferramentas de produção...</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* A Sala de Produção foi removida como tela independente e integrada ao Fechamento */}
+
       <header>
         <h1 className="font-display text-3xl font-semibold text-bone">{TITULOS[passo]}</h1>
       </header>
