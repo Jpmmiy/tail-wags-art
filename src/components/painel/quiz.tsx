@@ -124,6 +124,15 @@ export function Quiz() {
   const [projetoCarregado, setProjetoCarregado] = useState<any>(null);
   const [concluido, setConcluido] = useState(false);
 
+  // Novos estados de usabilidade
+  const [salvando, setSalvando] = useState(false);
+  const [ultimoSalvo, setUltimoSalvo] = useState<Date | null>(null);
+  const [erroSalvamento, setErroSalvamento] = useState(false);
+  const [revisando, setRevisando] = useState(false);
+  const [editandoConcluido, setEditandoConcluido] = useState(false);
+  const [errosValidacao, setErrosValidacao] = useState<string[]>([]);
+
+
   const resultadosFiltrados = useMemo(() => {
     let base = [...resultados];
     
