@@ -63,28 +63,16 @@ const POR_LINHA = 230;
 export function TelaGeracao({ aoTerminar }: { aoTerminar: () => void }) {
   const [etapa, setEtapa] = useState(0);
   const [linha, setLinha] = useState(0);
-  const [erro, setErro] = useState(false);
   const consoleRef = useRef<HTMLDivElement>(null);
   const terminou = useRef(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const total = ETAPAS.reduce((s, e) => s + e.linhas.length, 0);
   const feitas =
     ETAPAS.slice(0, etapa).reduce((s, e) => s + e.linhas.length, 0) + linha;
   const progresso = Math.min(100, (feitas / total) * 100);
 
-  // Safety Timeout: 30 segundos
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!terminou.current) {
-        setErro(true);
-      }
-    }, 30000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (terminou.current || erro) return;
+    if (terminou.current) return;
 
     if (etapa >= ETAPAS.length) {
       terminou.current = true;
@@ -93,7 +81,7 @@ export function TelaGeracao({ aoTerminar }: { aoTerminar: () => void }) {
     }
 
     const atual = ETAPAS[etapa];
-    timeoutRef.current = setTimeout(() => {
+    const t = setTimeout(() => {
       if (linha + 1 >= atual.linhas.length) {
         setEtapa((e) => e + 1);
         setLinha(0);
@@ -102,10 +90,8 @@ export function TelaGeracao({ aoTerminar }: { aoTerminar: () => void }) {
       }
     }, POR_LINHA);
 
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [etapa, linha, aoTerminar, erro]);
+    return () => clearTimeout(t);
+  }, [etapa, linha, aoTerminar]);
 
   useEffect(() => {
     consoleRef.current?.scrollTo({
@@ -140,16 +126,16 @@ export function TelaGeracao({ aoTerminar }: { aoTerminar: () => void }) {
             </span>
             <div>
               <p className="font-display text-[1.35rem] font-semibold tracking-[-0.025em] text-bone">
-                {erro ? "Ops! Algo deu errado" : concluido ? "Material pronto" : ETAPAS[etapa].rotulo}
+                {concluido ? "Material pronto" : ETAPAS[etapa].rotulo}
               </p>
               <p className="mt-0.5 text-[0.86rem] text-stone">
-                {erro ? "A geração demorou mais do que o esperado." : "A Nexofly está montando sua entrega"}
+                A Nexofly está montando sua entrega
               </p>
             </div>
           </div>
 
           <span className="metal-text font-display text-[2.4rem] font-semibold leading-none tabular-nums">
-            {erro ? "!" : Math.round(progresso)}%
+            {Math.round(progresso)}%
           </span>
         </div>
 
@@ -229,12 +215,9 @@ export function TelaGeracao({ aoTerminar }: { aoTerminar: () => void }) {
               <span className="font-mono text-[10.5px] text-stone">
                 nexofly ~ produção
               </span>
-              <span className={cn(
-                "ml-auto flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-[0.16em]",
-                erro ? "text-red-400" : "text-jade"
-              )}>
-                <span className={cn("size-1.5 rounded-full", erro ? "bg-red-400" : "bg-jade motion-safe:animate-pulse")} />
-                {erro ? "erro" : concluido ? "concluído" : "executando"}
+              <span className="ml-auto flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-[0.16em] text-jade">
+                <span className="size-1.5 rounded-full bg-jade motion-safe:animate-pulse" />
+                {concluido ? "concluído" : "executando"}
               </span>
             </div>
 
@@ -242,52 +225,29 @@ export function TelaGeracao({ aoTerminar }: { aoTerminar: () => void }) {
               ref={consoleRef}
               className="h-64 overflow-y-auto px-5 py-4 font-mono text-[12px] leading-[1.9]"
             >
-              {erro ? (
-                <div className="flex h-full flex-col items-center justify-center text-center">
-                  <p className="text-red-400">Tempo limite de geração atingido.</p>
-                  <p className="mt-2 text-stone/60">Isso pode acontecer por instabilidade na rede.</p>
-                  <div className="mt-6 flex gap-3">
-                    <button 
-                      onClick={() => window.location.reload()}
-                      className="rounded-lg bg-white/5 px-4 py-2 text-[11px] font-bold text-bone ring-1 ring-white/10 transition-hover hover:bg-white/10"
-                    >
-                      Tentar de novo
-                    </button>
-                    <button 
-                      onClick={() => window.location.href = '/painel'}
-                      className="px-4 py-2 text-[11px] font-medium text-stone hover:text-bone"
-                    >
-                      Voltar ao painel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {visiveis.map((l, i) => (
-                    <p
-                      key={`${l}-${i}`}
-                      className={cn(
-                        "motion-safe:animate-rise",
-                        l.startsWith("✓")
-                          ? "text-jade"
-                          : l.startsWith("$")
-                            ? "text-bone"
-                            : "text-stone",
-                      )}
-                    >
-                      {l}
-                    </p>
-                  ))}
-                  {!concluido && (
-                    <span className="inline-block h-3.5 w-1.5 translate-y-0.5 bg-bone motion-safe:animate-pulse" />
+              {visiveis.map((l, i) => (
+                <p
+                  key={`${l}-${i}`}
+                  className={cn(
+                    "motion-safe:animate-rise",
+                    l.startsWith("✓")
+                      ? "text-jade"
+                      : l.startsWith("$")
+                        ? "text-bone"
+                        : "text-stone",
                   )}
-                </>
+                >
+                  {l}
+                </p>
+              ))}
+              {!concluido && (
+                <span className="inline-block h-3.5 w-1.5 translate-y-0.5 bg-bone motion-safe:animate-pulse" />
               )}
             </div>
           </div>
 
           <p className="mt-5 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-stone/60">
-            {erro ? "operação interrompida" : concluido ? "abrindo sua entrega" : "não feche esta janela"}
+            {concluido ? "abrindo sua entrega" : "não feche esta janela"}
           </p>
         </div>
       </div>
