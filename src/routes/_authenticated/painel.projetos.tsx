@@ -104,7 +104,7 @@ function ProjetosPage() {
                       
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between text-[11px] uppercase tracking-wider text-stone">
-                          <span>Entregáveis</span>
+                          <span>Materiais</span>
                           <span className="text-bone">{gerados} de {totalEsperado}</span>
                         </div>
                         <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
