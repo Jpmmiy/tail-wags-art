@@ -1,5 +1,4 @@
 "use client";
-
 import { Link } from "@/components/ui/link";
 import { usePathname } from "@/components/ui/link";
 import { useState } from "react";
@@ -10,8 +9,6 @@ import {
   Bot,
   GalleryVerticalEnd,
   Infinity as Infinito,
-  GraduationCap,
-  Trophy,
   Gift,
   Settings,
   Menu,
@@ -19,6 +16,9 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+
 
 /** Agrupado por intenção: trabalhar, crescer, conta. */
 const GRUPOS = [
