@@ -171,8 +171,8 @@ export function Mentor() {
         return;
       }
       const aviso =
-        e instanceof Error ? e.message : "Não consegui responder agora.";
-      setMsgs((m) => m.map((x) => (x.id === id ? { ...x, texto: aviso } : x)));
+        e instanceof Error ? e.message : "Não consegui responder agora por causa de uma falha na conexão.";
+      setMsgs((m) => m.map((x) => (x.id === id ? { ...x, texto: `⚠️ ${aviso}` } : x)));
     } finally {
       setEscrevendo(false);
       controle.current = null;
