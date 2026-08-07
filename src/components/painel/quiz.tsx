@@ -820,7 +820,7 @@ export function Quiz() {
                 <button 
                     onClick={() => { 
                         autosave(passo, 'aguardando_resposta'); 
-                        window.location.href='/projetos'; 
+                        window.location.href='/painel/projetos'; 
                     }} 
                     className="w-full py-3 rounded-2xl text-stone hover:text-bone transition-all text-xs"
                 >
