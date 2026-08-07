@@ -178,14 +178,24 @@ export type Respostas = {
   publico: string;
   comodos: string[];
   entregaveis: string[];
+  objetivo: string | null;
+  objetivoVideoTipo: "institucional" | "dinamico" | "cinematografico";
+  possuiDrone: boolean;
+  videoVertical: boolean;
+  cidade: string;
+  paisId: string;
+  regiaoId: string;
   /** Texto livre por seção do briefing. Vazio quando não preenchido. */
   notas: {
     estilo?: string;
     publico?: string;
     comodos?: string;
     pacote?: string;
+    objetivoVideoTipo?: string;
+    possuiDrone?: string;
   };
 };
+
 
 /** Bloco só aparece no material quando o usuário escreveu algo. */
 function obs(texto?: string) {
