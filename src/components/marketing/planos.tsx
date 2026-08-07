@@ -73,48 +73,6 @@ export function Planos() {
           </p>
         </Reveal>
 
-        {/* cupom */}
-        <Reveal delay={80}>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const c = codigo.trim().toUpperCase();
-              if (c) setAplicado(c);
-            }}
-            className="glass mx-auto mt-10 flex max-w-md items-center gap-2 rounded-full p-1.5"
-          >
-            <label htmlFor="cupom" className="sr-only">
-              Código de cupom
-            </label>
-            <span className="pl-3 text-stone" aria-hidden>
-              <Tag className="size-4" strokeWidth={1.8} />
-            </span>
-            <input
-              id="cupom"
-              value={codigo}
-              onChange={(e) => {
-                setCodigo(e.target.value);
-                setAplicado(null);
-              }}
-              placeholder="Tem um cupom de desconto?"
-              className="h-10 min-w-0 flex-1 bg-transparent text-[0.9rem] text-bone outline-none placeholder:text-stone/60"
-            />
-            <button
-              type="submit"
-              disabled={!codigo.trim()}
-              className="metal-pill h-10 shrink-0 rounded-full px-5 text-[0.85rem] font-semibold text-[#08090B] transition-transform hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40"
-            >
-              Aplicar
-            </button>
-          </form>
-
-          {aplicado && (
-            <p className="mt-3 text-center text-[0.82rem] text-jade motion-safe:animate-rise">
-              Cupom <span className="font-semibold">{aplicado}</span> guardado.
-              O desconto aparece no pagamento.
-            </p>
-          )}
-        </Reveal>
 
         {/* cartões: o vitalício domina */}
         <div className="mx-auto mt-12 grid max-w-5xl items-center gap-6 lg:grid-cols-[0.85fr_1.15fr]">
