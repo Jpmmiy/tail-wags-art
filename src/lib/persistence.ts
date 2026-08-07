@@ -26,16 +26,27 @@ export const setCurrentProjectId = (id: string | null) => {
 };
 
 /**
- * Recupera o perfil do usuário atual
+ * Recupera o perfil do usuário atual e garante que a sessão está ativa
  */
 export const getUserProfile = async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.user) return null;
+  const { data: { session: activeSession }, error: sessionError } = await supabase.auth.getSession();
   
+  let currentUserId = activeSession?.user.id;
+
+  // Tenta renovar se houver erro ou se não houver usuário
+  if (sessionError || !currentUserId) {
+    const { data: refresh, error: refreshError } = await supabase.auth.refreshSession();
+    if (!refreshError && refresh.session) {
+      currentUserId = refresh.session.user.id;
+    }
+  }
+  
+  if (!currentUserId) return null;
+
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
-    .eq("id", session.user.id)
+    .eq("id", currentUserId)
     .single();
     
   if (error) return null;
@@ -64,16 +75,26 @@ export const getLatestProjectId = async () => {
 };
 
 export const saveProjectStep = async (step: number, data: any, status: 'rascunho' | 'aguardando_resposta' | 'em_producao' | 'concluido' = 'rascunho') => {
+  // Garantia de Sessão Ativa
+  const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+  let activeUser = currentSession?.user;
+
+  if (sessionError || !activeUser) {
+    const { data: refresh, error: refreshError } = await supabase.auth.refreshSession();
+    if (refreshError) {
+      // Se falhar o refresh, precisamos avisar a UI para salvar localmente e pedir login
+      throw new Error("SESSÃO_EXPIRADA");
+    }
+    activeUser = refresh.session?.user;
+  }
+
   console.log("Saving project step:", step, "Status:", status);
   const sessionId = getSessionId();
   
-  const { data: { session } } = await supabase.auth.getSession();
-  const user = session?.user;
-
   // Fonte da verdade: prioriza o ID do banco se estiver logado
   let projectId = null;
   
-  if (user) {
+  if (activeUser) {
     projectId = await getLatestProjectId();
   } else {
     projectId = getCurrentProjectId();
@@ -84,7 +105,7 @@ export const saveProjectStep = async (step: number, data: any, status: 'rascunho
   try {
     if (step === 1 && data.escolhido) {
       const projectData: any = {
-        user_id: user?.id || null,
+        user_id: activeUser?.id || null,
         session_id: sessionId,
         modalidade: data.modalidade,
         current_step: step,
