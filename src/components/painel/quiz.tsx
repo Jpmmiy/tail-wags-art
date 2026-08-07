@@ -351,7 +351,7 @@ export function Quiz() {
       if (!escolhido && !manualNome) erros.push("Selecione ou insira um imóvel");
     }
     if (p === 1) {
-      if (entregaveis.length === 0) erros.push("Selecione pelo menos um entregável");
+      if (entregaveis.length === 0) erros.push("Selecione pelo menos um material");
       if (!publico) erros.push("Selecione o público-alvo");
     }
     setErrosValidacao(erros);
