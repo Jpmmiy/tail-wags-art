@@ -887,9 +887,10 @@ export function Quiz() {
 
                 <div className="flex items-center justify-between group border-t border-white/5 pt-4">
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-stone">Pacote de Entregáveis</p>
+                    <p className="text-[10px] uppercase font-bold text-stone">Materiais Selecionados</p>
                     <p className="text-bone font-medium">{entregaveis.map(e => PACOTE_CONFIG.find(p => p.id === e)?.rotulo).join(", ")}</p>
                   </div>
+
                   <button onClick={() => { setPasso(1); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
                 </div>
 
