@@ -66,7 +66,7 @@ const PACOTE_CONFIG = [
   { id: "fotos", rotulo: "Fotos tratadas", icone: ImageIcon },
   { id: "video", rotulo: "Vídeo curto", icone: Clapperboard },
   { id: "site", rotulo: "Site com reserva direta", icone: LayoutTemplate },
-  { id: "abordagem", rotulo: "Proposta", icone: MessageSquare },
+  { id: "abordagem", rotulo: "Script para WhatsApp", icone: MessageSquare },
 ];
 
 function Progresso({ passo }: { passo: number }) {
