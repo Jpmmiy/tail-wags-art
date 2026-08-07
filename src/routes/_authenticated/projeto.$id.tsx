@@ -224,7 +224,7 @@ function ProjetoDetalhesPage() {
                   <Link to="/perfil" className="text-[10px] text-chrome hover:underline">Editar perfil</Link>
                 </div>
               </div>
-              {!profile?.business_name && (
+              {!(profile as any)?.business_name && (
                 <div className="p-3 rounded-lg bg-orange-400/10 border border-orange-400/20 flex gap-2">
                   <AlertCircle className="size-4 text-orange-400 shrink-0" />
                   <p className="text-[10px] text-orange-200">Personalize seu perfil para propostas profissionais.</p>
