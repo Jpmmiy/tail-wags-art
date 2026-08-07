@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/brand/logo";
@@ -23,6 +23,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const navigate = useNavigate();
+  const router = useRouter();
   const { redirect: redirectUrl } = Route.useSearch();
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -44,19 +45,41 @@ function AuthPage() {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
+
+    console.log("Iniciando processo de autenticação para:", email);
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        console.log("Chamando signInWithPassword...");
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (error) throw error;
-        toast.success("Bem-vindo de volta!");
-        // Usando reload para garantir que todos os contextos e middlewares capturem a nova sessão
-        window.location.href = redirectUrl || "/painel";
+        
+        if (error) {
+          console.error("Erro no Supabase auth:", error);
+          throw error;
+        }
 
+        console.log("Login realizado com sucesso. Dados retornados:", data);
+        
+        if (!data.session) {
+          console.error("Sessão não retornada após login bem-sucedido");
+          throw new Error("Sessão não iniciada. Verifique suas credenciais.");
+        }
+
+        toast.success("Bem-vindo de volta!");
+        
+        const targetUrl = redirectUrl || "/painel";
+        console.log("Redirecionando para:", targetUrl);
+        
+        // Invalida o roteador para recarregar matchers de rota e beforeLoad
+        await router.invalidate();
+        
+        // Navegação forçada para garantir que saia da tela de auth
+        window.location.assign(targetUrl);
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -72,6 +95,7 @@ function AuthPage() {
         toast.success("Conta criada! Verifique seu e-mail para confirmar.");
       }
     } catch (error: any) {
+      console.error("Catch handleAuth:", error);
       toast.error(error.message || "Erro na autenticação");
     } finally {
       setLoading(false);
@@ -114,7 +138,13 @@ function AuthPage() {
             }}
           />
 
-          <form onSubmit={handleAuth} className="relative space-y-5">
+          <form 
+            onSubmit={(e) => {
+              console.log("Formulário submetido via onSubmit nativo");
+              handleAuth(e);
+            }} 
+            className="relative space-y-5"
+          >
             {!isLogin && (
               <div className="space-y-2">
                 <label className="eyebrow ml-1" htmlFor="name">
@@ -143,11 +173,13 @@ function AuthPage() {
                 <Mail className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-stone/40 transition-colors group-focus-within:text-chrome" />
                 <input
                   id="email"
+                  name="email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="nome@empresa.com"
+                  autoComplete="username"
                   className="w-full rounded-2xl border border-white/8 bg-white/[0.03] py-3.5 pl-11 pr-4 text-bone placeholder:text-stone/30 outline-none transition-all focus:border-chrome/40 focus:bg-white/[0.06] focus:ring-1 focus:ring-chrome/20"
                 />
               </div>
@@ -168,11 +200,13 @@ function AuthPage() {
                 <Lock className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-stone/40 transition-colors group-focus-within:text-chrome" />
                 <input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   className="w-full rounded-2xl border border-white/8 bg-white/[0.03] py-3.5 pl-11 pr-12 text-bone placeholder:text-stone/30 outline-none transition-all focus:border-chrome/40 focus:bg-white/[0.06] focus:ring-1 focus:ring-chrome/20"
                 />
                 <button
@@ -186,6 +220,7 @@ function AuthPage() {
             </div>
 
             <button
+              id="submit-auth"
               type="submit"
               disabled={loading}
               className={cn(
