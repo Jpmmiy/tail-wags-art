@@ -44,18 +44,40 @@ function AuthPage() {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
+
+    console.log("Iniciando processo de autenticação para:", email);
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        console.log("Chamando signInWithPassword...");
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (error) throw error;
+        
+        if (error) {
+          console.error("Erro no Supabase auth:", error);
+          throw error;
+        }
+
+        console.log("Login realizado com sucesso. Dados retornados:", data);
+        
+        if (!data.session) {
+          console.error("Sessão não retornada após login bem-sucedido");
+          throw new Error("Sessão não iniciada. Verifique suas credenciais.");
+        }
+
         toast.success("Bem-vindo de volta!");
-        // Usando reload para garantir que todos os contextos e middlewares capturem a nova sessão
-        window.location.href = redirectUrl || "/painel";
+        
+        const targetUrl = redirectUrl || "/painel";
+        console.log("Redirecionando para:", targetUrl);
+        
+        // Garante que o estado persistiu antes de mudar de página
+        setTimeout(() => {
+          window.location.href = targetUrl;
+        }, 100);
 
       } else {
         const { error } = await supabase.auth.signUp({
@@ -72,6 +94,7 @@ function AuthPage() {
         toast.success("Conta criada! Verifique seu e-mail para confirmar.");
       }
     } catch (error: any) {
+      console.error("Catch handleAuth:", error);
       toast.error(error.message || "Erro na autenticação");
     } finally {
       setLoading(false);
