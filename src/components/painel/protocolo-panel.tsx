@@ -4,12 +4,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trash2, Plus, Zap } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // Using a simplified switch if the component is missing, or we can use a button/checkbox
 // For safety, I'll use a checkbox-like button since switch might not exist yet
 export const ProtocoloPanel = () => {
-  const { enabled, setEnabled, sales, addSale, removeSale, overrides, setOverride } = useProtocoloStore();
+  const { enabled, setEnabled, sales, addSale, removeSale, overrides, setOverride, fetchSettings, loading } = useProtocoloStore();
+
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
+
+  if (loading) return <div className="flex h-32 items-center justify-center text-stone">Carregando configurações...</div>;
+
   const [newSale, setNewSale] = useState<Omit<FakeSale, 'id'>>({
     produto: 'Plano VIP',
     valor: 'R$ 497,00',

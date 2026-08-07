@@ -271,34 +271,43 @@ export function Quiz() {
       return; 
     }
 
-    const pid = await autosave(proximo, s);
-    
-    // Se temos um projeto, recarregamos para garantir que a SalaProducao tenha tudo
-    if (pid) {
-      const p = await loadProject(pid);
-      if (p) setProjetoCarregado(p);
-    }
+    try {
+      const pid = await autosave(proximo, s);
+      
+      // Se temos um projeto, recarregamos para garantir que a SalaProducao tenha tudo
+      if (pid) {
+        const p = await loadProject(pid);
+        if (p) setProjetoCarregado(p);
+      }
 
-    setPasso(proximo);
+      setPasso(proximo);
+    } catch (err) {
+      console.error("Erro ao avançar:", err);
+      toast.error("Não foi possível salvar seu progresso. Tente novamente.");
+    }
   };
 
   const finalizarGeracao = async () => {
     setGerando(false);
     const proximoPasso = 2;
     
-    // Forçamos o salvamento como 'em_producao' para liberar os cards
-    const pid = await autosave(proximoPasso, 'em_producao');
-    
-    if (pid) {
-      const p = await loadProject(pid);
-      if (p) {
-        setProjetoCarregado(p);
-        setPasso(proximoPasso);
-        return;
+    try {
+      // Forçamos o salvamento como 'em_producao' para liberar os cards
+      const pid = await autosave(proximoPasso, 'em_producao');
+      
+      if (pid) {
+        const p = await loadProject(pid);
+        if (p) {
+          setProjetoCarregado(p);
+          setPasso(proximoPasso);
+          return;
+        }
       }
+    } catch (err) {
+      console.error("Erro ao finalizar geração:", err);
     }
 
-    // Fallback absoluto: se o banco falhar, monta o objeto na memória
+    // Fallback absoluto: se o banco falhar, monta o objeto na memória e avança para não travar
     setProjetoCarregado({
       id: getCurrentProjectId() || 'temp-' + Date.now(),
       status: 'em_producao',

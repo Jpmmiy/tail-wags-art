@@ -92,50 +92,66 @@ export const Route = createFileRoute("/api/mentor")({
           );
         }
 
-        const resposta = await fetch(
-          "https://ai.gateway.lovable.dev/v1/chat/completions",
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${chave}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: MODELO,
-              stream: true,
-              messages: [{ role: "system", content: SISTEMA }, ...mensagens],
-            }),
-          },
-        );
+        const MAX_RETRIES = 2;
+        let attempt = 0;
+        let resposta: Response | null = null;
 
-        // Persistência em segundo plano (não bloqueia a resposta)
-        const ultimaMensagem = mensagens[mensagens.length - 1];
-        if (ultimaMensagem) {
-          void (async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user?.id) {
-              await supabase.from("mentor_messages").insert({
-                user_id: session.user.id,
-                role: ultimaMensagem.role,
-                content: ultimaMensagem.content
-              });
-            }
-          })();
+        while (attempt <= MAX_RETRIES) {
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+            resposta = await fetch(
+              "https://ai.gateway.lovable.dev/v1/chat/completions",
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${chave}`,
+                  "Content-Type": "application/json",
+                },
+                signal: controller.signal,
+                body: JSON.stringify({
+                  model: MODELO,
+                  stream: true,
+                  messages: [{ role: "system", content: SISTEMA }, ...mensagens],
+                }),
+              },
+            );
+
+            clearTimeout(timeoutId);
+
+            if (resposta.ok) break;
+
+            const retryableStatus = [429, 500, 502, 503, 504].includes(resposta.status);
+            if (!retryableStatus || attempt === MAX_RETRIES) break;
+
+            attempt++;
+            const backoff = Math.pow(2, attempt) * 1000;
+            console.log(`[Mentor] Erro ${resposta.status}. Tentativa ${attempt} em ${backoff}ms...`);
+            await new Promise(r => setTimeout(r, backoff));
+          } catch (e) {
+            const isTimeout = e instanceof Error && e.name === 'AbortError';
+            if (isTimeout) console.error(`[Mentor] Timeout na tentativa ${attempt + 1}`);
+            
+            if (attempt === MAX_RETRIES) throw e;
+            attempt++;
+            await new Promise(r => setTimeout(r, 1000));
+          }
         }
 
-        if (!resposta.ok || !resposta.body) {
-          const detalhe = await resposta.text();
-          console.error(`Falha no Mentor [${resposta.status}]: ${detalhe}`);
-          if (resposta.status === 429) {
+        if (!resposta || !resposta.ok || !resposta.body) {
+          const detalhe = resposta ? await resposta.text() : "Sem resposta da rede";
+          console.error(`Falha no Mentor [${resposta?.status}]: ${detalhe}`);
+          if (resposta?.status === 429) {
             return json({ erro: "Muitos pedidos agora. Tente em instantes." }, 429);
           }
-          if (resposta.status === 402) {
+          if (resposta?.status === 402) {
             return json(
               { erro: "Os créditos de IA do espaço acabaram." },
               402,
             );
           }
-          return json({ erro: "A resposta falhou.", detalhe }, 502);
+          return json({ erro: "A IA não conseguiu responder no tempo limite." }, 504);
         }
 
         const leitor = resposta.body.getReader();
@@ -181,7 +197,7 @@ export const Route = createFileRoute("/api/mentor")({
           if (!texto) return;
           const { data: { session } } = await supabase.auth.getSession();
           if (session?.user?.id) {
-            await supabase.from("mentor_messages").insert({
+            await (supabase.from("mentor_messages") as any).insert({
               user_id: session.user.id,
               role: "assistant",
               content: texto

@@ -3,7 +3,11 @@ import { useProtocoloStore, FakeSale } from '@/lib/protocolo';
 import { toast } from 'sonner';
 
 export const FakeSaleNotifications = () => {
-  const { enabled, sales, triggers } = useProtocoloStore();
+  const { enabled, sales, triggers, fetchSettings } = useProtocoloStore();
+
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
 
   useEffect(() => {
     if (!enabled || sales.length === 0 || !triggers.onLoad) return;
