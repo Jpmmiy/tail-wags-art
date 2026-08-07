@@ -323,8 +323,9 @@ export function Quiz() {
       
       {passo === -1 && (
         <div className="space-y-8 motion-safe:animate-rise py-10">
-          <div className="text-center">
+          <div className="text-center space-y-3">
             <h2 className="text-2xl font-display font-semibold text-bone">O que vamos criar hoje?</h2>
+            <p className="text-stone">Selecione seu objetivo para personalizarmos o fluxo.</p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 max-w-4xl mx-auto">
