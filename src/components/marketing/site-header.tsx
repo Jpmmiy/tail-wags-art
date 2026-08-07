@@ -17,27 +17,26 @@ const LINKS = [
 function BannerAniversario() {
   const [timeLeft, setTimeLeft] = useState({
     hours: 8,
-    minutes: 13,
-    seconds: 42
+    minutes: 0,
+    seconds: 0
   });
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        let { hours, minutes, seconds } = prev;
-        if (seconds > 0) {
-          seconds--;
-        } else if (minutes > 0) {
-          minutes--;
-          seconds = 59;
-        } else if (hours > 0) {
-          hours--;
-          minutes = 59;
-          seconds = 59;
-        }
-        return { hours, minutes, seconds };
+    const updateTimer = () => {
+      const agora = new Date();
+      const meiaNoite = new Date();
+      meiaNoite.setHours(24, 0, 0, 0);
+
+      const diff = meiaNoite.getTime() - agora.getTime();
+      setTimeLeft({
+        hours: Math.floor(diff / (1000 * 60 * 60)),
+        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((diff % (1000 * 60)) / 1000)
       });
-    }, 1000);
+    };
+
+    updateTimer();
+    const timer = setInterval(updateTimer, 1000);
     return () => clearInterval(timer);
   }, []);
 
