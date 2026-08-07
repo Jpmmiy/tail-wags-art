@@ -203,7 +203,7 @@ function ProjetoDetalhesPage() {
 
           <aside className="space-y-6">
             <section className="glass rounded-2xl p-6 space-y-4">
-              <h3 className="font-medium text-bone">Proposta Comercial</h3>
+              <h3 className="font-medium text-bone">Proposta</h3>
               {precos ? (
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-2">
