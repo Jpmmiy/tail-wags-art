@@ -29,7 +29,6 @@ import { Route as AuthenticatedPainelMentorRouteImport } from './routes/_authent
 import { Route as AuthenticatedPainelCriarRouteImport } from './routes/_authenticated/painel/criar'
 import { Route as AuthenticatedPainelCreditosRouteImport } from './routes/_authenticated/painel/creditos'
 import { Route as AuthenticatedPainelContaRouteImport } from './routes/_authenticated/painel/conta'
-import { Route as AuthenticatedProjetoRouteImport } from './routes/_authenticated/projeto.'
 
 const TermosRoute = TermosRouteImport.update({
   id: '/termos',
@@ -138,11 +137,6 @@ const AuthenticatedPainelContaRoute =
     path: '/painel/conta',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedProjetoRoute = AuthenticatedProjetoRouteImport.update({
-  id: '/projeto/',
-  path: '/projeto/',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -153,7 +147,6 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/api/imoveis': typeof ApiImoveisRoute
   '/api/mentor': typeof ApiMentorRoute
-  '/projeto/': typeof AuthenticatedProjetoRoute
   '/painel/conta': typeof AuthenticatedPainelContaRoute
   '/painel/creditos': typeof AuthenticatedPainelCreditosRoute
   '/painel/criar': typeof AuthenticatedPainelCriarRoute
@@ -175,7 +168,6 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/api/imoveis': typeof ApiImoveisRoute
   '/api/mentor': typeof ApiMentorRoute
-  '/projeto': typeof AuthenticatedProjetoRoute
   '/painel/conta': typeof AuthenticatedPainelContaRoute
   '/painel/creditos': typeof AuthenticatedPainelCreditosRoute
   '/painel/criar': typeof AuthenticatedPainelCriarRoute
@@ -199,7 +191,6 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/api/imoveis': typeof ApiImoveisRoute
   '/api/mentor': typeof ApiMentorRoute
-  '/_authenticated/projeto/': typeof AuthenticatedProjetoRoute
   '/_authenticated/painel/conta': typeof AuthenticatedPainelContaRoute
   '/_authenticated/painel/creditos': typeof AuthenticatedPainelCreditosRoute
   '/_authenticated/painel/criar': typeof AuthenticatedPainelCriarRoute
@@ -223,7 +214,6 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/api/imoveis'
     | '/api/mentor'
-    | '/projeto/'
     | '/painel/conta'
     | '/painel/creditos'
     | '/painel/criar'
@@ -245,7 +235,6 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/api/imoveis'
     | '/api/mentor'
-    | '/projeto'
     | '/painel/conta'
     | '/painel/creditos'
     | '/painel/criar'
@@ -268,7 +257,6 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/api/imoveis'
     | '/api/mentor'
-    | '/_authenticated/projeto/'
     | '/_authenticated/painel/conta'
     | '/_authenticated/painel/creditos'
     | '/_authenticated/painel/criar'
@@ -437,19 +425,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelContaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/projeto/': {
-      id: '/_authenticated/projeto/'
-      path: '/projeto'
-      fullPath: '/projeto/'
-      preLoaderRoute: typeof AuthenticatedProjetoRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
-  AuthenticatedProjetoRoute: typeof AuthenticatedProjetoRoute
   AuthenticatedPainelContaRoute: typeof AuthenticatedPainelContaRoute
   AuthenticatedPainelCreditosRoute: typeof AuthenticatedPainelCreditosRoute
   AuthenticatedPainelCriarRoute: typeof AuthenticatedPainelCriarRoute
@@ -463,7 +443,6 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
-  AuthenticatedProjetoRoute: AuthenticatedProjetoRoute,
   AuthenticatedPainelContaRoute: AuthenticatedPainelContaRoute,
   AuthenticatedPainelCreditosRoute: AuthenticatedPainelCreditosRoute,
   AuthenticatedPainelCriarRoute: AuthenticatedPainelCriarRoute,
@@ -494,3 +473,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
