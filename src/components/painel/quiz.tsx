@@ -248,22 +248,37 @@ export function Quiz() {
   useEffect(() => {
     const resumeProject = async () => {
       const pid = getCurrentProjectId();
-      console.log("Attempting to resume project:", pid);
       if (pid) {
         try {
           const p = await loadProject(pid);
-          console.log("Project loaded:", p);
           if (p) {
-            setPasso(p.current_step || 0);
-            setModalidade(p.modalidade as Modalidade);
+            setPasso(p.current_step ?? 0);
+            const props = p.properties?.[0] || {};
+            setModalidade(props.modalidade || p.modalidade);
+            setEscolhido(props.escolhido);
+            setPublico(props.publico || "casais");
+            setEntregaveis(props.entregaveis || ["video", "abordagem"]);
+            setDiaria(props.diaria || "250");
+            setEstilo(props.estilo || "aconchegante");
+            setCidade(props.cidade || "");
+            setPaisId(props.paisId || "BR");
+            setRegiaoId(props.regiaoId || "");
+            setObjetivo(props.objetivo);
+            setObjetivoVideoTipo(props.objetivoVideoTipo || "dinamico");
+            setPossuiDrone(props.possuiDrone || false);
+            setVideoVertical(props.videoVertical !== undefined ? props.videoVertical : true);
+            
             setProjetoCarregado(p);
-            if (p.status === 'concluido') setConcluido(true);
+            if (p.status === 'concluido' || p.status === 'em_producao') {
+              setConcluido(true);
+            }
           }
         } catch (err) { 
           console.error("Error loading project in useEffect:", err); 
         }
       }
     };
+
 
     resumeProject();
   }, []);
