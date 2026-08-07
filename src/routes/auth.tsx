@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter, redirect } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/brand/logo";
@@ -11,6 +11,13 @@ export const Route = createFileRoute("/auth")({
   validateSearch: z.object({
     redirect: z.string().optional(),
   }),
+  beforeLoad: async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      console.log("Sessão detectada em /auth via beforeLoad, redirecionando...");
+      throw redirect({ to: "/painel" });
+    }
+  },
   component: AuthPage,
 });
 
@@ -27,6 +34,18 @@ function AuthPage() {
   const { redirect: redirectUrl } = Route.useSearch();
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Redirecionamento preventivo caso a sessão apareça
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        console.log("Sessão detectada no useEffect de /auth, redirecionando...");
+        window.location.assign("/painel");
+      }
+    };
+    checkSession();
+  }, []);
 
   // Efeito de brilho que segue o cursor (padrão Nexofly)
   useEffect(() => {
@@ -81,10 +100,10 @@ function AuthPage() {
         
         await router.invalidate();
         
-        // Pequeno atraso para o toast ser visível e o cookie persistir
+        // Atraso mínimo e redirecionamento direto
         setTimeout(() => {
-          window.location.href = targetUrl;
-        }, 150);
+          window.location.assign(targetUrl);
+        }, 100);
       } else {
         const { error } = await supabase.auth.signUp({
           email,
