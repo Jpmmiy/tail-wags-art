@@ -135,11 +135,14 @@ function RootComponent() {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("[AUTH] 3. dentro do onAuthStateChange. EVENTO:", event, "temSessao:", !!session, "userId:", session?.user?.id);
+      
       if (event === "SIGNED_IN" && session?.user) {
         syncProjectsOnLogin(session.user.id);
       }
       
       if (event === "SIGNED_OUT") {
+        console.log("[AUTH] Reagindo a SIGNED_OUT, redirecionando para /auth");
         router.invalidate();
         router.navigate({ to: "/auth" });
       }

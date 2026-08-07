@@ -67,23 +67,23 @@ function AuthPage() {
     if (loading) return;
     setLoading(true);
 
-    console.log("Iniciando processo de autenticação para:", email);
-
+    console.log("[AUTH] 1. antes de chamar signInWithPassword para:", email);
+    
     try {
       if (isLogin) {
-        console.log("Chamando signInWithPassword...");
+        console.log("[AUTH] Chamando signInWithPassword...");
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         
+        console.log("[AUTH] 2. logo depois de signInWithPassword. data:", !!data.session, "error:", error?.message);
+
         if (error) {
           console.error("Erro no Supabase auth:", error);
           throw error;
         }
 
-        console.log("Login realizado com sucesso. Dados retornados:", data);
-        
         if (!data.session) {
           console.error("Sessão não retornada após login bem-sucedido");
           throw new Error("Sessão não iniciada. Verifique suas credenciais.");
@@ -96,12 +96,14 @@ function AuthPage() {
         document.cookie = `${key}=${encodeURIComponent(JSON.stringify(data.session))}; path=/; max-age=3600; SameSite=Lax`;
 
         const targetUrl = redirectUrl || "/painel";
-        console.log("Redirecionando para:", targetUrl);
+        console.log("[AUTH] 7. na navegação pós-login para:", targetUrl);
         
         await router.invalidate();
+        console.log("[AUTH] Router invalidado após login.");
         
         // Atraso mínimo e redirecionamento direto
         setTimeout(() => {
+          console.log("[AUTH] Executando window.location.assign para:", targetUrl);
           window.location.assign(targetUrl);
         }, 100);
       } else {
