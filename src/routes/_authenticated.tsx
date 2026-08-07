@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect, useRouter } from '@tanstack/react-router'
 import { supabase } from '@/integrations/supabase/client'
 import { syncProjectsOnLogin } from '@/lib/persistence'
 
@@ -33,5 +33,16 @@ export const Route = createFileRoute('/_authenticated')({
 
     return { session, profile }
   },
-  component: () => <Outlet />,
+  component: AuthenticatedLayout,
 })
+
+function AuthenticatedLayout() {
+  const router = useRouter();
+  console.log("[RENDER] 1: AuthenticatedLayout component rendering");
+  
+  return (
+    <div className="min-h-screen bg-ink">
+      <Outlet />
+    </div>
+  );
+}

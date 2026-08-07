@@ -64,7 +64,7 @@ function AuthPage() {
         toast.success("Bem-vindo de volta!");
         
         console.log("[AUTH] Invalidating router and navigating...");
-        await navigate({ to: "/painel" });
+        await navigate({ to: "/painel/" });
         // Removido window.location.href para evitar concorrência com o router
       } else {
         const { error } = await supabase.auth.signUp({
