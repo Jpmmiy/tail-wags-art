@@ -4,36 +4,33 @@ import { syncProjectsOnLogin } from '@/lib/persistence'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
-    // Tenta pegar a sessão atual de forma síncrona se possível ou assíncrona
+    // Tenta pegar a sessão atual
     const { data: { session } } = await supabase.auth.getSession()
     
     if (!session) {
-      console.log("Sessão não encontrada em _authenticated, redirecionando para /auth");
-      throw redirect({ 
-        to: '/auth', 
-        search: { 
-          redirect: location.href 
-        } 
-      })
-    }
-
-    console.log("Sessão encontrada em _authenticated para o usuário:", session.user.id);
-
-    try {
-      // Sincroniza projetos em segundo plano para não travar o carregamento inicial
-      syncProjectsOnLogin(session.user.id).catch(err => console.error("Erro ao sincronizar projetos:", err));
-
-      // Se estiver logado e tentar acessar /auth ou /, vai para o painel
-      if (location.pathname === '/' || location.pathname === '/auth') {
-        throw redirect({ to: '/painel' });
+      console.log("Sem sessão em _authenticated, checando redirecionamento...");
+      // Se não estiver logado, redireciona para /auth
+      if (location.pathname !== '/auth') {
+        throw redirect({ 
+          to: '/auth', 
+          search: { 
+            redirect: location.href 
+          } 
+        })
       }
-
-      return { session }
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('redirect')) throw error;
-      console.error("Erro no loader de _authenticated:", error);
-      return { session }
+      return { session: null };
     }
+
+    // Se estiver logado, sincroniza projetos
+    syncProjectsOnLogin(session.user.id).catch(console.error);
+
+    // Se estiver logado e na página de auth ou home, vai para o painel
+    if (location.pathname === '/' || location.pathname === '/auth') {
+      console.log("Usuário logado tentando acessar root/auth, redirecionando para painel");
+      throw redirect({ to: '/painel' });
+    }
+
+    return { session }
   },
   component: () => <Outlet />,
 })
