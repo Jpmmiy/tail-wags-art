@@ -29,7 +29,12 @@ export const Route = createFileRoute('/_authenticated')({
     // Sincroniza rascunhos anônimos e recupera último ID no primeiro load autenticado
     await syncProjectsOnLogin(session.user.id);
 
+    if (location.pathname === '/painel') {
+      throw redirect({ to: '/painel' });
+    }
+
     return { session, profile }
   },
   component: () => <Outlet />,
 })
+
