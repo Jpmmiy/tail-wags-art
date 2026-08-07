@@ -1,7 +1,5 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import { Json } from '@/integrations/supabase/types';
-
 
 export interface FakeSale {
   id: string;
@@ -36,13 +34,8 @@ interface ProtocoloState {
 
 const SETTINGS_KEY = 'protocolo_config';
 
-const getTable = () => supabase.from('app_settings');
-
-const formatForSupabase = (data: any): Json => {
-  return JSON.parse(JSON.stringify(data));
-};
-
-
+// Cast para evitar erros de tipo já que a tabela foi criada via migração SQL
+const getTable = () => (supabase as any).from('app_settings');
 
 export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
   enabled: false,
@@ -58,8 +51,6 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
   fetchSettings: async () => {
     set({ loading: true });
     try {
-      // Admins usam a rota direta (que passa pelo RLS de admin)
-      // Visitantes usariam o endpoint público, mas o store é usado no Admin
       const { data, error } = await getTable()
         .select('value')
         .eq('key', SETTINGS_KEY)
@@ -67,7 +58,6 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
 
       if (data?.value) {
         const val = data.value as any;
-
         set({
           enabled: val.enabled ?? false,
           sales: val.sales ?? [],
@@ -86,7 +76,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     const current = get();
     const newValue = { ...current, enabled };
     set({ enabled });
-    await getTable().upsert({ key: SETTINGS_KEY, value: formatForSupabase({ enabled, sales: current.sales, triggers: current.triggers, overrides: current.overrides }) });
+    await getTable().upsert({ key: SETTINGS_KEY, value: newValue });
   },
 
   addSale: async (sale: Omit<FakeSale, 'id'>) => {
@@ -96,9 +86,8 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     set({ sales: newSales });
     await getTable().upsert({ 
       key: SETTINGS_KEY, 
-      value: formatForSupabase({ enabled: current.enabled, sales: newSales, triggers: current.triggers, overrides: current.overrides })
+      value: { ...current, sales: newSales } 
     });
-
   },
 
   removeSale: async (id: string) => {
@@ -107,9 +96,8 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     set({ sales: newSales });
     await getTable().upsert({ 
       key: SETTINGS_KEY, 
-      value: formatForSupabase({ enabled: current.enabled, sales: newSales, triggers: current.triggers, overrides: current.overrides })
+      value: { ...current, sales: newSales } 
     });
-
   },
 
   updateTriggers: async (triggers: Partial<ProtocoloState['triggers']>) => {
@@ -118,9 +106,8 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     set({ triggers: newTriggers });
     await getTable().upsert({ 
       key: SETTINGS_KEY, 
-      value: formatForSupabase({ enabled: current.enabled, sales: current.sales, triggers: newTriggers, overrides: current.overrides })
+      value: { ...current, triggers: newTriggers } 
     });
-
   },
 
   setOverride: async (key: keyof ProtocoloState['overrides'], value: string) => {
@@ -129,8 +116,7 @@ export const useProtocoloStore = create<ProtocoloState>((set, get) => ({
     set({ overrides: newOverrides });
     await getTable().upsert({ 
       key: SETTINGS_KEY, 
-      value: formatForSupabase({ enabled: current.enabled, sales: current.sales, triggers: current.triggers, overrides: newOverrides })
+      value: { ...current, overrides: newOverrides } 
     });
-
   },
 }));
