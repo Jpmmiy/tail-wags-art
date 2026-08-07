@@ -835,8 +835,12 @@ export function Quiz() {
 
       {concluido && (
         <TelaConcluida 
-          aoVoltar={() => window.location.href = '/projetos'} 
-          aoNovo={() => window.location.href = '/'} 
+          aoVoltar={() => window.location.href = '/painel/projetos'} 
+          aoNovo={() => {
+            setCurrentProjectId(null);
+            window.location.href = '/painel/criar';
+          }} 
+
         />
       )}
     </div>
