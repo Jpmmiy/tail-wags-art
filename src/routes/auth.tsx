@@ -54,7 +54,12 @@ function AuthPage() {
         });
         if (error) throw error;
         toast.success("Bem-vindo de volta!");
-        navigate({ to: "/painel" });
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
+        } else {
+          navigate({ to: "/painel" });
+        }
+
       } else {
         const { error } = await supabase.auth.signUp({
           email,
