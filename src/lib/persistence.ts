@@ -26,16 +26,21 @@ export const setCurrentProjectId = (id: string | null) => {
 };
 
 /**
- * Recupera o perfil do usuário atual
+ * Recupera o perfil do usuário atual e garante que a sessão está ativa
  */
 export const getUserProfile = async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.user) return null;
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  
+  // Tenta renovar se houver erro ou se estiver próximo de expirar
+  if (sessionError || !session) {
+    const { data: refresh, error: refreshError } = await supabase.auth.refreshSession();
+    if (refreshError || !refresh.session) return null;
+  }
   
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
-    .eq("id", session.user.id)
+    .eq("id", (session || (await supabase.auth.getSession()).data.session)?.user.id)
     .single();
     
   if (error) return null;
@@ -64,6 +69,16 @@ export const getLatestProjectId = async () => {
 };
 
 export const saveProjectStep = async (step: number, data: any, status: 'rascunho' | 'aguardando_resposta' | 'em_producao' | 'concluido' = 'rascunho') => {
+  // Garantia de Sessão Ativa
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError || !session) {
+    const { data: refresh, error: refreshError } = await supabase.auth.refreshSession();
+    if (refreshError) {
+      // Se falhar o refresh, precisamos avisar a UI para salvar localmente e pedir login
+      throw new Error("SESSÃO_EXPIRADA");
+    }
+  }
+
   console.log("Saving project step:", step, "Status:", status);
   const sessionId = getSessionId();
   

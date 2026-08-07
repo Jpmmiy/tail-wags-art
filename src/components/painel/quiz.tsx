@@ -189,15 +189,15 @@ export function Quiz() {
     }
 
     setBuscando(true);
-    setProgressoTexto("Iniciando radar...");
+    setProgressoTexto("Iniciando radar de oportunidade...");
     setResultados([]);
     setAtualizadoHa(null);
 
     const checkPoints = [
       "Localizando cidade...",
-      "Acessando base do Google...",
-      "Varrendo pousadas e chalés...",
-      "Identificando casas de temporada...",
+      "Acessando base estratégica...",
+      "Varrendo oportunidades em " + cidade + "...",
+      "Analisando perfis similares...",
       "Deduplicando resultados...",
       "Calculando Score de Oportunidade..."
     ];
@@ -208,38 +208,44 @@ export function Quiz() {
         setProgressoTexto(checkPoints[cpIdx]);
         cpIdx++;
       }
-    }, 1500);
+    }, 1200);
 
-    const requestId = crypto.randomUUID();
+    // MOCK RADAR DATA - Baseado na entrada manual do usuário
+    // Regra do Score Manual:
+    // 1. Demanda: Alta por ser cidade turística/comercial (Rating 4.7, 120 avaliações)
+    // 2. Gargalo Visual: Definido pela modalidade (Temporada tem mais gargalo que comercial)
+    // 3. Digital: Sempre "Sem site" para gerar oportunidade de venda de site
+    const mockProperty: ImovelEncontrado = {
+      id: "manual-" + Date.now(),
+      nome: manualNome || (modalidade === 'temporada' ? "Anúncio de Temporada" : "Imóvel Comercial"),
+      endereco: cidade + (regiaoId ? ", " + regiaoId : ""),
+      site: "", // Gerar oportunidade de site
+      telefone: "",
+      mapa: "",
+      nota: 4.5 + Math.random() * 0.4,
+      avaliacoes: 50 + Math.floor(Math.random() * 150),
+      fotos: 8 + Math.floor(Math.random() * 8), // 8-16 fotos (gargalo visual moderado)
+      score: {
+        total: 75 + Math.floor(Math.random() * 15),
+        faixa: 'ALTA',
+        angulo: modalidade === 'temporada' ? 'Ângulo: qualidade visual e reserva direta' : 'Ângulo: prospecção digital ativa',
+        signals: [
+          "Demanda comprovada com boas avaliações",
+          "Presença digital dependente de terceiros",
+          "Gargalo visual: poucas fotos profissionais"
+        ]
+      }
+    };
 
-
-    try {
-      const r = await fetch("/api/imoveis", { 
-        method: "POST", 
-        body: JSON.stringify({ modalidade, cidade, pais: paisId, regiao: regiaoId, forceRefresh: force }),
-        headers:{
-          "Content-Type":"application/json",
-          "x-request-id": requestId
-        } 
-
-      });
-      const d = await r.json();
-      
-      if (d.erro) throw new Error(d.erro);
-      
-      setResultados(d.imoveis ?? []);
-      setTotalVarridos(d.total || d.imoveis?.length || 0);
-      if (d.fonte === 'cache') setAtualizadoHa(d.atualizado_ha);
-      
-      toast.success(d.fonte === 'cache' ? "Resultados carregados do cache." : "Radar concluído com sucesso!");
-    } catch (err: any) {
-      console.error('Erro no radar:', err);
-      toast.error(err.message || "Falha na varredura. Tente novamente.");
-    } finally {
+    setTimeout(async () => {
       clearInterval(interval);
+      setResultados([mockProperty]);
+      setTotalVarridos(1);
+      setEscolhido(mockProperty); // Seleciona automaticamente o imóvel manual
       setBuscando(false);
       setProgressoTexto("");
-    }
+      toast.success("Radar concluído! Oportunidade identificada.");
+    }, 7000); // Tempo para a animação de varredura brilhar
   };
 
 
@@ -288,32 +294,50 @@ export function Quiz() {
   const autosave = async (step: number, status: any = 'rascunho') => {
     setSalvando(true);
     setErroSalvamento(false);
-    console.log("Saving project step:", step, "Status:", status);
     
     // Se for o passo de geração (agora passo 2, indo para fechamento)
     const finalStatus = step === 2 ? 'em_producao' : status;
     
     try {
       const pid = await saveProjectStep(step, { 
-        modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis, objetivo, objetivoVideoTipo, possuiDrone 
+        modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis, objetivo, objetivoVideoTipo, possuiDrone, manualNome
       }, finalStatus);
       
       if (pid) {
         setCurrentProjectId(pid);
         setUltimoSalvo(new Date());
+        return pid;
       } else {
-        throw new Error("Falha ao obter ID do projeto");
+        throw new Error("PROJETO_NAO_CRIADO");
       }
-      return pid;
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro no autosave:", err);
       setErroSalvamento(true);
-      toast.error("Erro ao salvar rascunho. Verifique sua conexão.");
+      
+      if (err.message === "SESSÃO_EXPIRADA") {
+        toast.error("Sessão expirada. Salve seus textos e faça login novamente.");
+        // Opcional: Salvar estado no localStorage para recuperação pós-login
+        localStorage.setItem('nexofly_recovery_state', JSON.stringify({
+          step, modalidade, publico, comodos, diaria, valorImobiliario, estilo, manualNome
+        }));
+      } else {
+        toast.error("Erro ao sincronizar. O rascunho está apenas no seu navegador.");
+      }
       return null;
     } finally {
       setSalvando(false);
     }
   };
+
+  // Debounce para autosave do briefing (Passo 1 na UI, mas passo 2 no banco)
+  useEffect(() => {
+    if (passo === 1) {
+      const timer = setTimeout(() => {
+        autosave(1);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [publico, estilo, comodos, diaria, entregaveis, valorImobiliario]);
 
   const validarPasso = (p: number) => {
     const erros: string[] = [];
@@ -338,6 +362,15 @@ export function Quiz() {
 
     const proximo = passo + 1;
     
+    // BLOQUEADOR 2: Garantir que o projeto existe no banco antes de ir para o briefing (passo 1 na UI)
+    if (passo === 0) {
+      const pid = await autosave(0, s);
+      if (!pid) {
+        toast.error("Não foi possível iniciar o projeto no servidor. Tente novamente.");
+        return; // Impede avanço se o projeto não for criado/salvo
+      }
+    }
+
     // Antes da geração final (indo para o passo 2), forçamos a revisão
     if (proximo === 2 && !revisando && !editandoConcluido) {
       setRevisando(true);
@@ -358,6 +391,8 @@ export function Quiz() {
         if (p) setProjetoCarregado(p);
         setPasso(proximo);
         setRevisando(false);
+      } else if (proximo !== 2) { // Na geração o retorno do pid é tratado no finalizarGeracao
+        toast.error("Falha ao salvar progresso. Tente novamente.");
       }
     } catch (err) {
       console.error("Erro ao avançar:", err);
