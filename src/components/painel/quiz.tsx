@@ -230,16 +230,20 @@ export function Quiz() {
   useEffect(() => {
     const resumeProject = async () => {
       const pid = getCurrentProjectId();
+      console.log("Attempting to resume project:", pid);
       if (pid) {
         try {
           const p = await loadProject(pid);
+          console.log("Project loaded:", p);
           if (p) {
             setPasso(p.current_step || 0);
             setModalidade(p.modalidade as Modalidade);
             setProjetoCarregado(p);
             if (p.status === 'concluido') setConcluido(true);
           }
-        } catch (err) { console.error(err); }
+        } catch (err) { 
+          console.error("Error loading project in useEffect:", err); 
+        }
       }
     };
 
@@ -258,7 +262,12 @@ export function Quiz() {
     const proximo = passo + 1;
     
     // Autosave antes de mudar o passo para garantir que o projeto existe no banco
-    const pid = await autosave(proximo, s);
+    let pid = await autosave(proximo, s);
+    
+    // Garantia de persistência local caso o retorno do saveProjectStep falhe ou demore
+    if (!pid) {
+      pid = getCurrentProjectId();
+    }
     
     if (pid) {
       try {
@@ -276,11 +285,18 @@ export function Quiz() {
         }
       } catch (err) {
         console.error("Erro ao carregar projeto após save:", err);
+        // Fallback para não travar a UI
+        setProjetoCarregado({
+          id: pid,
+          status: s,
+          current_step: proximo,
+          properties: [{ modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, cidade, entregaveis }]
+        });
       }
-    } else if (!projetoCarregado) {
-      // Fallback para não travar a UI caso o salvamento falhe
+    } else if (projetoCarregado || (escolhido && passo >= 0)) {
+      // Se não temos PID mas temos dados locais, criamos um objeto temporário para a SalaProducao
       setProjetoCarregado({
-        id: 'temp-' + Date.now(),
+        id: getCurrentProjectId() || 'temp-' + Date.now(),
         status: s,
         current_step: proximo,
         properties: [{ modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, cidade, entregaveis }]
@@ -323,7 +339,7 @@ export function Quiz() {
 
   return (
     <div className="space-y-8">
-      {gerando && <TelaGeracao aoTerminar={() => { setGerando(false); setPasso(3); }} />}
+      {gerando && <TelaGeracao aoTerminar={() => { setGerando(false); avancar('aguardando_resposta'); }} />}
       {(passo === 3) && (
         <div className="fixed inset-0 z-50 bg-ink overflow-y-auto p-4 sm:p-8">
           <div className="max-w-4xl mx-auto space-y-8">
