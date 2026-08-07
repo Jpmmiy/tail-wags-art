@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useEffect } from "react";
 import { Link } from "@/components/ui/link";
 import {
   Wand2,
