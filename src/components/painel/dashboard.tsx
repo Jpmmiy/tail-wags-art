@@ -586,10 +586,10 @@ export function Dashboard() {
       if (!session) return null;
       const { data } = await supabase
         .from("profiles")
-        .select("onboarding_completed")
+        .select("*")
         .eq("id", session.user.id)
         .single();
-      return data;
+      return data as any;
     }
   });
 
@@ -598,6 +598,7 @@ export function Dashboard() {
       setMostrarOnboarding(true);
     }
   }, [profile]);
+
 
   const p = demo ? dados : ZERADO;
   const temProjetos = (projects && projects.length > 0) || demo;
