@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { loadProject, saveDeliverable, getUserProfile } from '@/lib/persistence';
+import { generateProposalPDF } from '@/lib/pdf-generator';
 import { 
+
   ArrowLeft, 
   Copy, 
   Check, 
@@ -111,8 +113,19 @@ function ProjetoDetalhesPage() {
           </div>
           <div className="flex gap-2">
             <button 
-              onClick={() => toast.info("Funcionalidade de PDF em breve!")}
-              className="metal-pill flex items-center gap-2 px-4 py-2 text-sm font-bold text-black"
+              onClick={() => {
+                if (!project || !precos) {
+                  toast.error("Aguarde o carregamento dos dados");
+                  return;
+                }
+                const promise = generateProposalPDF(project, profile, precos);
+                toast.promise(promise, {
+                  loading: 'Gerando PDF...',
+                  success: 'PDF exportado com sucesso!',
+                  error: 'Erro ao gerar PDF'
+                });
+              }}
+              className="metal-pill flex items-center gap-2 px-4 py-2 text-sm font-bold text-black disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Download className="size-4" /> Exportar PDF
             </button>
