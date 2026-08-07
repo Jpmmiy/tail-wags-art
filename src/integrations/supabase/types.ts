@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_usage: {
+        Row: {
+          completion_tokens: number | null
+          created_at: string | null
+          estimated_cost: number | null
+          id: string
+          ip: string
+          prompt_tokens: number | null
+          request_id: string
+          response_cache: string | null
+          route: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          completion_tokens?: number | null
+          created_at?: string | null
+          estimated_cost?: number | null
+          id?: string
+          ip: string
+          prompt_tokens?: number | null
+          request_id: string
+          response_cache?: string | null
+          route: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          completion_tokens?: number | null
+          created_at?: string | null
+          estimated_cost?: number | null
+          id?: string
+          ip?: string
+          prompt_tokens?: number | null
+          request_id?: string
+          response_cache?: string | null
+          route?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       briefings: {
         Row: {
           comodos: Json | null
