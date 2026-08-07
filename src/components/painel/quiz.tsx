@@ -225,6 +225,7 @@ export function Quiz() {
       nota: 4.5 + Math.random() * 0.4,
       avaliacoes: 50 + Math.floor(Math.random() * 150),
       fotos: 8 + Math.floor(Math.random() * 8), // 8-16 fotos (gargalo visual moderado)
+      airbnb: manualLink || "",
       score: {
         total: 75 + Math.floor(Math.random() * 15),
         faixa: 'ALTA',
