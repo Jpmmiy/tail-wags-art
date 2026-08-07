@@ -21,6 +21,7 @@ import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPainelIndexRouteImport } from './routes/_authenticated/painel/index'
 import { Route as ApiPublicWebhookRouteImport } from './routes/api/public/webhook'
+import { Route as ApiPublicProtocoloRouteImport } from './routes/api/public/protocolo'
 import { Route as AuthenticatedPainelProjetosRouteImport } from './routes/_authenticated/painel/projetos'
 import { Route as AuthenticatedPainelPresenteRouteImport } from './routes/_authenticated/painel/presente'
 import { Route as AuthenticatedPainelPremiacoesRouteImport } from './routes/_authenticated/painel/premiacoes'
@@ -89,6 +90,11 @@ const AuthenticatedPainelIndexRoute =
 const ApiPublicWebhookRoute = ApiPublicWebhookRouteImport.update({
   id: '/api/public/webhook',
   path: '/api/public/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicProtocoloRoute = ApiPublicProtocoloRouteImport.update({
+  id: '/api/public/protocolo',
+  path: '/api/public/protocolo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPainelProjetosRoute =
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/painel/premiacoes': typeof AuthenticatedPainelPremiacoesRoute
   '/painel/presente': typeof AuthenticatedPainelPresenteRoute
   '/painel/projetos': typeof AuthenticatedPainelProjetosRoute
+  '/api/public/protocolo': typeof ApiPublicProtocoloRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
   '/painel/': typeof AuthenticatedPainelIndexRoute
 }
@@ -186,6 +193,7 @@ export interface FileRoutesByTo {
   '/painel/premiacoes': typeof AuthenticatedPainelPremiacoesRoute
   '/painel/presente': typeof AuthenticatedPainelPresenteRoute
   '/painel/projetos': typeof AuthenticatedPainelProjetosRoute
+  '/api/public/protocolo': typeof ApiPublicProtocoloRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
   '/painel': typeof AuthenticatedPainelIndexRoute
 }
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/_authenticated/painel/premiacoes': typeof AuthenticatedPainelPremiacoesRoute
   '/_authenticated/painel/presente': typeof AuthenticatedPainelPresenteRoute
   '/_authenticated/painel/projetos': typeof AuthenticatedPainelProjetosRoute
+  '/api/public/protocolo': typeof ApiPublicProtocoloRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
   '/_authenticated/painel/': typeof AuthenticatedPainelIndexRoute
 }
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/painel/premiacoes'
     | '/painel/presente'
     | '/painel/projetos'
+    | '/api/public/protocolo'
     | '/api/public/webhook'
     | '/painel/'
   fileRoutesByTo: FileRoutesByTo
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/painel/premiacoes'
     | '/painel/presente'
     | '/painel/projetos'
+    | '/api/public/protocolo'
     | '/api/public/webhook'
     | '/painel'
   id:
@@ -278,6 +289,7 @@ export interface FileRouteTypes {
     | '/_authenticated/painel/premiacoes'
     | '/_authenticated/painel/presente'
     | '/_authenticated/painel/projetos'
+    | '/api/public/protocolo'
     | '/api/public/webhook'
     | '/_authenticated/painel/'
   fileRoutesById: FileRoutesById
@@ -291,6 +303,7 @@ export interface RootRouteChildren {
   TermosRoute: typeof TermosRoute
   ApiImoveisRoute: typeof ApiImoveisRoute
   ApiMentorRoute: typeof ApiMentorRoute
+  ApiPublicProtocoloRoute: typeof ApiPublicProtocoloRoute
   ApiPublicWebhookRoute: typeof ApiPublicWebhookRoute
 }
 
@@ -378,6 +391,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/webhook'
       fullPath: '/api/public/webhook'
       preLoaderRoute: typeof ApiPublicWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/protocolo': {
+      id: '/api/public/protocolo'
+      path: '/api/public/protocolo'
+      fullPath: '/api/public/protocolo'
+      preLoaderRoute: typeof ApiPublicProtocoloRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/painel/projetos': {
@@ -498,6 +518,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermosRoute: TermosRoute,
   ApiImoveisRoute: ApiImoveisRoute,
   ApiMentorRoute: ApiMentorRoute,
+  ApiPublicProtocoloRoute: ApiPublicProtocoloRoute,
   ApiPublicWebhookRoute: ApiPublicWebhookRoute,
 }
 export const routeTree = rootRouteImport
