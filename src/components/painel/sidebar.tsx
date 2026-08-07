@@ -58,10 +58,10 @@ function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
     }
   });
 
-  const tier = profile?.tier || "gratuito";
-  const labelPlano = tier === 'vitalicio' ? "Plano Vitalício" : tier === 'mensal' ? "Plano Mensal" : "Plano Gratuito";
+  const tier = profile?.tier || "free";
+  const labelPlano = tier === 'vitalicio' ? "Plano Vitalício" : tier === 'pro' ? "Plano Pro" : "Plano Gratuito";
   const labelCreditos = tier === 'vitalicio' ? "Créditos Infinitos" : "Créditos Limitados";
-  const descPlano = tier === 'vitalicio' ? "Acesso liberado. Sem renovação." : tier === 'mensal' ? "Assinatura ativa." : "Acesso limitado.";
+  const descPlano = tier === 'vitalicio' ? "Acesso liberado. Sem renovação." : tier === 'pro' ? "Assinatura ativa." : "Acesso limitado.";
 
   return (
     <div className="flex h-full flex-col gap-6 p-4">
