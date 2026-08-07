@@ -216,7 +216,7 @@ function ProjetoDetalhesPage() {
                     onClick={() => setConteudoEditado(whatsMessage(project, profile))}
                     className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-green-500/10 text-green-400 border border-green-500/20 text-sm font-bold hover:bg-green-500/20 transition-all"
                   >
-                    <MessageSquare className="size-4" /> Mensagem WhatsApp
+                    <MessageSquare className="size-4" /> Script para WhatsApp
                   </button>
                 </div>
               ) : (
