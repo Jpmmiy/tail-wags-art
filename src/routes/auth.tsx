@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/brand/logo";
@@ -23,6 +23,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const navigate = useNavigate();
+  const router = useRouter();
   const { redirect: redirectUrl } = Route.useSearch();
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -74,11 +75,11 @@ function AuthPage() {
         const targetUrl = redirectUrl || "/painel";
         console.log("Redirecionando para:", targetUrl);
         
-        // Garante que o estado persistiu antes de mudar de página
-        setTimeout(() => {
-          window.location.href = targetUrl;
-        }, 100);
-
+        // Invalida o roteador para recarregar matchers de rota e beforeLoad
+        await router.invalidate();
+        
+        // Navegação forçada para garantir que saia da tela de auth
+        window.location.assign(targetUrl);
       } else {
         const { error } = await supabase.auth.signUp({
           email,
