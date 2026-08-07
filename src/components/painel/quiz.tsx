@@ -157,9 +157,12 @@ export function Quiz() {
   }, [resultados, totalVarridos]);
 
   const exportarCSV = useCallback(() => {
-    if (resultados.length === 0) return;
+    if (resultadosFiltrados.length === 0) {
+      toast.error("Não há dados para exportar com os filtros atuais.");
+      return;
+    }
     const headers = ["Nome", "Endereço", "Score", "Faixa", "Telefone", "Site", "Link Maps"];
-    const rows = resultados.map(r => [
+    const rows = resultadosFiltrados.map(r => [
       r.nome,
       r.endereco,
       r.score?.total || 0,
@@ -180,7 +183,7 @@ export function Quiz() {
     link.click();
     document.body.removeChild(link);
     toast.success("CSV exportado com sucesso!");
-  }, [resultados, cidade]);
+  }, [resultadosFiltrados, cidade]);
 
   const ativarRadar = async (force: boolean = false) => {
     if (!cidade) {
