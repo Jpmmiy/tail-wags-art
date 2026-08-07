@@ -230,16 +230,20 @@ export function Quiz() {
   useEffect(() => {
     const resumeProject = async () => {
       const pid = getCurrentProjectId();
+      console.log("Attempting to resume project:", pid);
       if (pid) {
         try {
           const p = await loadProject(pid);
+          console.log("Project loaded:", p);
           if (p) {
             setPasso(p.current_step || 0);
             setModalidade(p.modalidade as Modalidade);
             setProjetoCarregado(p);
             if (p.status === 'concluido') setConcluido(true);
           }
-        } catch (err) { console.error(err); }
+        } catch (err) { 
+          console.error("Error loading project in useEffect:", err); 
+        }
       }
     };
 
