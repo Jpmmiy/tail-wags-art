@@ -4,11 +4,12 @@ import autoTable from "jspdf-autotable";
 export async function generateProposalPDF(project: any, profile: any, pricing: any) {
   const doc = new jsPDF();
   const property = project.properties?.[0];
-  const businessName = profile?.business_name || "Nexofly Global";
-  const userName = profile?.full_name || "Especialista Nexofly";
-  const userEmail = profile?.email || "";
+  const businessName = profile?.business_name || (project as any).user_profile?.business_name || "Nexofly Global";
+  const userName = profile?.full_name || (project as any).user_profile?.full_name || "Especialista Nexofly";
+  const userEmail = profile?.email || (project as any).user_profile?.email || "";
   const date = new Date().toLocaleDateString('pt-BR');
   const projectName = project.name || property?.nome || "Proposta Comercial";
+
 
   // --- Header ---
   // Background rectangle for header
