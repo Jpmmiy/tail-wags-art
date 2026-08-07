@@ -201,11 +201,18 @@ export function Quiz() {
       }
     }, 1500);
 
+    const requestId = crypto.randomUUID();
+
+
     try {
       const r = await fetch("/api/imoveis", { 
         method: "POST", 
         body: JSON.stringify({ modalidade, cidade, pais: paisId, regiao: regiaoId, forceRefresh: force }),
-        headers:{"Content-Type":"application/json"} 
+        headers:{
+          "Content-Type":"application/json",
+          "x-request-id": requestId
+        } 
+
       });
       const d = await r.json();
       
