@@ -162,14 +162,21 @@ export type ImovelSelecionado = {
   anfitriao: string;
   diaria: number;
   potencial: number;
-  nota: number;
-  avaliacoes: number;
+  nota: number | null;
+  avaliacoes: number | null;
   fotos: number;
   problemas: string[];
   mapa?: string | null;
   airbnb?: string | null;
   site?: string | null;
+  score?: {
+    total: number;
+    faixa: string;
+    signals: string[];
+    angulo: string;
+  };
 };
+
 
 export type Respostas = {
   modalidade: "temporada" | "imobiliario";
@@ -212,7 +219,7 @@ export function promptFoto(r: Respostas, comodo: string) {
   
   // ESTRATÉGIA BASEADA EM SINAIS DO RADAR
   const sinais = r.imovel.score?.signals || [];
-  const focoRadar = sinais.some(s => s.toLowerCase().includes("foto")) 
+  const focoRadar = sinais.some((s: string) => s.toLowerCase().includes("foto")) 
     ? "PRIORIDADE: Volume e variedade. O imóvel possui poucas fotos ou fotos ruins no radar. Capture ângulos inéditos."
     : "FOCO: Qualidade e refinamento. O imóvel já tem base, foque em elevar o padrão visual.";
 
