@@ -1,5 +1,4 @@
 "use client";
-
 import { Link } from "@/components/ui/link";
 import { usePathname } from "@/components/ui/link";
 import { useState } from "react";
@@ -10,8 +9,6 @@ import {
   Bot,
   GalleryVerticalEnd,
   Infinity as Infinito,
-  GraduationCap,
-  Trophy,
   Gift,
   Settings,
   Menu,
@@ -19,6 +16,9 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+
 
 /** Agrupado por intenção: trabalhar, crescer, conta. */
 const GRUPOS = [
@@ -33,15 +33,13 @@ const GRUPOS = [
   {
     titulo: "Recursos",
     itens: [
-      { href: "/painel/creditos", rotulo: "Créditos infinitos", icone: Infinito },
+      { href: "/painel/creditos", rotulo: "Créditos Nexofly", icone: Infinito },
       { href: "/painel/mentor", rotulo: "Mentor Nexofly", icone: Bot },
-      { href: "/painel/membros", rotulo: "Área de membros", icone: GraduationCap },
     ],
   },
   {
     titulo: "Conta",
     itens: [
-      { href: "/painel/premiacoes", rotulo: "Premiações", icone: Trophy },
       { href: "/painel/presente", rotulo: "Presente", icone: Gift },
       { href: "/painel/conta", rotulo: "Configurações", icone: Settings },
     ],
@@ -50,6 +48,20 @@ const GRUPOS = [
 
 function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
   const caminho = usePathname();
+  const { data: profile } = useQuery({
+    queryKey: ['profile-sidebar'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return null;
+      const { data } = await supabase.from("profiles").select("tier").eq("id", session.user.id).single();
+      return data;
+    }
+  });
+
+  const tier = profile?.tier || "free";
+  const labelPlano = tier === 'vitalicio' ? "Plano Vitalício" : tier === 'pro' ? "Plano Pro" : "Plano Gratuito";
+  const labelCreditos = tier === 'vitalicio' ? "Créditos Infinitos" : "Créditos Limitados";
+  const descPlano = tier === 'vitalicio' ? "Acesso liberado. Sem renovação." : tier === 'pro' ? "Assinatura ativa." : "Acesso limitado.";
 
   return (
     <div className="flex h-full flex-col gap-6 p-4">
@@ -84,6 +96,7 @@ function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
             <ul className="space-y-0.5">
               {grupo.itens.map((item) => {
                 const Icone = item.icone;
+                const rotulo = item.href === "/painel/creditos" ? labelCreditos : item.rotulo;
                 const ativo =
                   item.href === "/painel"
                     ? caminho === "/painel"
@@ -111,7 +124,7 @@ function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
                         className={cn("size-4 shrink-0", ativo && "text-chrome")}
                         strokeWidth={1.8}
                       />
-                      {item.rotulo}
+                      {rotulo}
                     </Link>
                   </li>
                 );
@@ -123,10 +136,10 @@ function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
 
       <div className="rounded-xl border border-chrome/20 bg-chrome/[0.06] p-4">
         <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-chrome-hi">
-          Plano vitalício
+          {labelPlano}
         </p>
         <p className="mt-1.5 text-[0.8rem] leading-relaxed text-stone">
-          Acesso liberado. Sem renovação.
+          {descPlano}
         </p>
       </div>
     </div>
