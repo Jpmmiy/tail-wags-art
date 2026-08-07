@@ -825,7 +825,68 @@ export function Quiz() {
         </div>
       )}
 
+      {revisando && (
+        <div className="fixed inset-0 z-[110] grid place-items-center bg-ink/90 p-6 backdrop-blur-md">
+          <div className="glass-deep max-w-2xl w-full overflow-hidden rounded-3xl p-8 ring-1 ring-white/10 space-y-8">
+            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+              <h2 className="font-display text-2xl font-bold text-bone">Revisão Final</h2>
+              <button onClick={() => setRevisando(false)} className="text-stone hover:text-bone text-sm">Cancelar</button>
+            </div>
+
+            <div className="grid gap-6 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between group">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-stone">Imóvel Selecionado</p>
+                    <p className="text-bone font-medium">{nomeExibicao}</p>
+                  </div>
+                  <button onClick={() => { setPasso(0); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
+                </div>
+
+                <div className="flex items-center justify-between group border-t border-white/5 pt-4">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-stone">Pacote de Entregáveis</p>
+                    <p className="text-bone font-medium">{entregaveis.map(e => PACOTE_CONFIG.find(p => p.id === e)?.rotulo).join(", ")}</p>
+                  </div>
+                  <button onClick={() => { setPasso(1); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
+                </div>
+
+                <div className="flex items-center justify-between group border-t border-white/5 pt-4">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-stone">Público-alvo & Estilo</p>
+                    <p className="text-bone font-medium capitalize">{publico} • {objetivoVideoTipo}</p>
+                  </div>
+                  <button onClick={() => { setPasso(1); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
+                </div>
+
+                <div className="flex items-center justify-between group border-t border-white/5 pt-4">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-stone">Recursos</p>
+                    <p className="text-bone font-medium">{possuiDrone ? "Com Drone" : "Sem Drone"} • {videoVertical ? "Vertical" : "Horizontal"}</p>
+                  </div>
+                  <button onClick={() => { setPasso(1); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-white/5 flex flex-col gap-4">
+              <button 
+                onClick={() => {
+                  setRevisando(false);
+                  setGerando(true);
+                }}
+                className="metal-pill w-full py-5 rounded-2xl text-black font-bold text-xl hover:scale-[1.02] transition-all shadow-2xl shadow-chrome/20 flex items-center justify-center gap-3"
+              >
+                <Sparkles className="size-5" /> Confirmar e Gerar
+              </button>
+              <p className="text-center text-[0.7rem] text-stone">Ao clicar em gerar, os créditos de IA serão utilizados.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {passo === 2 && (
+
         <div className="space-y-8 motion-safe:animate-rise pb-12">
             {/* BLOCO 1 — WHATSAPP */}
             <div className="glass p-6 rounded-2xl border-chrome/20 rim-lit">
