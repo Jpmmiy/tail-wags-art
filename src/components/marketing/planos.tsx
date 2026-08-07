@@ -28,22 +28,30 @@ function Marca({ ok }: { ok: boolean }) {
 export function Planos() {
   const [codigo, setCodigo] = useState("");
   const [aplicado, setAplicado] = useState<string | null>(null);
-  const [timer, setTimer] = useState("08:25:40");
+  const [timer, setTimer] = useState("08:00:00");
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const parts = timer.split(':').map(Number);
-      let s = parts[2], m = parts[1], h = parts[0];
-      
-      s--;
-      if (s < 0) { s = 59; m--; }
-      if (m < 0) { m = 59; h--; }
-      if (h < 0) { h = 23; }
-      
-      setTimer(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
-    }, 1000);
+    const updateTimer = () => {
+      const agora = new Date();
+      const meiaNoite = new Date();
+      meiaNoite.setHours(24, 0, 0, 0); // Próxima meia-noite
+
+      const diff = meiaNoite.getTime() - agora.getTime();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setTimer(
+        `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+      );
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [timer]);
+  }, []);
 
   const mensal = PLANOS.find((p) => p.id === "mensal")! as any;
   const vitalicio = PLANOS.find((p) => p.id === "vitalicio")! as any;
