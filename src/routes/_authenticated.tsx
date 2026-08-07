@@ -4,33 +4,32 @@ import { syncProjectsOnLogin } from '@/lib/persistence'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
-    console.log("[AUTH] 4. no início do beforeLoad de _authenticated na rota:", location.pathname);
-    
     const { data: { session } } = await supabase.auth.getSession()
-    console.log("[AUTH] 5. resultado getSession() no beforeLoad. temSessao:", !!session);
-
     if (!session) {
-      console.log("[AUTH] 6. Redirect para /auth");
       throw redirect({ 
         to: '/auth', 
-        search: { redirect: location.href } 
+        search: { 
+          redirect: location.href 
+        } 
       })
     }
 
-    if (session && (location.pathname === '/auth' || location.pathname === '/')) {
-      console.log("[AUTH] Redirect para /painel (já logado)");
-      throw redirect({ to: '/painel' });
-    }
+    // VERIFICAÇÃO DE ACESSO (TIER VITALÍCIO)
+    // Buscamos o perfil no banco para garantir que o tier é real e não do localStorage
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('tier')
+      .eq('id', session.user.id)
+      .single();
 
-    // REMOVIDO: syncProjectsOnLogin daqui para evitar chamadas duplicadas e bloqueios de guard.
-    // O onAuthStateChange em __root cuida disso de forma assíncrona.
+    // Se o usuário não for vitalício, você pode redirecionar ou limitar o acesso aqui
+    // No momento, deixaremos passar para o dashboard, mas a lógica de bloqueio
+    // de funcionalidades específicas deve ler o context.profile.tier retornado aqui.
 
-    return { session }
+    // Sincroniza rascunhos anônimos e recupera último ID no primeiro load autenticado
+    await syncProjectsOnLogin(session.user.id);
+
+    return { session, profile }
   },
-  component: AuthenticatedLayout,
+  component: () => <Outlet />,
 })
-
-function AuthenticatedLayout() {
-  console.log("[RENDER] 1. Início do componente AuthenticatedLayout (_authenticated.tsx)");
-  return <Outlet />;
-}

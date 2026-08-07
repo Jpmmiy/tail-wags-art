@@ -55,7 +55,7 @@ import { cn } from "@/lib/utils";
 import { saveProjectStep, loadProject, setCurrentProjectId, getCurrentProjectId } from "@/lib/persistence";
 import { toast } from "sonner";
 
-const TITULOS = ["Radar de Oportunidades", "Perfil do Imóvel", "Proposta"];
+const TITULOS = ["Radar de Oportunidades", "Personalização", "Fechamento"];
 
 const MODALIDADES = [
   { id: "temporada" as const, icone: Home, titulo: "Airbnb e temporada", desc: "Pousadas, chalés e casas anunciadas por diária." },
@@ -66,7 +66,7 @@ const PACOTE_CONFIG = [
   { id: "fotos", rotulo: "Fotos tratadas", icone: ImageIcon },
   { id: "video", rotulo: "Vídeo curto", icone: Clapperboard },
   { id: "site", rotulo: "Site com reserva direta", icone: LayoutTemplate },
-  { id: "abordagem", rotulo: "Script para WhatsApp", icone: MessageSquare },
+  { id: "abordagem", rotulo: "Proposta", icone: MessageSquare },
 ];
 
 function Progresso({ passo }: { passo: number }) {
@@ -124,15 +124,6 @@ export function Quiz() {
   const [projetoCarregado, setProjetoCarregado] = useState<any>(null);
   const [concluido, setConcluido] = useState(false);
 
-  // Novos estados de usabilidade
-  const [salvando, setSalvando] = useState(false);
-  const [ultimoSalvo, setUltimoSalvo] = useState<Date | null>(null);
-  const [erroSalvamento, setErroSalvamento] = useState(false);
-  const [revisando, setRevisando] = useState(false);
-  const [editandoConcluido, setEditandoConcluido] = useState(false);
-  const [errosValidacao, setErrosValidacao] = useState<string[]>([]);
-
-
   const resultadosFiltrados = useMemo(() => {
     let base = [...resultados];
     
@@ -157,12 +148,9 @@ export function Quiz() {
   }, [resultados, totalVarridos]);
 
   const exportarCSV = useCallback(() => {
-    if (resultadosFiltrados.length === 0) {
-      toast.error("Não há dados para exportar com os filtros atuais.");
-      return;
-    }
+    if (resultados.length === 0) return;
     const headers = ["Nome", "Endereço", "Score", "Faixa", "Telefone", "Site", "Link Maps"];
-    const rows = resultadosFiltrados.map(r => [
+    const rows = resultados.map(r => [
       r.nome,
       r.endereco,
       r.score?.total || 0,
@@ -183,7 +171,7 @@ export function Quiz() {
     link.click();
     document.body.removeChild(link);
     toast.success("CSV exportado com sucesso!");
-  }, [resultadosFiltrados, cidade]);
+  }, [resultados, cidade]);
 
   const ativarRadar = async (force: boolean = false) => {
     if (!cidade) {
@@ -192,15 +180,15 @@ export function Quiz() {
     }
 
     setBuscando(true);
-    setProgressoTexto("Iniciando radar de oportunidade...");
+    setProgressoTexto("Iniciando radar...");
     setResultados([]);
     setAtualizadoHa(null);
 
     const checkPoints = [
       "Localizando cidade...",
-      "Acessando base estratégica...",
-      "Varrendo oportunidades em " + cidade + "...",
-      "Analisando perfis similares...",
+      "Acessando base do Google...",
+      "Varrendo pousadas e chalés...",
+      "Identificando casas de temporada...",
       "Deduplicando resultados...",
       "Calculando Score de Oportunidade..."
     ];
@@ -211,45 +199,31 @@ export function Quiz() {
         setProgressoTexto(checkPoints[cpIdx]);
         cpIdx++;
       }
-    }, 1200);
+    }, 1500);
 
-    // MOCK RADAR DATA - Baseado na entrada manual do usuário
-    // Regra do Score Manual:
-    // 1. Demanda: Alta por ser cidade turística/comercial (Rating 4.7, 120 avaliações)
-    // 2. Gargalo Visual: Definido pela modalidade (Temporada tem mais gargalo que comercial)
-    // 3. Digital: Sempre "Sem site" para gerar oportunidade de venda de site
-    const mockProperty: ImovelEncontrado = {
-      id: "manual-" + Date.now(),
-      nome: manualNome || (modalidade === 'temporada' ? "Anúncio de Temporada" : "Imóvel Comercial"),
-      endereco: cidade + (regiaoId ? ", " + regiaoId : ""),
-      site: "", // Gerar oportunidade de site
-      telefone: "",
-      mapa: "",
-      nota: 4.5 + Math.random() * 0.4,
-      avaliacoes: 50 + Math.floor(Math.random() * 150),
-      fotos: 8 + Math.floor(Math.random() * 8), // 8-16 fotos (gargalo visual moderado)
-      airbnb: manualLink || "",
-      score: {
-        total: 75 + Math.floor(Math.random() * 15),
-        faixa: 'ALTA',
-        angulo: modalidade === 'temporada' ? 'Ângulo: qualidade visual e reserva direta' : 'Ângulo: prospecção digital ativa',
-        signals: [
-          "Demanda comprovada com boas avaliações",
-          "Presença digital dependente de terceiros",
-          "Gargalo visual: poucas fotos profissionais"
-        ]
-      }
-    };
-
-    setTimeout(async () => {
+    try {
+      const r = await fetch("/api/imoveis", { 
+        method: "POST", 
+        body: JSON.stringify({ modalidade, cidade, pais: paisId, regiao: regiaoId, forceRefresh: force }),
+        headers:{"Content-Type":"application/json"} 
+      });
+      const d = await r.json();
+      
+      if (d.erro) throw new Error(d.erro);
+      
+      setResultados(d.imoveis ?? []);
+      setTotalVarridos(d.total || d.imoveis?.length || 0);
+      if (d.fonte === 'cache') setAtualizadoHa(d.atualizado_ha);
+      
+      toast.success(d.fonte === 'cache' ? "Resultados carregados do cache." : "Radar concluído com sucesso!");
+    } catch (err: any) {
+      console.error('Erro no radar:', err);
+      toast.error(err.message || "Falha na varredura. Tente novamente.");
+    } finally {
       clearInterval(interval);
-      setResultados([mockProperty]);
-      setTotalVarridos(1);
-      setEscolhido(mockProperty); // Seleciona automaticamente o imóvel manual
       setBuscando(false);
       setProgressoTexto("");
-      toast.success("Radar concluído! Oportunidade identificada.");
-    }, 7000); // Tempo para a animação de varredura brilhar
+    }
   };
 
 
@@ -258,30 +232,16 @@ export function Quiz() {
   useEffect(() => {
     const resumeProject = async () => {
       const pid = getCurrentProjectId();
+      console.log("Attempting to resume project:", pid);
       if (pid) {
         try {
           const p = await loadProject(pid);
+          console.log("Project loaded:", p);
           if (p) {
-            setPasso(p.current_step ?? 0);
-            const props = p.properties?.[0] || {};
-            setModalidade(props.modalidade || p.modalidade);
-            setEscolhido(props.escolhido);
-            setPublico(props.publico || "casais");
-            setEntregaveis(props.entregaveis || ["video", "abordagem"]);
-            setDiaria(props.diaria || "250");
-            setEstilo(props.estilo || "aconchegante");
-            setCidade(props.cidade || "");
-            setPaisId(props.paisId || "BR");
-            setRegiaoId(props.regiaoId || "");
-            setObjetivo(props.objetivo);
-            setObjetivoVideoTipo(props.objetivoVideoTipo || "dinamico");
-            setPossuiDrone(props.possuiDrone || false);
-            setVideoVertical(props.videoVertical !== undefined ? props.videoVertical : true);
-            
+            setPasso(p.current_step || 0);
+            setModalidade(p.modalidade as Modalidade);
             setProjetoCarregado(p);
-            if (p.status === 'concluido' || p.status === 'em_producao') {
-              setConcluido(true);
-            }
+            if (p.status === 'concluido') setConcluido(true);
           }
         } catch (err) { 
           console.error("Error loading project in useEffect:", err); 
@@ -289,100 +249,24 @@ export function Quiz() {
       }
     };
 
-
     resumeProject();
   }, []);
 
 
 
   const autosave = async (step: number, status: any = 'rascunho') => {
-    setSalvando(true);
-    setErroSalvamento(false);
-    
     // Se for o passo de geração (agora passo 2, indo para fechamento)
     const finalStatus = step === 2 ? 'em_producao' : status;
-    
-    try {
-      const pid = await saveProjectStep(step, { 
-        modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis, objetivo, objetivoVideoTipo, possuiDrone, manualNome
-      }, finalStatus);
-      
-      if (pid) {
-        setCurrentProjectId(pid);
-        setUltimoSalvo(new Date());
-        return pid;
-      } else {
-        throw new Error("PROJETO_NAO_CRIADO");
-      }
-    } catch (err: any) {
-      console.error("Erro no autosave:", err);
-      setErroSalvamento(true);
-      
-      if (err.message === "SESSÃO_EXPIRADA") {
-        toast.error("Sessão expirada. Salve seus textos e faça login novamente.");
-        // Opcional: Salvar estado no localStorage para recuperação pós-login
-        localStorage.setItem('nexofly_recovery_state', JSON.stringify({
-          step, modalidade, publico, comodos, diaria, valorImobiliario, estilo, manualNome
-        }));
-      } else {
-        toast.error("Erro ao sincronizar. O rascunho está apenas no seu navegador.");
-      }
-      return null;
-    } finally {
-      setSalvando(false);
-    }
-  };
-
-  // Debounce para autosave do briefing (Passo 1 na UI, mas passo 2 no banco)
-  useEffect(() => {
-    if (passo === 1) {
-      const timer = setTimeout(() => {
-        autosave(1);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [publico, estilo, comodos, diaria, entregaveis, valorImobiliario]);
-
-  const validarPasso = (p: number) => {
-    const erros: string[] = [];
-    if (p === 0) {
-      if (!modalidade) erros.push("Selecione a modalidade do imóvel");
-      if (!cidade) erros.push("Selecione a cidade");
-      if (!escolhido && !manualNome) erros.push("Selecione ou insira um imóvel");
-    }
-    if (p === 1) {
-      if (entregaveis.length === 0) erros.push("Selecione pelo menos um material");
-      if (!publico) erros.push("Selecione o público-alvo");
-    }
-    setErrosValidacao(erros);
-    return erros.length === 0;
+    const pid = await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis, objetivo, objetivoVideoTipo, possuiDrone }, finalStatus);
+    if (pid) setCurrentProjectId(pid);
+    return pid;
   };
 
   const avancar = async (s: any = 'rascunho') => {
-    if (!validarPasso(passo)) {
-      errosValidacao.forEach(e => toast.error(e));
-      return;
-    }
-
     const proximo = passo + 1;
     
-    // BLOQUEADOR 2: Garantir que o projeto existe no banco antes de ir para o briefing (passo 1 na UI)
-    if (passo === 0) {
-      const pid = await autosave(0, s);
-      if (!pid) {
-        toast.error("Não foi possível iniciar o projeto no servidor. Tente novamente.");
-        return; // Impede avanço se o projeto não for criado/salvo
-      }
-    }
-
-    // Antes da geração final (indo para o passo 2), forçamos a revisão
-    if (proximo === 2 && !revisando && !editandoConcluido) {
-      setRevisando(true);
-      return;
-    }
-
-    // Mostra feedback visual se estiver indo para a geração
-    if (proximo === 2 && !editandoConcluido) {
+    // Mostra feedback visual
+    if (proximo === 2) {
       setGerando(true);
       return; 
     }
@@ -390,23 +274,16 @@ export function Quiz() {
     try {
       const pid = await autosave(proximo, s);
       
+      // Se temos um projeto, recarregamos para garantir que a SalaProducao tenha tudo
       if (pid) {
         const p = await loadProject(pid);
         if (p) setProjetoCarregado(p);
-        setPasso(proximo);
-        setRevisando(false);
-      } else if (proximo !== 2) { // Na geração o retorno do pid é tratado no finalizarGeracao
-        toast.error("Falha ao salvar progresso. Tente novamente.");
       }
+
+      setPasso(proximo);
     } catch (err) {
       console.error("Erro ao avançar:", err);
-    }
-  };
-
-  const voltar = () => {
-    if (passo > -1) {
-      setPasso(passo - 1);
-      setRevisando(false);
+      toast.error("Não foi possível salvar seu progresso. Tente novamente.");
     }
   };
 
@@ -430,7 +307,7 @@ export function Quiz() {
       console.error("Erro ao finalizar geração:", err);
     }
 
-    // Fallback absoluto
+    // Fallback absoluto: se o banco falhar, monta o objeto na memória e avança para não travar
     setProjetoCarregado({
       id: getCurrentProjectId() || 'temp-' + Date.now(),
       status: 'em_producao',
@@ -439,7 +316,6 @@ export function Quiz() {
     });
     setPasso(proximoPasso);
   };
-
 
 
   const nomeExibicao = useMemo(() => {
@@ -451,27 +327,24 @@ export function Quiz() {
 
   const whatsMessage = useMemo(() => {
     if (!escolhido) return "";
-    const businessName = (projetoCarregado?.user_profile as any)?.business_name || "Nexofly";
     const dadoReal = escolhido.nota 
       ? `${escolhido.nota} com ${escolhido.avaliacoes} avaliações` 
       : escolhido.avaliacoes 
         ? `${escolhido.avaliacoes} avaliações`
         : "o potencial de mercado";
     
-    return `Oi! Aqui é do ${businessName}. Vi o anúncio do ${nomeExibicao} — ${dadoReal} mostra que é um excelente produto.\nReparei que o material visual ainda não acompanha esse nível, o que acaba segurando o clique de muitos interessados.\nMontei uma estratégia de renovação visual para valorizar o imóvel. Posso te mandar os detalhes?`;
-  }, [escolhido, nomeExibicao, projetoCarregado]);
+    return `Oi! Vi o anúncio do ${nomeExibicao} — ${dadoReal} mostra que é um excelente produto.\nReparei que o material visual ainda não acompanha esse nível, o que acaba segurando o clique de muitos interessados.\nMontei uma estratégia de renovação visual e um roteiro de vídeo curto para valorizar o imóvel. Sem compromisso.\nPosso te mandar os detalhes aqui?`;
+  }, [escolhido, nomeExibicao]);
 
 
 
   const precos = useMemo(() => {
-    const table = (projetoCarregado?.user_profile as any)?.pricing_table;
     return calculatePricing(
       Number(modalidade === 'temporada' ? diaria : valorImobiliario), 
       modalidade || 'temporada',
-      entregaveis,
-      table
+      entregaveis
     );
-  }, [modalidade, diaria, valorImobiliario, entregaveis, projetoCarregado]);
+  }, [modalidade, diaria, valorImobiliario, entregaveis]);
 
 
 
@@ -480,39 +353,10 @@ export function Quiz() {
       {gerando && <TelaGeracao aoTerminar={finalizarGeracao} />}
       {/* A Sala de Produção foi removida como tela independente e integrada ao Fechamento */}
 
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          {passo > -1 && !concluido && (
-            <button onClick={voltar} className="size-10 rounded-xl bg-white/5 border border-white/10 grid place-items-center text-stone hover:text-bone transition-colors">
-              <ArrowLeft className="size-5" />
-            </button>
-          )}
-          <h1 className="font-display text-3xl font-semibold text-bone">{TITULOS[passo]}</h1>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          {salvando && (
-            <div className="flex items-center gap-2 text-stone text-[0.8rem]">
-              <Loader2 className="size-3 animate-spin" />
-              <span>Salvando...</span>
-            </div>
-          )}
-          {!salvando && ultimoSalvo && (
-            <div className="text-stone/60 text-[0.7rem] flex items-center gap-1.5">
-              <div className="size-1.5 rounded-full bg-chrome/50" />
-              Salvo às {ultimoSalvo.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </div>
-          )}
-          {erroSalvamento && (
-            <button onClick={() => autosave(passo)} className="text-red-400 text-[0.8rem] flex items-center gap-1.5 hover:underline">
-              <RotateCcw className="size-3" />
-              Falha ao salvar. Tentar novamente?
-            </button>
-          )}
-        </div>
+      <header>
+        <h1 className="font-display text-3xl font-semibold text-bone">{TITULOS[passo]}</h1>
       </header>
       {passo >= 0 && <Progresso passo={passo} />}
-
 
 
 
@@ -540,7 +384,7 @@ export function Quiz() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-display font-semibold text-bone">Fluxo de Vídeos</h3>
-                  <p className="text-sm text-stone mt-1">Roteiros profissionais para Airbnb e handoff direto para Materiais Gerados.</p>
+                  <p className="text-sm text-stone mt-1">Roteiros profissionais para Airbnb e handoff direto para Google Flow.</p>
                 </div>
                 <ChevronRight className="size-6 text-stone group-hover:text-chrome transition-colors" />
               </div>
@@ -771,8 +615,7 @@ export function Quiz() {
           
           <div className="space-y-6">
             <div className="space-y-3">
-              <label className="text-sm font-medium text-bone">Quais materiais vamos entregar para o cliente?</label>
-
+              <label className="text-sm font-medium text-bone">O que vamos entregar para o cliente?</label>
               <div className="grid grid-cols-2 gap-4">
                 {PACOTE_CONFIG.map(p => (
                     <button 
@@ -868,74 +711,12 @@ export function Quiz() {
         </div>
       )}
 
-      {revisando && (
-        <div className="fixed inset-0 z-[110] grid place-items-center bg-ink/90 p-6 backdrop-blur-md">
-          <div className="glass-deep max-w-2xl w-full overflow-hidden rounded-3xl p-8 ring-1 ring-white/10 space-y-8">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4">
-              <h2 className="font-display text-2xl font-bold text-bone">Revisão Final</h2>
-              <button onClick={() => setRevisando(false)} className="text-stone hover:text-bone text-sm">Cancelar</button>
-            </div>
-
-            <div className="grid gap-6 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between group">
-                  <div>
-                    <p className="text-[10px] uppercase font-bold text-stone">Imóvel Selecionado</p>
-                    <p className="text-bone font-medium">{nomeExibicao}</p>
-                  </div>
-                  <button onClick={() => { setPasso(0); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
-                </div>
-
-                <div className="flex items-center justify-between group border-t border-white/5 pt-4">
-                  <div>
-                    <p className="text-[10px] uppercase font-bold text-stone">Materiais Selecionados</p>
-                    <p className="text-bone font-medium">{entregaveis.map(e => PACOTE_CONFIG.find(p => p.id === e)?.rotulo).join(", ")}</p>
-                  </div>
-
-                  <button onClick={() => { setPasso(1); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
-                </div>
-
-                <div className="flex items-center justify-between group border-t border-white/5 pt-4">
-                  <div>
-                    <p className="text-[10px] uppercase font-bold text-stone">Público-alvo & Estilo</p>
-                    <p className="text-bone font-medium capitalize">{publico} • {objetivoVideoTipo}</p>
-                  </div>
-                  <button onClick={() => { setPasso(1); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
-                </div>
-
-                <div className="flex items-center justify-between group border-t border-white/5 pt-4">
-                  <div>
-                    <p className="text-[10px] uppercase font-bold text-stone">Recursos</p>
-                    <p className="text-bone font-medium">{possuiDrone ? "Com Drone" : "Sem Drone"} • {videoVertical ? "Vertical" : "Horizontal"}</p>
-                  </div>
-                  <button onClick={() => { setPasso(1); setRevisando(false); }} className="text-chrome text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">EDITAR</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-white/5 flex flex-col gap-4">
-              <button 
-                onClick={() => {
-                  setRevisando(false);
-                  setGerando(true);
-                }}
-                className="metal-pill w-full py-5 rounded-2xl text-black font-bold text-xl hover:scale-[1.02] transition-all shadow-2xl shadow-chrome/20 flex items-center justify-center gap-3"
-              >
-                <Sparkles className="size-5" /> Confirmar e Gerar
-              </button>
-              <p className="text-center text-[0.7rem] text-stone">Ao clicar em gerar, os créditos de IA serão utilizados.</p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {passo === 2 && (
-
         <div className="space-y-8 motion-safe:animate-rise pb-12">
             {/* BLOCO 1 — WHATSAPP */}
             <div className="glass p-6 rounded-2xl border-chrome/20 rim-lit">
                 <h3 className="text-bone font-medium flex items-center gap-2 mb-4">
-                    <MessageCircle className="size-4 text-chrome" /> Script para WhatsApp
+                    <MessageCircle className="size-4 text-chrome" /> Abordagem WhatsApp
                 </h3>
                 <div className="p-4 bg-white/[0.03] rounded-xl text-[0.9rem] text-bone italic border-l-2 border-chrome whitespace-pre-wrap">
                     {whatsMessage}
@@ -969,9 +750,8 @@ export function Quiz() {
                     <Clapperboard className="size-5" />
                   </div>
                   <div>
-                    <h3 className="text-bone font-medium text-lg">Handoff para Materiais Gerados</h3>
+                    <h3 className="text-bone font-medium text-lg">Handoff para Produção</h3>
                     <p className="text-[10px] text-stone uppercase font-bold tracking-wider">Técnica Frames-to-Video no Google Flow</p>
-
                   </div>
                 </div>
                 
@@ -989,68 +769,6 @@ export function Quiz() {
                       } as any)}
                     </p>
                   </div>
-                  
-                  {/* Edição de Concluído */}
-                  <div className="pt-6 border-t border-white/5">
-                    {!editandoConcluido ? (
-                      <button 
-                        onClick={() => setEditandoConcluido(true)}
-                        className="text-stone hover:text-chrome text-xs font-bold flex items-center gap-2 transition-colors mx-auto"
-                      >
-                        <PenLine className="size-3" /> Editar respostas deste projeto
-                      </button>
-                    ) : (
-                      <div className="space-y-6 motion-safe:animate-rise">
-                         <div className="flex items-center justify-between">
-                            <h4 className="text-bone font-medium text-sm">Ajustar Estratégia</h4>
-                            <button onClick={() => setEditandoConcluido(false)} className="text-stone text-xs">Fechar</button>
-                         </div>
-                         
-                         <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                               <label className="text-[10px] uppercase font-bold text-stone">Estilo</label>
-                               <select 
-                                 value={objetivoVideoTipo}
-                                 onChange={(e) => setObjetivoVideoTipo(e.target.value as any)}
-                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-bone"
-                               >
-                                  <option value="dinamico">Dinâmico</option>
-                                  <option value="cinematografico">Cinematográfico</option>
-                                  <option value="institucional">Institucional</option>
-                               </select>
-                            </div>
-                            <div className="space-y-2">
-                               <label className="text-[10px] uppercase font-bold text-stone">Público</label>
-                               <select 
-                                 value={publico}
-                                 onChange={(e) => setPublico(e.target.value)}
-                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-bone"
-                               >
-                                  <option value="casais">Casais</option>
-                                  <option value="famílias">Famílias</option>
-                                  <option value="trabalho">Trabalho</option>
-                               </select>
-                            </div>
-                         </div>
-                         
-                         <button 
-                           onClick={async () => {
-                             const confirm = window.confirm("Deseja regerar os materiais com as novas configurações? Isso atualizará os prompts.");
-                             if (confirm) {
-                               await autosave(2, 'em_producao');
-
-                               setEditandoConcluido(false);
-                               toast.success("Estratégia atualizada!");
-                             }
-                           }}
-                           className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-bone text-xs font-bold hover:bg-white/10 transition-all"
-                         >
-                           Salvar Alterações
-                         </button>
-                      </div>
-                    )}
-                  </div>
-
 
                   <div className="flex flex-col gap-3">
                     <button 
@@ -1095,7 +813,7 @@ export function Quiz() {
                 <button 
                     onClick={() => { 
                         autosave(passo, 'aguardando_resposta'); 
-                        window.location.href='/painel/projetos'; 
+                        window.location.href='/projetos'; 
                     }} 
                     className="w-full py-3 rounded-2xl text-stone hover:text-bone transition-all text-xs"
                 >
@@ -1110,12 +828,8 @@ export function Quiz() {
 
       {concluido && (
         <TelaConcluida 
-          aoVoltar={() => window.location.href = '/painel/projetos'} 
-          aoNovo={() => {
-            setCurrentProjectId(null);
-            window.location.href = '/painel/criar';
-          }} 
-
+          aoVoltar={() => window.location.href = '/projetos'} 
+          aoNovo={() => window.location.href = '/'} 
         />
       )}
     </div>
