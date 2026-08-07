@@ -6,7 +6,7 @@ import { Wordmark } from "./wordmark";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pb-20 pt-28 sm:pt-32 lg:pb-20 lg:pt-32">
+    <section className="relative overflow-hidden pb-20 pt-28 sm:pt-32 lg:pb-20 lg:pt-32" style={{ contentVisibility: 'visible' }}>
       <LiquidBackdrop />
       <div aria-hidden className="blueprint absolute inset-0 opacity-25" />
 
