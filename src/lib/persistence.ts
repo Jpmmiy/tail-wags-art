@@ -161,7 +161,7 @@ export const saveDeliverable = async (projectId: string, shotData: any) => {
     .eq("tipo", shotData.tipo)
     .maybeSingle();
 
-  const deliverableData = {
+  const deliverableData: any = {
     project_id: projectId,
     shot_number: shotData.shot_number,
     conteudo: shotData.conteudo,

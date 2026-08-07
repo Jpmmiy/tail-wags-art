@@ -12,7 +12,8 @@ import {
   ExternalLink,
   Download,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Building2
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';

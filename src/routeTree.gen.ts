@@ -22,6 +22,7 @@ import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedPainelIndexRouteImport } from './routes/_authenticated/painel.index'
 import { Route as ApiPublicWebhookRouteImport } from './routes/api/public/webhook'
 import { Route as ApiPublicProtocoloRouteImport } from './routes/api/public/protocolo'
+import { Route as AuthenticatedProjetoIdRouteImport } from './routes/_authenticated/projeto.$id'
 import { Route as AuthenticatedPainelProjetosRouteImport } from './routes/_authenticated/painel.projetos'
 import { Route as AuthenticatedPainelCriarRouteImport } from './routes/_authenticated/painel.criar'
 
@@ -90,6 +91,11 @@ const ApiPublicProtocoloRoute = ApiPublicProtocoloRouteImport.update({
   path: '/api/public/protocolo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProjetoIdRoute = AuthenticatedProjetoIdRouteImport.update({
+  id: '/projeto/$id',
+  path: '/projeto/$id',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedPainelProjetosRoute =
   AuthenticatedPainelProjetosRouteImport.update({
     id: '/projetos',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/api/mentor': typeof ApiMentorRoute
   '/painel/criar': typeof AuthenticatedPainelCriarRoute
   '/painel/projetos': typeof AuthenticatedPainelProjetosRoute
+  '/projeto/$id': typeof AuthenticatedProjetoIdRoute
   '/api/public/protocolo': typeof ApiPublicProtocoloRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
   '/painel/': typeof AuthenticatedPainelIndexRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/api/mentor': typeof ApiMentorRoute
   '/painel/criar': typeof AuthenticatedPainelCriarRoute
   '/painel/projetos': typeof AuthenticatedPainelProjetosRoute
+  '/projeto/$id': typeof AuthenticatedProjetoIdRoute
   '/api/public/protocolo': typeof ApiPublicProtocoloRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
   '/painel': typeof AuthenticatedPainelIndexRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/api/mentor': typeof ApiMentorRoute
   '/_authenticated/painel/criar': typeof AuthenticatedPainelCriarRoute
   '/_authenticated/painel/projetos': typeof AuthenticatedPainelProjetosRoute
+  '/_authenticated/projeto/$id': typeof AuthenticatedProjetoIdRoute
   '/api/public/protocolo': typeof ApiPublicProtocoloRoute
   '/api/public/webhook': typeof ApiPublicWebhookRoute
   '/_authenticated/painel/': typeof AuthenticatedPainelIndexRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/api/mentor'
     | '/painel/criar'
     | '/painel/projetos'
+    | '/projeto/$id'
     | '/api/public/protocolo'
     | '/api/public/webhook'
     | '/painel/'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/api/mentor'
     | '/painel/criar'
     | '/painel/projetos'
+    | '/projeto/$id'
     | '/api/public/protocolo'
     | '/api/public/webhook'
     | '/painel'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/api/mentor'
     | '/_authenticated/painel/criar'
     | '/_authenticated/painel/projetos'
+    | '/_authenticated/projeto/$id'
     | '/api/public/protocolo'
     | '/api/public/webhook'
     | '/_authenticated/painel/'
@@ -309,6 +321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicProtocoloRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/projeto/$id': {
+      id: '/_authenticated/projeto/$id'
+      path: '/projeto/$id'
+      fullPath: '/projeto/$id'
+      preLoaderRoute: typeof AuthenticatedProjetoIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/painel/projetos': {
       id: '/_authenticated/painel/projetos'
       path: '/projetos'
@@ -344,11 +363,13 @@ const AuthenticatedPainelRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRouteWithChildren
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedProjetoIdRoute: typeof AuthenticatedProjetoIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPainelRoute: AuthenticatedPainelRouteWithChildren,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedProjetoIdRoute: AuthenticatedProjetoIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
