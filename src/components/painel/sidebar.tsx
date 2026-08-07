@@ -65,11 +65,12 @@ function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
       <Link
         href="/painel/criar"
         onClick={aoNavegar}
-        className="group relative flex h-11 items-center justify-center gap-2 overflow-hidden rounded-xl metal-pill text-[0.88rem] font-semibold text-[#08090B] shadow-[0_10px_26px_-12px_rgba(255,255,255,0.32)] transition-transform hover:-translate-y-0.5"
+        className="group relative flex h-11 items-center justify-center gap-2 overflow-hidden rounded-xl metal-pill text-[0.88rem] font-semibold text-[#08090B] shadow-[0_20px_40px_-12px_rgba(255,255,255,0.4)] transition-all hover:-translate-y-1 active:scale-95"
       >
-        <Wand2 className="size-4" strokeWidth={2} />
-        Nova entrega
+        <Wand2 className="size-4" strokeWidth={2.5} />
+        Criar novo projeto
       </Link>
+
 
       <nav
         aria-label="Seções da plataforma"
