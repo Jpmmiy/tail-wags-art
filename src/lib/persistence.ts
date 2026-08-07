@@ -26,6 +26,7 @@ export const setCurrentProjectId = (id: string | null) => {
 };
 
 export const saveProjectStep = async (step: number, data: any, status: 'rascunho' | 'aguardando_resposta' | 'em_producao' | 'concluido' = 'rascunho') => {
+  console.log("Saving project step:", step, "Status:", status);
   const sessionId = getSessionId();
   const projectId = getCurrentProjectId();
   const { data: { session } } = await supabase.auth.getSession();
