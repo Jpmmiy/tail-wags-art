@@ -74,9 +74,9 @@ export function generateVideoPrompts(respostas: Respostas, vertical: boolean) {
   return VIDEO_SHOTS.map((shot, index) => {
     const atmosphere = atmospheres[index % atmospheres.length];
     
-    const templateEn = "Use the reference image as the first frame. Preserve the exact architecture, furniture, colors and straight-line geometry of the original image. {camera} Lighting: {light}, side incidence, soft elongated shadows. Atmosphere: {atmosphere}. Do not include: people, text, logos, watermarks, warped straight lines, layout or furniture changes, abrupt zoom, wall color changes. Ambient audio: {audio}. Duration: 8 seconds. Aspect ratio: {ratio}.";
+    const templateEn = "Use the reference image as the first frame. Preserve the exact architecture, furniture, colors and straight-line geometry of the original image. {camera} Lighting: {light}, side incidence, soft elongated shadows. Atmosphere: {atmosphere}. Do not include: people, text, logos, watermarks, warped straight lines, layout or furniture changes, abrupt zoom, wall color changes. Ambient audio: {audio}. Duration: 20 seconds. Aspect ratio: {ratio}.";
     
-    const templatePt = "Use a imagem de referência como o primeiro frame. Preserve a arquitetura exata, móveis, cores e a geometria de linhas retas da imagem original. {camera} Iluminação: {light}, incidência lateral, sombras suaves e alongadas. Atmosfera: {atmosphere}. Não inclua: pessoas, texto, logos, marcas d'água, linhas retas distorcidas, mudanças de layout ou móveis, zoom abrupto, mudanças na cor da parede. Áudio ambiente: {audio}. Duração: 8 segundos. Proporção: {ratio}.";
+    const templatePt = "Use a imagem de referência como o primeiro frame. Preserve a arquitetura exata, móveis, cores e a geometria de linhas retas da imagem original. {camera} Iluminação: {light}, incidência lateral, sombras suaves e alongadas. Atmosfera: {atmosphere}. Não inclua: pessoas, texto, logos, marcas d'água, linhas retas distorcidas, mudanças de layout ou móveis, zoom abrupto, mudanças na cor da parede. Áudio ambiente: {audio}. Duração: 20 segundos. Proporção: {ratio}.";
 
     const cameraEn = shot.camera_en.replace("{highlight}", highlight).replace("{detail}", detail);
     const cameraPt = shot.camera_pt.replace("{highlight}", highlight).replace("{detail}", detail);
