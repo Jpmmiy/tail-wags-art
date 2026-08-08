@@ -184,7 +184,7 @@ export const Route = createFileRoute("/api/mentor")({
             if (!retryableStatus || attempt === MAX_RETRIES) break;
 
             attempt++;
-            const backoff = Math.pow(2, attempt) * 1500; // Backoff um pouco maior
+            const backoff = 1000; // Backoff fixo e curto para rapidez
             console.warn(`[Mentor] Erro ${resposta.status}. Tentativa ${attempt} em ${backoff}ms...`);
             await new Promise(r => setTimeout(r, backoff));
           } catch (e) {
