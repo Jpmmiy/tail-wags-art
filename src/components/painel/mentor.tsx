@@ -175,6 +175,8 @@ export function Mentor() {
       }
       const aviso =
         e instanceof Error ? e.message : "Não consegui responder agora por causa de uma falha na conexão.";
+      // Remove o aviso de erro de autenticação se for apenas falta de sessão no catch inicial, mas mantém erros reais de IA
+      if (aviso.includes("precisa estar logado")) return;
       setMsgs((m) => m.map((x) => (x.id === id ? { ...x, texto: `⚠️ ${aviso}` } : x)));
     } finally {
       setEscrevendo(false);
