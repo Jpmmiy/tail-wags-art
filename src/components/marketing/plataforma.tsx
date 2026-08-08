@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Monitor, Smartphone, Play } from "lucide-react";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
+import plataformaDesktopAsset from "@/assets/plataforma-desktop.mov.asset.json";
 import { cn } from "@/lib/utils";
 
 type Tela = "computador" | "celular";
