@@ -52,7 +52,7 @@ function Palco({ tela }: { tela: Tela }) {
           playsInline
           preload="none"
         >
-          <source src={arquivo} type="video/mp4" />
+          <source src={arquivo} type={tela === "computador" ? "video/quicktime" : "video/mp4"} />
         </video>
       </div>
     </div>
