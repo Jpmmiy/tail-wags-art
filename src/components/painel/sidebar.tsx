@@ -128,6 +128,18 @@ function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
           Acesso liberado.
         </p>
       </div>
+
+      <button
+        type="button"
+        onClick={async () => {
+          await supabase.auth.signOut();
+          window.location.href = "/auth";
+        }}
+        className="mt-3 flex w-full items-center gap-3 rounded-lg border border-white/10 px-3 py-2 text-[0.86rem] text-stone transition-colors hover:border-white/20 hover:bg-white/5 hover:text-bone"
+      >
+        <LogOut className="size-4 shrink-0" strokeWidth={1.8} />
+        Sair da conta
+      </button>
     </div>
   );
 }
