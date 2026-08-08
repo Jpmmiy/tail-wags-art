@@ -91,7 +91,7 @@ export const Route = createFileRoute("/api/mentor")({
 
         // PASSO 2 — LIMITES
         const ip = request.headers.get("x-forwarded-for") || "unknown";
-        const limitCheck = await checkAiLimits(session.user.id, ip);
+        const limitCheck = await checkAiLimits(currentUser.id, ip);
         if (!limitCheck.allowed) {
           return json({ erro: limitCheck.reason }, 429);
         }
