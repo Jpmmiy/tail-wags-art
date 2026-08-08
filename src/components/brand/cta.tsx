@@ -41,11 +41,15 @@ export function Cta({
   children,
   size = "md",
   className,
+  target,
+  rel,
 }: {
   href: string;
   children: React.ReactNode;
   size?: Size;
   className?: string;
+  target?: string;
+  rel?: string;
 }) {
   const { ref, onMove, onLeave } = useTilt<HTMLAnchorElement>();
 
@@ -53,6 +57,8 @@ export function Cta({
     <Link
       ref={ref}
       href={href}
+      target={target}
+      rel={rel}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
       className={cn(
