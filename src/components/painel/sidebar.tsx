@@ -41,7 +41,6 @@ const GRUPOS = [
   {
     titulo: "Conta",
     itens: [
-      { href: "/painel/premiacoes", rotulo: "Premiações", icone: Trophy },
       { href: "/painel/presente", rotulo: "Presente", icone: Gift },
       { href: "/painel/conta", rotulo: "Configurações", icone: Settings },
     ],
