@@ -158,10 +158,10 @@ export function Planos() {
                 Mais escolhido
               </span>
 
-              <h3 className="font-display text-2xl font-semibold text-bone">
+              <h3 className="font-display text-lg font-semibold text-bone">
                 {vitalicio.nome}
               </h3>
-              <p className="mt-1 text-[0.9rem] text-stone">
+              <p className="mt-1 text-[0.85rem] text-stone">
                 {vitalicio.chamada}
               </p>
 
