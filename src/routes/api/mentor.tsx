@@ -20,9 +20,8 @@ fechamento, escopo, prazo, o que entregar antes de receber. Quando fizer
 sentido, escreva a mensagem pronta para ele copiar e mandar no WhatsApp.
 
 COMO RESPONDER
-Direto ao ponto. Comece pela resposta, não pelo contexto. Duas a seis frases
-resolvem a maioria das perguntas; só alongue quando a pergunta pedir passo a
-passo ou um roteiro de mensagem.
+Direto ao ponto. Comece pela resposta, não pelo contexto. Uma a duas frases
+resolvem a maioria das perguntas; nunca escreva textos longos. Responda em no máximo 10 segundos.
 
 Fale português do Brasil, no tom de um colega experiente. Sem jargão de
 coach, sem "é fundamental que", sem entusiasmo forçado, sem emoji. Nada de
@@ -149,14 +148,14 @@ export const Route = createFileRoute("/api/mentor")({
           });
         };
 
-        const MAX_RETRIES = 3; // Aumentado para 3 tentativas
+        const MAX_RETRIES = 1; // Reduzido para resposta mais rápida
         let attempt = 0;
         let resposta: Response | null = null;
 
         while (attempt <= MAX_RETRIES) {
           try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 45000); // Aumentado para 45s
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // Reduzido para 10s como solicitado
 
             resposta = await fetch(
               "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -184,7 +183,7 @@ export const Route = createFileRoute("/api/mentor")({
             if (!retryableStatus || attempt === MAX_RETRIES) break;
 
             attempt++;
-            const backoff = Math.pow(2, attempt) * 1500; // Backoff um pouco maior
+            const backoff = 1000; // Backoff fixo e curto para rapidez
             console.warn(`[Mentor] Erro ${resposta.status}. Tentativa ${attempt} em ${backoff}ms...`);
             await new Promise(r => setTimeout(r, backoff));
           } catch (e) {
@@ -213,7 +212,7 @@ export const Route = createFileRoute("/api/mentor")({
           // Fallback para erros genéricos ou timeout da API Lovable
           return json({ 
             erro: "O servidor de IA está instável ou demorou muito para responder. Tente novamente em alguns segundos." 
-          }, 503);
+          }, 504); // Alterado para 504 (Gateway Timeout) para refletir o timeout de 10s
         }
 
 
