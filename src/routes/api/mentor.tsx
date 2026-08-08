@@ -180,16 +180,19 @@ export const Route = createFileRoute("/api/mentor")({
         if (!resposta || !resposta.ok || !resposta.body) {
           const detalhe = resposta ? await resposta.text() : "Sem resposta da rede";
           console.error(`Falha no Mentor [${resposta?.status}]: ${detalhe}`);
+          
+          // Se for erro de cota ou rede, tentamos retornar uma mensagem amigável em vez de 504
           if (resposta?.status === 429) {
             return json({ erro: "Muitos pedidos agora. Tente em instantes." }, 429);
           }
           if (resposta?.status === 402) {
-            return json(
-              { erro: "Os créditos de IA do espaço acabaram." },
-              402,
-            );
+            return json({ erro: "Os créditos de IA do espaço acabaram." }, 402);
           }
-          return json({ erro: "A IA não conseguiu responder no tempo limite." }, 504);
+          
+          // Fallback para erros genéricos ou timeout da API Lovable
+          return json({ 
+            erro: "O servidor de IA está instável ou demorou muito para responder. Tente novamente em alguns segundos." 
+          }, 503);
         }
 
 
