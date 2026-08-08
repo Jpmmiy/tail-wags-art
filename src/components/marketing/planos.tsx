@@ -147,7 +147,7 @@ export function Planos() {
 
           {/* vitalício */}
           <Reveal delay={120}>
-            <article className="glass-deep rim-lit specular relative flex h-full flex-col rounded-[1.75rem] p-7 shadow-[0_40px_100px_-30px_rgba(255,255,255,0.18)] transition-all duration-500 hover:-translate-y-1.5 sm:p-8">
+            <article className="glass-deep rim-lit specular relative flex h-full flex-col rounded-3xl p-7 shadow-2xl transition-all duration-500 hover:-translate-y-1">
               <div className="absolute -right-2 -top-4 z-10 flex animate-bounce items-center gap-1.5 rounded-full bg-red-600 px-4 py-2 text-[0.75rem] font-bold uppercase tracking-wider text-white shadow-xl shadow-red-600/20">
                 <Flame className="size-4 fill-white" />
                 Restam apenas 3 vitalícios
