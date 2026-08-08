@@ -188,15 +188,15 @@ export function Planos() {
                         {vitalicio.parcelas}
                       </span>
                     )}
-                    <span className="font-display text-[1.5rem] text-stone">
+                    <span className="font-display text-[1.2rem] text-stone">
                       R$
                     </span>
-                    <span className="metal-text font-display text-[3.8rem] font-semibold leading-none tracking-[-0.04em] sm:text-[4.2rem]">
+                    <span className="metal-text font-display text-[2.7rem] font-semibold leading-none tracking-[-0.035em] text-bone">
                       {vitalicio.preco}
                     </span>
                   </p>
                 </div>
-                <div className="pb-1.5">
+                <div className="pb-0.5">
                   <p className="text-[0.86rem] uppercase tracking-widest text-blue-400 font-bold">
                     {vitalicio.periodo}
                   </p>
