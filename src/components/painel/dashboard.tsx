@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useEffect } from "react";
+import { useId, useEffect, useMemo } from "react";
 import { Link } from "@/components/ui/link";
 import {
   Wand2,
@@ -16,6 +16,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { useDemo, mesCorrente, ZERADO, type Painel } from "@/lib/demo";
+import { useProtocoloStore } from "@/lib/protocolo";
 import { cn } from "@/lib/utils";
 
 const MESES = [
@@ -44,7 +45,7 @@ const MESES_LONGOS = [
   "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
 ];
 
-function Faturamento({ d }: { d: Painel }) {
+function Faturamento({ d, protocoloAtivo, overrides }: { d: Painel; protocoloAtivo: boolean; overrides: any }) {
   // Comparação real entre o mês corrente e o anterior, tirada do fluxo.
   const m = mesCorrente();
   const atual = d.fluxo[m] ?? 0;
@@ -89,7 +90,7 @@ function Faturamento({ d }: { d: Painel }) {
           </p>
 
           <p className="metal-text mt-3 font-display text-[3.4rem] font-semibold leading-[0.95] tabular-nums sm:text-[4.4rem]">
-            {brl(d.faturado)}
+            {protocoloAtivo && overrides.totalVendas ? overrides.totalVendas : brl(d.faturado)}
           </p>
 
           {variacao !== null && (
@@ -483,13 +484,25 @@ function Atividade({ d }: { d: Painel }) {
 export function Dashboard() {
   console.log("[RENDER] 3: Dashboard component start");
   const { ligado: demo, dados } = useDemo();
+  const { enabled: protocoloAtivo, overrides, fetchSettings } = useProtocoloStore();
   
   useEffect(() => {
     console.log("[RENDER] 4: Dashboard mounted (useEffect)");
-  }, []);
+    fetchSettings();
+  }, [fetchSettings]);
 
-  const d = demo ? dados : ZERADO;
-  console.log("[RENDER] 5: Rendering Dashboard with demo:", demo);
+  const d = useMemo(() => {
+    const base = demo ? dados : ZERADO;
+    if (!protocoloAtivo) return base;
+
+    return {
+      ...base,
+      faturado: overrides.totalVendas ? parseFloat(overrides.totalVendas.replace(/[^\d]/g, '')) : base.faturado,
+      entregas: overrides.projetosConcluidos ? parseInt(overrides.projetosConcluidos, 10) : base.entregas,
+    };
+  }, [demo, dados, protocoloAtivo, overrides]);
+
+  console.log("[RENDER] 5: Rendering Dashboard with demo:", demo, "protocolo:", protocoloAtivo);
 
   return (
     <div className="space-y-5">
@@ -524,7 +537,7 @@ export function Dashboard() {
 
       </header>
 
-      <Faturamento d={d} />
+      <Faturamento d={d} protocoloAtivo={protocoloAtivo} overrides={overrides} />
 
       <div className="grid gap-4 xl:grid-cols-[1.75fr_1fr]">
         <Fluxo d={d} />
