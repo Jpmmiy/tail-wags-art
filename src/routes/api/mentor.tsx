@@ -20,9 +20,8 @@ fechamento, escopo, prazo, o que entregar antes de receber. Quando fizer
 sentido, escreva a mensagem pronta para ele copiar e mandar no WhatsApp.
 
 COMO RESPONDER
-Direto ao ponto. Comece pela resposta, não pelo contexto. Duas a seis frases
-resolvem a maioria das perguntas; só alongue quando a pergunta pedir passo a
-passo ou um roteiro de mensagem.
+Direto ao ponto. Comece pela resposta, não pelo contexto. UMA a duas frases
+resolvem a maioria das perguntas; nunca escreva textos longos. Responda em no máximo 5 segundos.
 
 Fale português do Brasil, no tom de um colega experiente. Sem jargão de
 coach, sem "é fundamental que", sem entusiasmo forçado, sem emoji. Nada de
@@ -213,7 +212,7 @@ export const Route = createFileRoute("/api/mentor")({
           // Fallback para erros genéricos ou timeout da API Lovable
           return json({ 
             erro: "O servidor de IA está instável ou demorou muito para responder. Tente novamente em alguns segundos." 
-          }, 503);
+          }, 504); // Alterado para 504 (Gateway Timeout) para refletir o timeout de 10s
         }
 
 
