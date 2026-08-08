@@ -63,9 +63,13 @@ function AuthPage() {
         
         toast.success("Bem-vindo de volta!");
         
-        console.log("[AUTH] Invalidating router and navigating...");
-        await navigate({ to: "/painel" });
-        // Removido window.location.href para evitar concorrência com o router
+        console.log("[AUTH] Navigation started to:", redirectUrl || "/painel");
+        
+        // Usamos window.location.href para garantir que o middleware do TanStack
+        // e o estado do Supabase nos cookies sejam sincronizados corretamente
+        // antes do roteamento do lado do cliente tomar o controle.
+        window.location.href = redirectUrl || "/painel";
+        return;
       } else {
         const { error } = await supabase.auth.signUp({
           email,
