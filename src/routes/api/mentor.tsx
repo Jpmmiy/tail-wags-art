@@ -197,41 +197,54 @@ export const Route = createFileRoute("/api/mentor")({
         const encoder = new TextEncoder();
         let resto = "";
 
-        const corpo = new ReadableStream<Uint8Array>({
-          async pull(controlador) {
-            const { done, value } = await leitor.read();
-            if (done) {
-              await salvarRespostaMentor(acumuladoParaSalvar);
-              // PASSO 5 — VISIBILIDADE DE CUSTO
-              // Estimamos tokens (4 chars por token aprox.)
-              await trackAiUsageEnd(requestId, 1000, Math.ceil(acumuladoParaSalvar.length / 4), acumuladoParaSalvar);
-              controlador.close();
-              return;
-            }
+        const corpoStream = new ReadableStream<Uint8Array>({
+          async start(controlador) {
+            let acumuladoParaSalvar = "";
+            const leitor = resposta!.body!.getReader();
+            const decoder = new TextDecoder();
+            const encoder = new TextEncoder();
+            let resto = "";
 
-            resto += decoder.decode(value, { stream: true });
-            const linhas = resto.split("\n");
-            resto = linhas.pop() ?? "";
-            for (const linha of linhas) {
-              if (!linha.startsWith("data: ")) continue;
-              const dado = linha.slice(6).trim();
-              if (!dado || dado === "[DONE]") continue;
-              try {
-                const evento = JSON.parse(dado);
-                const texto = evento?.choices?.[0]?.delta?.content;
-                if (texto) {
-                  acumuladoParaSalvar += texto;
-                  controlador.enqueue(encoder.encode(texto));
+            try {
+              for (;;) {
+                const { done, value } = await leitor.read();
+                if (done) {
+                  await salvarRespostaMentor(acumuladoParaSalvar);
+                  await trackAiUsageEnd(requestId, 1000, Math.ceil(acumuladoParaSalvar.length / 4), acumuladoParaSalvar);
+                  controlador.close();
+                  break;
                 }
-              } catch {
-                /* fragmento incompleto */
+
+                resto += decoder.decode(value, { stream: true });
+                const linhas = resto.split("\n");
+                resto = linhas.pop() ?? "";
+                
+                for (const linha of linhas) {
+                  const limpa = linha.trim();
+                  if (!limpa || !limpa.startsWith("data: ")) continue;
+                  
+                  const dado = limpa.slice(6).trim();
+                  if (dado === "[DONE]") continue;
+                  
+                  try {
+                    const evento = JSON.parse(dado);
+                    const texto = evento?.choices?.[0]?.delta?.content;
+                    if (texto) {
+                      acumuladoParaSalvar += texto;
+                      controlador.enqueue(encoder.encode(texto));
+                    }
+                  } catch (e) {
+                    // Fragmento incompleto, ignora
+                  }
+                }
               }
+            } catch (err) {
+              console.error("[Mentor Stream Error]", err);
+              controlador.error(err);
+            } finally {
+              leitor.releaseLock();
             }
-          },
-          async cancel() {
-            await salvarRespostaMentor(acumuladoParaSalvar);
-            void leitor.cancel();
-          },
+          }
         });
 
         let acumuladoParaSalvar = "";
