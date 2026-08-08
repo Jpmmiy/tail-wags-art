@@ -59,10 +59,16 @@ export const Route = createFileRoute("/api/mentor")({
       POST: async ({ request }) => {
         // PASSO 3 — ROTA AUTENTICADA (Usando supabaseAdmin para bypass de RLS se necessário, mas validando sessão)
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseAdmin.auth.getSession(
+          request.headers.get("Authorization")?.replace("Bearer ", "") || ""
+        );
         
         if (!session?.user) {
-          return json({ erro: "Você precisa estar logado para usar o Mentor." }, 401);
+          // Se falhar o getSession direto (sem header), tentamos o método padrão que lê cookies
+          const { data: { session: cookieSession } } = await supabase.auth.getSession();
+          if (!cookieSession?.user) {
+            return json({ erro: "Você precisa estar logado para usar o Mentor." }, 401);
+          }
         }
 
         if (!isMentorEnabled()) {
