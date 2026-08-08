@@ -179,7 +179,7 @@ export function Planos() {
 
               <div className="mt-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
                 <div>
-                  <p className="text-[1.1rem] font-medium text-red-500 line-through decoration-2 opacity-80">
+                  <p className="text-[0.9rem] font-medium text-red-500 line-through decoration-2 opacity-80">
                     R$ {vitalicio.precoAntigo}
                   </p>
                   <p className="flex items-baseline gap-2">
