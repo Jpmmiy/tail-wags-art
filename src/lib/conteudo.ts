@@ -189,7 +189,7 @@ export const PLANOS = [
     ],
     fora: [],
     acao: "Garantir vitalício",
-    href: "https://checkout.applyfy.com.br/checkout/cms0w2pbd05j301n26c9xwryz?offer=B742TVS",
+    href: "https://pay.kirvano.com/0c37394f-cd9f-49d9-8f09-55ed597d4b9a",
   },
 ];
 
