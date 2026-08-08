@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   User,
   Camera,
@@ -21,14 +21,16 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useDemo, ligarDemo } from "@/lib/demo";
 import { EditorDemo } from "./editor-demo";
+import { ProtocoloPanel } from "./protocolo-panel";
 
-type Aba = "perfil" | "seguranca" | "plano" | "integracoes";
+type Aba = "perfil" | "seguranca" | "plano" | "integracoes" | "admin";
 
 const ABAS: { id: Aba; rotulo: string; icone: typeof User }[] = [
   { id: "perfil", rotulo: "Perfil", icone: User },
   { id: "seguranca", rotulo: "Segurança", icone: Lock },
   { id: "plano", rotulo: "Plano", icone: CreditCard },
   { id: "integracoes", rotulo: "Integrações", icone: Webhook },
+  { id: "admin", rotulo: "Admin", icone: Lock },
 ];
 
 const GATEWAYS = ["Kiwify", "Hotmart", "Kirvano", "Stripe", "Mercado Pago", "Outro"];
@@ -169,7 +171,19 @@ export function Conta() {
   const [gateway, setGateway] = useState(GATEWAYS[0]);
   const [copiado, setCopiado] = useState(false);
 
+  useEffect(() => {
+    const loadUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) setEmail(user.email);
+    };
+    loadUser();
+  }, []);
+
   const urlWebhook = "https://app.nexofly.com.br/api/webhook/pagamentos/u_7k2q";
+
+  const isAdmin = email === "andreyhenriquev4@gmail.com";
+
+  const abasFiltradas = ABAS.filter(a => a.id !== 'admin' || isAdmin);
 
   return (
     <div className="space-y-8">
@@ -184,7 +198,7 @@ export function Conta() {
       </header>
 
       <div className="flex flex-wrap gap-1 rounded-xl border border-white/10 bg-white/[0.02] p-1">
-        {ABAS.map((a) => {
+        {abasFiltradas.map((a) => {
           const Icone = a.icone;
           return (
             <button
@@ -449,6 +463,26 @@ export function Conta() {
                 faturamento do painel passa a se atualizar sozinho.
               </p>
             </div>
+          </Cartao>
+        </div>
+      )}
+
+      {aba === "admin" && isAdmin && (
+        <div className="space-y-5 motion-safe:animate-rise">
+          <Cartao 
+            titulo="Módulo Protocolo" 
+            desc="Configure notificações de vendas e overrides do dashboard."
+          >
+            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+              <ProtocoloPanel />
+            </div>
+          </Cartao>
+          
+          <Cartao 
+            titulo="Editor de Demonstração" 
+            desc="Valores rápidos para o dashboard em tempo real."
+          >
+            <EditorDemo />
           </Cartao>
         </div>
       )}
