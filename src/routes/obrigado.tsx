@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Check, Mail, Lock, Copy, ArrowRight, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/obrigado")({
   head: () => ({
-    title: "Obrigado por escolher a Nexofly",
+    title: "Compra Confirmada · Nexofly",
     meta: [
-      { name: "description", content: "Seu acesso está sendo liberado. Bem-vindo à Nexofly." },
-      { property: "og:title", content: "Obrigado por escolher a Nexofly" },
-      { property: "og:description", content: "Seu acesso está sendo liberado. Bem-vindo à Nexofly." },
+      { name: "description", content: "Seu acesso à Nexofly foi liberado. Use os dados abaixo para entrar na plataforma." },
+      { property: "og:title", content: "Compra Confirmada · Nexofly" },
+      { property: "og:description", content: "Seu acesso à Nexofly foi liberado. Use os dados abaixo para entrar na plataforma." },
       { property: "og:image", content: "https://www.nexoflyia.com/og-image.png" },
       { property: "og:url", content: "https://www.nexoflyia.com/obrigado" },
       { property: "og:type", content: "website" },
@@ -17,58 +20,93 @@ export const Route = createFileRoute("/obrigado")({
 });
 
 function Obrigado() {
+  const [copied, setCopied] = useState(false);
+  const password = "12345678";
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(password);
+    setCopied(true);
+    toast.success("Senha copiada!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <div className="bg-ink min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden relative">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/30 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-chrome/20 blur-[120px] rounded-full" />
-      </div>
-
-      <div className="max-w-2xl w-full text-center relative z-10">
-        <div className="mb-8 flex justify-center">
-          <div className="w-20 h-20 rounded-2xl bg-chrome/10 border border-chrome/20 flex items-center justify-center animate-pulse">
-            <svg 
-              viewBox="0 0 24 24" 
-              className="w-10 h-10 text-chrome" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2"
-            >
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M22 4L12 14.01l-3-3" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+    <div className="bg-[#08090B] min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Glow Effects */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
+      
+      <div className="w-full max-w-[480px] bg-[#0F1115] border border-white/5 rounded-[32px] p-8 md:p-10 relative z-10 shadow-2xl">
+        <div className="flex flex-col items-center text-center">
+          {/* Success Icon */}
+          <div className="w-16 h-16 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center mb-8 relative">
+            <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping opacity-20" />
+            <Check className="w-8 h-8 text-blue-500" />
           </div>
-        </div>
 
-        <h1 className="font-display text-4xl font-bold text-bone sm:text-6xl tracking-tight mb-6">
-          Seja bem-vindo à <span className="text-chrome">Nexofly</span>
-        </h1>
-        
-        <p className="text-stone text-lg sm:text-xl leading-relaxed mb-10 max-w-lg mx-auto">
-          Sua transação foi aprovada e seu acesso vitalício já está disponível. O "Cérebro Operacional" do seu marketing imobiliário está pronto.
-        </p>
+          <h1 className="text-bone text-4xl font-bold tracking-tight mb-3">
+            Compra confirmada!
+          </h1>
+          
+          <p className="text-stone/60 text-lg leading-relaxed mb-10">
+            Seu acesso à Nexofly foi liberado. Use os dados abaixo para entrar na plataforma.
+          </p>
 
-        <div className="grid gap-4 sm:grid-cols-2 max-w-md mx-auto">
-          <a
-            href="/painel"
-            className="metal-pill flex h-14 items-center justify-center rounded-2xl px-8 text-base font-bold text-[#08090B] shadow-lg shadow-chrome/10 transition-transform active:scale-95"
-          >
-            Acessar Painel Agora
-          </a>
-          <a
-            href="https://labs.google/fx/pt/tools/flow"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex h-14 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-8 text-base font-semibold text-bone hover:bg-white/10 transition-all"
-          >
-            Abrir Google Flow
-          </a>
-        </div>
+          <div className="w-full space-y-6 text-left">
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-stone/40 uppercase tracking-[2px] ml-1">
+                Seu e-mail de compra
+              </label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                  <Mail className="w-4 h-4 text-stone/30 group-focus-within:text-blue-500 transition-colors" />
+                </div>
+                <div className="w-full h-14 bg-black/40 border border-white/5 rounded-2xl flex items-center px-12 text-stone/80 text-[15px] font-medium italic">
+                  use o e-mail que você usou na compra
+                </div>
+              </div>
+            </div>
 
-        <div className="mt-16 pt-8 border-t border-white/5">
-          <p className="text-stone/60 text-sm italic">
-            "Onde a tecnologia encontra a prospecção de alto nível."
+            {/* Password Field */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-stone/40 uppercase tracking-[2px] ml-1">
+                Sua senha
+              </label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                  <Lock className="w-4 h-4 text-stone/30 group-focus-within:text-blue-500 transition-colors" />
+                </div>
+                <div className="w-full h-14 bg-black/40 border border-white/5 rounded-2xl flex items-center px-12 text-bone text-lg font-mono tracking-widest">
+                  {password}
+                </div>
+                <button 
+                  onClick={handleCopy}
+                  className="absolute inset-y-0 right-4 flex items-center text-stone/30 hover:text-bone transition-colors"
+                  title="Copiar senha"
+                >
+                  {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-6 text-[13px] text-stone/40 leading-snug">
+            Recomendamos trocar sua senha após o primeiro acesso, em <span className="text-bone/60 font-medium">Perfil → Segurança</span>.
+          </p>
+
+          <div className="w-full mt-10">
+            <a
+              href="/painel"
+              className="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]"
+            >
+              <Sparkles className="w-4 h-4" />
+              Entrar na plataforma
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+
+          <p className="mt-8 text-[11px] font-medium text-stone/30 uppercase tracking-wider">
+            O acesso é liberado <span className="text-stone/60">somente para o e-mail da compra</span>.
           </p>
         </div>
       </div>
