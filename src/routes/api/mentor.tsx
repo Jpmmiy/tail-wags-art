@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { createClient } from "@supabase/supabase-js";
 import { isMentorEnabled } from "@/lib/mentor-config";
-import { checkAiLimits, trackAiUsageStart, trackAiUsageEnd, getCachedAiResponse } from "@/lib/ai-control.server";
 
-
-const MODELO = "google/gemini-3-flash";
+const MODELO = "google/gemini-3.6-flash";
 
 const SISTEMA = `Você é o Mentor Nexofly: o consultor de vendas de quem usa a plataforma.
 
@@ -21,27 +19,20 @@ sentido, escreva a mensagem pronta para ele copiar e mandar no WhatsApp.
 
 COMO RESPONDER
 Direto ao ponto. Comece pela resposta, não pelo contexto. Uma a duas frases
-resolvem a maioria das perguntas; nunca escreva textos longos. Responda em no máximo 10 segundos.
+resolvem a maioria das perguntas; nunca escreva textos longos.
 
 Fale português do Brasil, no tom de um colega experiente. Sem jargão de
-coach, sem "é fundamental que", sem entusiasmo forçado, sem emoji. Nada de
-listas com sete itens quando três bastam.
+coach, sem "é fundamental que", sem entusiasmo forçado, sem emoji.
 
-Dê números concretos sempre que puder, e diga de onde vieram. Ancorar preço na
-diária do imóvel funciona: um pacote costuma valer de duas a três diárias.
-Se ele não deu o dado que você precisa para calcular, peça esse dado em uma
-frase em vez de responder no vazio.
-
-Quando escrever uma mensagem pronta, marque com aspas ou em bloco separado, e
-escreva do jeito que se manda de verdade — curta, sem saudação formal, sem
-"venho por meio desta".
+Dê números concretos sempre que puder. Ancorar preço na diária do imóvel
+funciona: um pacote costuma valer de duas a três diárias. Se faltar o dado
+para calcular, peça esse dado em uma frase.
 
 O QUE NÃO FAZER
-Não prometa resultado ("você vai fechar", "garantido"). Não invente número de
-mercado que você não tem. Não recomende baixar preço como primeira resposta a
-uma objeção — troque escopo antes de trocar valor. Não fale sobre assuntos
-fora de venda, produção e operação desse negócio; se perguntarem, diga em uma
-frase que não é o seu assunto e volte ao que você resolve.`;
+Não prometa resultado. Não invente número de mercado. Não recomende baixar
+preço como primeira resposta a uma objeção — troque escopo antes de trocar
+valor. Não fale sobre assuntos fora de venda, produção e operação desse
+negócio.`;
 
 type Turno = { de: "voce" | "mentor"; texto: string };
 
@@ -52,19 +43,36 @@ function json(dados: unknown, status = 200) {
   });
 }
 
+/** Descobre o usuário pelo token enviado pelo navegador (opcional). */
+async function usuarioDoToken(request: Request) {
+  const auth = request.headers.get("authorization");
+  const token = auth?.replace(/^Bearer\s+/i, "").trim();
+  if (!token) return null;
+
+  const url = process.env["VITE_SUPABASE_URL"] ?? process.env["SUPABASE_URL"];
+  const key =
+    process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] ??
+    process.env["SUPABASE_PUBLISHABLE_KEY"] ??
+    process.env["SUPABASE_ANON_KEY"];
+  if (!url || !key) return null;
+
+  try {
+    const cliente = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
+    const { data } = await cliente.auth.getUser(token);
+    if (!data?.user) return null;
+    return { id: data.user.id, cliente };
+  } catch {
+    return null;
+  }
+}
+
 export const Route = createFileRoute("/api/mentor")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // PASSO 3 — ROTA AUTENTICADA
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        const currentUser = session?.user;
-        
-        if (!currentUser) {
-          return json({ erro: "Você precisa estar logado para usar o Mentor." }, 401);
-        }
-
         if (!isMentorEnabled()) {
           return json(
             { erro: "O Mentor está em manutenção ou foi desativado temporariamente." },
@@ -72,38 +80,9 @@ export const Route = createFileRoute("/api/mentor")({
           );
         }
 
-        const requestId = request.headers.get("x-request-id");
-        if (!requestId) return json({ erro: "Request ID ausente." }, 400);
-
-        // PASSO 4 — IDEMPOTÊNCIA
-        const cache = await getCachedAiResponse(requestId);
-        if (cache) {
-          if (cache.status === 'completed' && cache.response_cache) {
-            return new Response(cache.response_cache, {
-              headers: { "Content-Type": "text/plain; charset=utf-8" }
-            });
-          }
-          if (cache.status === 'processing') {
-            return json({ erro: "Geração em andamento. Aguarde." }, 202);
-          }
-        }
-
-        // PASSO 2 — LIMITES
-        const ip = request.headers.get("x-forwarded-for") || "unknown";
-        const limitCheck = await checkAiLimits(currentUser.id, ip);
-        if (!limitCheck.allowed) {
-          return json({ erro: limitCheck.reason }, 429);
-        }
-
-        // PASSO 1 & 4 — GRAVAR INÍCIO
-        await trackAiUsageStart(currentUser.id, requestId, "/api/mentor", ip);
-
         const chave = process.env["LOVABLE_API_KEY"];
         if (!chave) {
-          return json(
-            { erro: "O Mentor não está configurado neste ambiente." },
-            503,
-          );
+          return json({ erro: "O Mentor não está configurado neste ambiente." }, 503);
         }
 
         let historico: Turno[];
@@ -114,161 +93,116 @@ export const Route = createFileRoute("/api/mentor")({
           return json({ erro: "Corpo inválido." }, 400);
         }
 
-
         const mensagens = historico
-          .filter((t) => t.texto.trim())
+          .filter((t) => t.texto?.trim())
+          .slice(-20)
           .map((t) => ({
             role: t.de === "voce" ? ("user" as const) : ("assistant" as const),
             content: t.texto,
           }));
 
         if (!mensagens.length || mensagens[0].role !== "user") {
-          return json(
-            { erro: "A conversa precisa começar com uma pergunta." },
-            400,
-          );
+          return json({ erro: "A conversa precisa começar com uma pergunta." }, 400);
         }
 
-        // Guarda a pergunta atual do usuário para o histórico persistente.
-        const ultima = mensagens[mensagens.length - 1];
-        if (ultima.role === "user" && currentUser?.id) {
-          await (supabase.from("mentor_messages") as any).insert({
-            user_id: currentUser.id,
-            role: "user",
-            content: ultima.content,
-          });
-        }
+        const usuario = await usuarioDoToken(request);
 
-        const salvarRespostaMentor = async (texto: string) => {
-          if (!texto || !currentUser?.id) return;
-          await (supabase.from("mentor_messages") as any).insert({
-            user_id: currentUser.id,
-            role: "assistant",
-            content: texto,
-          });
+        const salvar = async (role: "user" | "assistant", content: string) => {
+          if (!usuario || !content) return;
+          try {
+            await (usuario.cliente.from("mentor_messages") as any).insert({
+              user_id: usuario.id,
+              role,
+              content,
+            });
+          } catch {
+            /* histórico é acessório: nunca derruba a resposta */
+          }
         };
 
-        const MAX_RETRIES = 1; // Reduzido para resposta mais rápida
-        let attempt = 0;
-        let resposta: Response | null = null;
+        const ultima = mensagens[mensagens.length - 1];
+        if (ultima.role === "user") void salvar("user", ultima.content);
 
-        while (attempt <= MAX_RETRIES) {
-          try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // Reduzido para 10s como solicitado
-
-            resposta = await fetch(
-              "https://ai.gateway.lovable.dev/v1/chat/completions",
-              {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${chave}`,
-                  "Content-Type": "application/json",
-                },
-                signal: controller.signal,
-                body: JSON.stringify({
-                  model: MODELO,
-                  stream: true,
-                  messages: [{ role: "system", content: SISTEMA }, ...mensagens],
-                  temperature: 0.7, // Adicionado temperatura para estabilidade
-                }),
-              },
-            );
-
-            clearTimeout(timeoutId);
-
-            if (resposta.ok) break;
-
-            const retryableStatus = [408, 429, 500, 502, 503, 504].includes(resposta.status);
-            if (!retryableStatus || attempt === MAX_RETRIES) break;
-
-            attempt++;
-            const backoff = 1000; // Backoff fixo e curto para rapidez
-            console.warn(`[Mentor] Erro ${resposta.status}. Tentativa ${attempt} em ${backoff}ms...`);
-            await new Promise(r => setTimeout(r, backoff));
-          } catch (e) {
-            const isTimeout = e instanceof Error && e.name === 'AbortError';
-            if (isTimeout) console.error(`[Mentor] Timeout na tentativa ${attempt + 1}`);
-            else console.error(`[Mentor] Erro de rede na tentativa ${attempt + 1}:`, e);
-            
-            if (attempt === MAX_RETRIES) throw e;
-            attempt++;
-            await new Promise(r => setTimeout(r, 2000));
-          }
+        let resposta: Response;
+        try {
+          resposta = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Lovable-API-Key": chave,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: MODELO,
+              stream: true,
+              messages: [{ role: "system", content: SISTEMA }, ...mensagens],
+            }),
+          });
+        } catch (e) {
+          console.error("[Mentor] Falha de rede:", e);
+          return json({ erro: "Não consegui falar com a IA agora. Tente de novo." }, 502);
         }
 
-        if (!resposta || !resposta.ok || !resposta.body) {
-          const detalhe = resposta ? await resposta.text() : "Sem resposta da rede";
-          console.error(`Falha no Mentor [${resposta?.status}]: ${detalhe}`);
-          
-          // Se for erro de cota ou rede, tentamos retornar uma mensagem amigável em vez de 504
-          if (resposta?.status === 429) {
+        if (!resposta.ok || !resposta.body) {
+          const detalhe = await resposta.text().catch(() => "");
+          console.error(`[Mentor] Gateway ${resposta.status}: ${detalhe}`);
+          if (resposta.status === 429) {
             return json({ erro: "Muitos pedidos agora. Tente em instantes." }, 429);
           }
-          if (resposta?.status === 402) {
+          if (resposta.status === 402) {
             return json({ erro: "Os créditos de IA do espaço acabaram." }, 402);
           }
-          
-          // Fallback para erros genéricos ou timeout da API Lovable
-          return json({ 
-            erro: "O servidor de IA está instável ou demorou muito para responder. Tente novamente em alguns segundos." 
-          }, 504); // Alterado para 504 (Gateway Timeout) para refletir o timeout de 10s
+          return json({ erro: "O servidor de IA respondeu com erro. Tente de novo." }, 502);
         }
-
 
         const corpoStream = new ReadableStream<Uint8Array>({
           async start(controlador) {
-            let acumuladoParaSalvar = "";
-            const leitor = resposta!.body!.getReader();
+            const leitor = resposta.body!.getReader();
             const decoder = new TextDecoder();
             const encoder = new TextEncoder();
             let resto = "";
+            let acumulado = "";
 
             try {
               for (;;) {
                 const { done, value } = await leitor.read();
-                if (done) {
-                  await salvarRespostaMentor(acumuladoParaSalvar);
-                  await trackAiUsageEnd(requestId, 1000, Math.ceil(acumuladoParaSalvar.length / 4), acumuladoParaSalvar);
-                  controlador.close();
-                  break;
-                }
+                if (done) break;
 
                 resto += decoder.decode(value, { stream: true });
                 const linhas = resto.split("\n");
                 resto = linhas.pop() ?? "";
-                
+
                 for (const linha of linhas) {
                   const limpa = linha.trim();
-                  if (!limpa || !limpa.startsWith("data: ")) continue;
-                  
+                  if (!limpa.startsWith("data: ")) continue;
                   const dado = limpa.slice(6).trim();
                   if (dado === "[DONE]") continue;
-                  
                   try {
                     const evento = JSON.parse(dado);
                     const texto = evento?.choices?.[0]?.delta?.content;
                     if (texto) {
-                      acumuladoParaSalvar += texto;
+                      acumulado += texto;
                       controlador.enqueue(encoder.encode(texto));
                     }
-                  } catch (e) {
-                    // Fragmento incompleto, ignora
+                  } catch {
+                    /* fragmento incompleto */
                   }
                 }
               }
+              await salvar("assistant", acumulado);
+              controlador.close();
             } catch (err) {
-              console.error("[Mentor Stream Error]", err);
-              controlador.error(err);
+              console.error("[Mentor] Erro no stream:", err);
+              try {
+                controlador.close();
+              } catch {
+                /* já fechado */
+              }
             } finally {
               leitor.releaseLock();
             }
-          }
+          },
         });
 
-
-
- 
         return new Response(corpoStream, {
           headers: {
             "Content-Type": "text/plain; charset=utf-8",
