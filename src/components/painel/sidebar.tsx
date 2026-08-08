@@ -125,7 +125,7 @@ function Conteudo({ aoNavegar }: { aoNavegar?: () => void }) {
           Plano vitalício
         </p>
         <p className="mt-1.5 text-[0.8rem] leading-relaxed text-stone">
-          Acesso liberado. Sem renovação.
+          Acesso liberado.
         </p>
       </div>
     </div>
