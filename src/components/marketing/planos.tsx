@@ -83,7 +83,7 @@ export function Planos() {
 
 
         {/* cartões: o vitalício domina */}
-        <div className="mx-auto mt-12 grid max-w-5xl items-center gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+        <div className="mx-auto mt-12 grid max-w-5xl items-center gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           {/* mensal */}
           <Reveal>
             <article className="glass specular relative flex h-full flex-col rounded-3xl p-7 transition-all duration-500 hover:-translate-y-1">
