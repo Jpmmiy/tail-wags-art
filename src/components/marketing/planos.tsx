@@ -195,6 +195,9 @@ export function Planos() {
                       {vitalicio.preco}
                     </span>
                   </p>
+                  <p className="mt-1 text-[0.8rem] text-stone">
+                    ou à vista R$ 249,00
+                  </p>
                 </div>
                 <div className="pb-0.5">
                   <p className="text-[0.86rem] uppercase tracking-widest text-blue-400 font-bold">
