@@ -16,8 +16,10 @@ import {
   Settings,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 /** Agrupado por intenção: trabalhar, crescer, conta. */
