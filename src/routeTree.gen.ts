@@ -24,6 +24,7 @@ import { Route as ApiPublicProtocoloRouteImport } from './routes/api/public/prot
 import { Route as AuthenticatedPainelProjetosRouteImport } from './routes/_authenticated/painel/projetos'
 import { Route as AuthenticatedPainelPresenteRouteImport } from './routes/_authenticated/painel/presente'
 import { Route as AuthenticatedPainelPremiacoesRouteImport } from './routes/_authenticated/painel/premiacoes'
+import { Route as AuthenticatedPainelPortfolioRouteImport } from './routes/_authenticated/painel/portfolio'
 import { Route as AuthenticatedPainelMentorRouteImport } from './routes/_authenticated/painel/mentor'
 import { Route as AuthenticatedPainelMembrosRouteImport } from './routes/_authenticated/painel/membros'
 import { Route as AuthenticatedPainelCriarRouteImport } from './routes/_authenticated/painel/criar'
@@ -108,6 +109,12 @@ const AuthenticatedPainelPremiacoesRoute =
     path: '/premiacoes',
     getParentRoute: () => AuthenticatedPainelRoute,
   } as any)
+const AuthenticatedPainelPortfolioRoute =
+  AuthenticatedPainelPortfolioRouteImport.update({
+    id: '/portfolio',
+    path: '/portfolio',
+    getParentRoute: () => AuthenticatedPainelRoute,
+  } as any)
 const AuthenticatedPainelMentorRoute =
   AuthenticatedPainelMentorRouteImport.update({
     id: '/mentor',
@@ -153,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/painel/criar': typeof AuthenticatedPainelCriarRoute
   '/painel/membros': typeof AuthenticatedPainelMembrosRoute
   '/painel/mentor': typeof AuthenticatedPainelMentorRoute
+  '/painel/portfolio': typeof AuthenticatedPainelPortfolioRoute
   '/painel/premiacoes': typeof AuthenticatedPainelPremiacoesRoute
   '/painel/presente': typeof AuthenticatedPainelPresenteRoute
   '/painel/projetos': typeof AuthenticatedPainelProjetosRoute
@@ -173,6 +181,7 @@ export interface FileRoutesByTo {
   '/painel/criar': typeof AuthenticatedPainelCriarRoute
   '/painel/membros': typeof AuthenticatedPainelMembrosRoute
   '/painel/mentor': typeof AuthenticatedPainelMentorRoute
+  '/painel/portfolio': typeof AuthenticatedPainelPortfolioRoute
   '/painel/premiacoes': typeof AuthenticatedPainelPremiacoesRoute
   '/painel/presente': typeof AuthenticatedPainelPresenteRoute
   '/painel/projetos': typeof AuthenticatedPainelProjetosRoute
@@ -196,6 +205,7 @@ export interface FileRoutesById {
   '/_authenticated/painel/criar': typeof AuthenticatedPainelCriarRoute
   '/_authenticated/painel/membros': typeof AuthenticatedPainelMembrosRoute
   '/_authenticated/painel/mentor': typeof AuthenticatedPainelMentorRoute
+  '/_authenticated/painel/portfolio': typeof AuthenticatedPainelPortfolioRoute
   '/_authenticated/painel/premiacoes': typeof AuthenticatedPainelPremiacoesRoute
   '/_authenticated/painel/presente': typeof AuthenticatedPainelPresenteRoute
   '/_authenticated/painel/projetos': typeof AuthenticatedPainelProjetosRoute
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
     | '/painel/criar'
     | '/painel/membros'
     | '/painel/mentor'
+    | '/painel/portfolio'
     | '/painel/premiacoes'
     | '/painel/presente'
     | '/painel/projetos'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/painel/criar'
     | '/painel/membros'
     | '/painel/mentor'
+    | '/painel/portfolio'
     | '/painel/premiacoes'
     | '/painel/presente'
     | '/painel/projetos'
@@ -261,6 +273,7 @@ export interface FileRouteTypes {
     | '/_authenticated/painel/criar'
     | '/_authenticated/painel/membros'
     | '/_authenticated/painel/mentor'
+    | '/_authenticated/painel/portfolio'
     | '/_authenticated/painel/premiacoes'
     | '/_authenticated/painel/presente'
     | '/_authenticated/painel/projetos'
@@ -389,6 +402,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelPremiacoesRouteImport
       parentRoute: typeof AuthenticatedPainelRoute
     }
+    '/_authenticated/painel/portfolio': {
+      id: '/_authenticated/painel/portfolio'
+      path: '/portfolio'
+      fullPath: '/painel/portfolio'
+      preLoaderRoute: typeof AuthenticatedPainelPortfolioRouteImport
+      parentRoute: typeof AuthenticatedPainelRoute
+    }
     '/_authenticated/painel/mentor': {
       id: '/_authenticated/painel/mentor'
       path: '/mentor'
@@ -433,6 +453,7 @@ interface AuthenticatedPainelRouteChildren {
   AuthenticatedPainelCriarRoute: typeof AuthenticatedPainelCriarRoute
   AuthenticatedPainelMembrosRoute: typeof AuthenticatedPainelMembrosRoute
   AuthenticatedPainelMentorRoute: typeof AuthenticatedPainelMentorRoute
+  AuthenticatedPainelPortfolioRoute: typeof AuthenticatedPainelPortfolioRoute
   AuthenticatedPainelPremiacoesRoute: typeof AuthenticatedPainelPremiacoesRoute
   AuthenticatedPainelPresenteRoute: typeof AuthenticatedPainelPresenteRoute
   AuthenticatedPainelProjetosRoute: typeof AuthenticatedPainelProjetosRoute
@@ -445,6 +466,7 @@ const AuthenticatedPainelRouteChildren: AuthenticatedPainelRouteChildren = {
   AuthenticatedPainelCriarRoute: AuthenticatedPainelCriarRoute,
   AuthenticatedPainelMembrosRoute: AuthenticatedPainelMembrosRoute,
   AuthenticatedPainelMentorRoute: AuthenticatedPainelMentorRoute,
+  AuthenticatedPainelPortfolioRoute: AuthenticatedPainelPortfolioRoute,
   AuthenticatedPainelPremiacoesRoute: AuthenticatedPainelPremiacoesRoute,
   AuthenticatedPainelPresenteRoute: AuthenticatedPainelPresenteRoute,
   AuthenticatedPainelProjetosRoute: AuthenticatedPainelProjetosRoute,
@@ -481,3 +503,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
