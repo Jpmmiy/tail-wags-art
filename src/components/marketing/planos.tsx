@@ -83,7 +83,7 @@ export function Planos() {
 
 
         {/* cartões: o vitalício domina */}
-        <div className="mx-auto mt-12 grid max-w-5xl items-center gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <div className="mx-auto mt-12 grid max-w-5xl items-center gap-6 lg:grid-cols-2">
           {/* mensal */}
           <Reveal>
             <article className="glass specular relative flex h-full flex-col rounded-3xl p-7 transition-all duration-500 hover:-translate-y-1">
@@ -147,7 +147,7 @@ export function Planos() {
 
           {/* vitalício */}
           <Reveal delay={120}>
-            <article className="glass-deep rim-lit specular relative flex h-full flex-col rounded-[1.75rem] p-7 shadow-[0_40px_100px_-30px_rgba(255,255,255,0.18)] transition-all duration-500 hover:-translate-y-1.5 sm:p-8">
+            <article className="glass-deep rim-lit specular relative flex h-full flex-col rounded-3xl p-7 shadow-2xl transition-all duration-500 hover:-translate-y-1">
               <div className="absolute -right-2 -top-4 z-10 flex animate-bounce items-center gap-1.5 rounded-full bg-red-600 px-4 py-2 text-[0.75rem] font-bold uppercase tracking-wider text-white shadow-xl shadow-red-600/20">
                 <Flame className="size-4 fill-white" />
                 Restam apenas 3 vitalícios
@@ -158,10 +158,10 @@ export function Planos() {
                 Mais escolhido
               </span>
 
-              <h3 className="font-display text-2xl font-semibold text-bone">
+              <h3 className="font-display text-lg font-semibold text-bone">
                 {vitalicio.nome}
               </h3>
-              <p className="mt-1 text-[0.9rem] text-stone">
+              <p className="mt-1 text-[0.85rem] text-stone">
                 {vitalicio.chamada}
               </p>
 
@@ -177,9 +177,9 @@ export function Planos() {
                 </div>
               </div>
 
-              <div className="mt-7 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+              <div className="mt-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
                 <div>
-                  <p className="text-[1.1rem] font-medium text-red-500 line-through decoration-2 opacity-80">
+                  <p className="text-[0.9rem] font-medium text-red-500 line-through decoration-2 opacity-80">
                     R$ {vitalicio.precoAntigo}
                   </p>
                   <p className="flex items-baseline gap-2">
@@ -188,15 +188,15 @@ export function Planos() {
                         {vitalicio.parcelas}
                       </span>
                     )}
-                    <span className="font-display text-[1.5rem] text-stone">
+                    <span className="font-display text-[1.2rem] text-stone">
                       R$
                     </span>
-                    <span className="metal-text font-display text-[3.8rem] font-semibold leading-none tracking-[-0.04em] sm:text-[4.2rem]">
+                    <span className="metal-text font-display text-[2.7rem] font-semibold leading-none tracking-[-0.035em] text-bone">
                       {vitalicio.preco}
                     </span>
                   </p>
                 </div>
-                <div className="pb-1.5">
+                <div className="pb-0.5">
                   <p className="text-[0.86rem] uppercase tracking-widest text-blue-400 font-bold">
                     {vitalicio.periodo}
                   </p>
@@ -205,11 +205,11 @@ export function Planos() {
 
               {/* Lista em coluna única: em duas colunas os itens de altura
                   diferente desalinhavam as linhas de baixo. */}
-              <ul className="mt-7 flex-1 divide-y divide-white/6 border-y border-white/6">
+              <ul className="mt-6 flex-1 space-y-2.5">
                 {vitalicio.inclui.map((item: string) => (
                   <li
                     key={item}
-                    className="flex items-center gap-3 py-3 text-[0.92rem] text-bone/90"
+                    className="flex gap-3 text-[0.86rem] text-bone/80"
                   >
                     <Marca ok />
                     {item}
@@ -217,7 +217,7 @@ export function Planos() {
                 ))}
               </ul>
 
-              <div className="mt-8">
+              <div className="mt-7">
                 <Cta href={vitalicio.href} size="lg" className="w-full">
                   {vitalicio.acao}
                 </Cta>
