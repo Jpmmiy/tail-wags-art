@@ -404,7 +404,7 @@ export function Quiz() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-display font-semibold text-bone">Fluxo de Site</h3>
-                  <p className="text-sm text-stone mt-1">Estrutura de alta conversão com envio automático para o Lovable.</p>
+                  <p className="text-sm text-stone mt-1">Crie landing pages para corretores de imóveis, ou junte imóvel e venda no mesmo pacote.</p>
                 </div>
                 <ChevronRight className="size-6 text-stone group-hover:text-chrome transition-colors" />
               </div>
