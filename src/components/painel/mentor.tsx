@@ -202,8 +202,10 @@ export function Mentor() {
     if (escrevendo) return;
     const ate = msgs.slice(0, i);
     if (!ate.length) return;
+    
+    const requestId = crypto.randomUUID();
     setMsgs(ate);
-    void responder(ate);
+    void responder(ate, requestId);
   };
 
   return (
