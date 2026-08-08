@@ -302,26 +302,28 @@ nada de "aconchegante refúgio". Descrever o que existe.${obs(r.notas.publico)}`
 }
 
 export function abordagem(r: Respostas) {
-  const ganho = Math.max(0, r.imovel.potencial - r.imovel.diaria);
+  const ganho = Math.max(0, (r.imovel.potencial || 0) - (r.imovel.diaria || 0));
+  const nomeImovel = r.imovel.nome || "seu imóvel";
+  const dadoReal = r.imovel.nota 
+    ? `${r.imovel.nota} estrelas` 
+    : r.imovel.avaliacoes 
+      ? `${r.imovel.avaliacoes} avaliações`
+      : "o potencial de mercado";
 
-  return `Oi, ${r.imovel.anfitriao}, tudo bem?
+  return `*1. Abertura (Conexão)*
+Oi, ${r.imovel.anfitriao || "tudo bem"}? Vi o anúncio do ${nomeImovel} — ${dadoReal} mostra que é um produto com excelente potencial.
 
-Vi o anúncio do ${r.imovel.nome}. O lugar é muito bom, só que o
-anúncio não está mostrando isso. As fotos são a primeira coisa que
-o hóspede vê antes de decidir.
+*2. Diagnóstico (O Problema)*
+Reparei que o material visual ainda não acompanha esse nível. Fotos amadoras e a falta de um vídeo profissional acabam "escondendo" o valor real do imóvel e segurando o clique de muitos interessados.
 
-Refiz três fotos pra você comparar, sem compromisso nenhum: [link]
+*3. Proposta de Valor (A Solução)*
+Montei uma estratégia de renovação visual e um roteiro de vídeo cinematográfico pensado especificamente para valorizar o ${nomeImovel}. O objetivo é aumentar o desejo imediato e justificar um ticket maior.
 
-Se curtir, eu faço o pacote inteiro. Fotos tratadas de todos os
-cômodos, um vídeo curto pro Instagram e um site só do ${r.imovel.tipo.toLowerCase()},
-com reserva caindo direto no seu WhatsApp. Sem taxa de plataforma
-no meio.
+*4. Prova de Conceito (Comparativo)*
+Imóveis com esse padrão visual na região chegam a performar com diárias de R$ ${r.imovel.potencial}. Hoje você está em R$ ${r.imovel.diaria}. Estamos falando de uma diferença de R$ ${ganho} por noite ocupada.
 
-Imóvel parecido na sua região, com o anúncio ajustado, está saindo
-a R$ ${r.imovel.potencial} a diária. Você está em R$ ${r.imovel.diaria}.
-Dá R$ ${ganho} a mais por noite ocupada.
-
-Te mando os valores?`;
+*5. Fechamento (Chamada para Ação)*
+Preparei um modelo de como ficaria essa nova apresentação, sem compromisso nenhum. Posso te mandar os detalhes aqui?`;
 }
 
 export function precificacao(r: Respostas) {

@@ -327,14 +327,20 @@ export function Quiz() {
 
   const whatsMessage = useMemo(() => {
     if (!escolhido) return "";
-    const dadoReal = escolhido.nota 
-      ? `${escolhido.nota} com ${escolhido.avaliacoes} avaliações` 
-      : escolhido.avaliacoes 
-        ? `${escolhido.avaliacoes} avaliações`
-        : "o potencial de mercado";
     
-    return `Oi! Vi o anúncio do ${nomeExibicao} — ${dadoReal} mostra que é um excelente produto.\nReparei que o material visual ainda não acompanha esse nível, o que acaba segurando o clique de muitos interessados.\nMontei uma estratégia de renovação visual e um roteiro de vídeo curto para valorizar o imóvel. Sem compromisso.\nPosso te mandar os detalhes aqui?`;
-  }, [escolhido, nomeExibicao]);
+    // Agora usamos a função centralizada no gerador.ts para manter a consistência
+    const respostasContexto: Respostas = {
+      modalidade: modalidade || 'temporada',
+      imovel: escolhido as any,
+      estilo,
+      publico,
+      comodos,
+      entregaveis,
+      notas: {}
+    };
+
+    return abordagem(respostasContexto);
+  }, [escolhido, modalidade, estilo, publico, comodos, entregaveis]);
 
 
 
