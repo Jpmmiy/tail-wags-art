@@ -165,7 +165,7 @@ export const PLANOS = [
     ],
     fora: ["Acesso vitalício"],
     acao: "Assinar mensal",
-    href: "https://pay.kiwify.com.br/x866v05",
+    href: "https://checkout.applyfy.com.br/checkout/cms0w2pbd05j301n26c9xwryz?offer=NIYOXHU",
   },
   {
     id: "vitalicio",
@@ -189,7 +189,7 @@ export const PLANOS = [
     ],
     fora: [],
     acao: "Garantir vitalício",
-    href: "https://pay.kiwify.com.br/RofK3N7",
+    href: "https://checkout.applyfy.com.br/checkout/cms0w2pbd05j301n26c9xwryz?offer=B742TVS",
   },
 ];
 
