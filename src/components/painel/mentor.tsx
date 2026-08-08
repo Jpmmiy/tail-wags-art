@@ -129,7 +129,7 @@ export function Mentor() {
   }, [msgs]);
 
   /** Fala com /api/mentor e vai escrevendo conforme o modelo responde. */
-  const responder = async (historico: Msg[]) => {
+  const responder = async (historico: Msg[], requestId: string) => {
     const id = crypto.randomUUID();
     setMsgs((m) => [...m, { id, de: "mentor", texto: "" }]);
     setEscrevendo(true);
@@ -141,7 +141,10 @@ export function Mentor() {
     try {
       const r = await fetch("/api/mentor", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "x-request-id": requestId 
+        },
         signal: ctrl.signal,
         body: JSON.stringify({
           historico: historico.map((m) => ({ de: m.de, texto: m.texto })),
@@ -182,21 +185,27 @@ export function Mentor() {
   const enviar = (pergunta: string) => {
     const p = pergunta.trim();
     if (!p || escrevendo) return;
+    
+    // Gerar um ID único para a requisição de IA (idempotência)
+    const requestId = crypto.randomUUID();
+    
     const proximo: Msg[] = [
       ...msgs,
       { id: crypto.randomUUID(), de: "voce", texto: p },
     ];
     setMsgs(proximo);
     setTexto("");
-    void responder(proximo);
+    void responder(proximo, requestId);
   };
 
   const refazer = (i: number) => {
     if (escrevendo) return;
     const ate = msgs.slice(0, i);
     if (!ate.length) return;
+    
+    const requestId = crypto.randomUUID();
     setMsgs(ate);
-    void responder(ate);
+    void responder(ate, requestId);
   };
 
   return (
