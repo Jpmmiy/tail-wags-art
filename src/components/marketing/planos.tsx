@@ -217,7 +217,7 @@ export function Planos() {
                 ))}
               </ul>
 
-              <div className="mt-8">
+              <div className="mt-7">
                 <Cta href={vitalicio.href} size="lg" className="w-full">
                   {vitalicio.acao}
                 </Cta>
