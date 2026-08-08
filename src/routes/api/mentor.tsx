@@ -149,14 +149,14 @@ export const Route = createFileRoute("/api/mentor")({
           });
         };
 
-        const MAX_RETRIES = 3; // Aumentado para 3 tentativas
+        const MAX_RETRIES = 1; // Reduzido para resposta mais rápida
         let attempt = 0;
         let resposta: Response | null = null;
 
         while (attempt <= MAX_RETRIES) {
           try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 45000); // Aumentado para 45s
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // Reduzido para 10s como solicitado
 
             resposta = await fetch(
               "https://ai.gateway.lovable.dev/v1/chat/completions",
