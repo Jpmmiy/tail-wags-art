@@ -5,7 +5,11 @@ import { syncProjectsOnLogin } from '@/lib/persistence'
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
     console.log("[RENDER] 1: AuthenticatedLayout beforeLoad");
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      console.error("[RENDER] 1.1: Session error:", sessionError);
+    }
     console.log("[RENDER] 1.1: Session status:", !!session);
     
     if (!session) {
