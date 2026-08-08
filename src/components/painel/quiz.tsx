@@ -276,35 +276,66 @@ export function Quiz() {
   }, [estilo, publico, comodos, entregaveis, diaria, valorImobiliario, objetivoVideoTipo, possuiDrone, videoVertical]);
 
   const autosave = async (step: number, status: any = 'rascunho') => {
-    // Se for o passo de geração (agora passo 2, indo para fechamento)
+    console.log("[QUIZ] Autosave acionado. Passo:", step, "Status:", status);
+    
+    const projectData = { 
+      modalidade, 
+      escolhido, 
+      publico, 
+      comodos, 
+      diaria, 
+      valorImobiliario, 
+      estilo, 
+      videoVertical, 
+      paisId, 
+      regiaoId, 
+      cidade, 
+      entregaveis, 
+      objetivo, 
+      objetivoVideoTipo, 
+      possuiDrone 
+    };
+
     const finalStatus = step === 2 ? 'em_producao' : status;
-    const pid = await saveProjectStep(step, { modalidade, escolhido, publico, comodos, diaria, valorImobiliario, estilo, videoVertical, paisId, regiaoId, cidade, entregaveis, objetivo, objetivoVideoTipo, possuiDrone }, finalStatus);
-    if (pid) setCurrentProjectId(pid);
-    return pid;
+    
+    try {
+      const pid = await saveProjectStep(step, projectData, finalStatus);
+      if (pid) {
+        setCurrentProjectId(pid);
+        return pid;
+      }
+    } catch (error) {
+      console.error("[QUIZ] Erro no saveProjectStep:", error);
+    }
+    return getCurrentProjectId();
   };
 
   const avancar = async (s: any = 'rascunho') => {
     const proximo = passo + 1;
+    console.log("[QUIZ] Avançando para o passo:", proximo);
     
-    // Mostra feedback visual
+    // Se estivermos no passo de personalização e formos gerar
     if (proximo === 2) {
+      console.log("[QUIZ] Iniciando estado de geração...");
       setGerando(true);
       return; 
     }
 
     try {
+      console.log("[QUIZ] Executando autosave...");
       const pid = await autosave(proximo, s);
       
-      // Se temos um projeto, recarregamos para garantir que a SalaProducao tenha tudo
       if (pid) {
+        console.log("[QUIZ] Projeto salvo/atualizado com ID:", pid);
         const p = await loadProject(pid);
         if (p) setProjetoCarregado(p);
       }
 
+      console.log("[QUIZ] Atualizando estado do passo para:", proximo);
       setPasso(proximo);
     } catch (err) {
-      console.error("Erro ao avançar:", err);
-      toast.error("Não foi possível salvar seu progresso. Tente novamente.");
+      console.error("[QUIZ] Erro crítico ao avançar:", err);
+      toast.error("Erro ao salvar progresso. Verifique sua conexão.");
     }
   };
 

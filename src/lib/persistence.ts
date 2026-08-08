@@ -47,25 +47,19 @@ export const getLatestProjectId = async () => {
 };
 
 export const saveProjectStep = async (step: number, data: any, status: 'rascunho' | 'aguardando_resposta' | 'em_producao' | 'concluido' = 'rascunho') => {
-  console.log("Saving project step:", step, "Status:", status);
+  console.log("[PERSISTENCE] Salvando passo:", step, "Status:", status);
   const sessionId = getSessionId();
   
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session }, error: authError } = await supabase.auth.getSession();
+  if (authError) console.error("[PERSISTENCE] Erro de auth no save:", authError);
   const user = session?.user;
 
-  // Fonte da verdade: prioriza o ID do banco se estiver logado
-  let projectId = null;
-  
-  if (user) {
-    projectId = await getLatestProjectId();
-  } else {
-    projectId = getCurrentProjectId();
-  }
-
-  let currentProjectId = projectId;
+  let currentProjectId = getCurrentProjectId();
+  console.log("[PERSISTENCE] ID atual do localStorage:", currentProjectId);
 
   try {
     if (step === 1 && data.escolhido) {
+      console.log("[PERSISTENCE] Criando ou atualizando projeto no passo 1...");
       const projectData: any = {
         user_id: user?.id || null,
         session_id: sessionId,
