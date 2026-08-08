@@ -264,7 +264,7 @@ Som ambiente natural (diegetico). Silêncio de fundo com sons sutis de natureza 
 - Zero cortes bruscos.
 
 ESPECIFICAÇÕES TÉCNICAS
-- Duração: 8 a 10 segundos.
+- Duração: 20 segundos.
 - Formato: 9:16 (Vertical) para Reels/Stories.
 - Estilo Visual: Cinematic Real Estate.${obs(r.notas?.pacote)}`;
 }
