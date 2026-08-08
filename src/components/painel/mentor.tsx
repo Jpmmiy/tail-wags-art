@@ -139,11 +139,16 @@ export function Mentor() {
     let acumulado = "";
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+
       const r = await fetch("/api/mentor", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "x-request-id": requestId 
+          "x-request-id": requestId,
+          ...(session?.access_token
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : {}),
         },
         signal: ctrl.signal,
         body: JSON.stringify({
