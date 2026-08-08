@@ -130,14 +130,14 @@ export const Route = createFileRoute("/api/mentor")({
           );
         }
 
-        const MAX_RETRIES = 2;
+        const MAX_RETRIES = 3; // Aumentado para 3 tentativas
         let attempt = 0;
         let resposta: Response | null = null;
 
         while (attempt <= MAX_RETRIES) {
           try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+            const timeoutId = setTimeout(() => controller.abort(), 45000); // Aumentado para 45s
 
             resposta = await fetch(
               "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -152,6 +152,7 @@ export const Route = createFileRoute("/api/mentor")({
                   model: MODELO,
                   stream: true,
                   messages: [{ role: "system", content: SISTEMA }, ...mensagens],
+                  temperature: 0.7, // Adicionado temperatura para estabilidade
                 }),
               },
             );
@@ -160,20 +161,21 @@ export const Route = createFileRoute("/api/mentor")({
 
             if (resposta.ok) break;
 
-            const retryableStatus = [429, 500, 502, 503, 504].includes(resposta.status);
+            const retryableStatus = [408, 429, 500, 502, 503, 504].includes(resposta.status);
             if (!retryableStatus || attempt === MAX_RETRIES) break;
 
             attempt++;
-            const backoff = Math.pow(2, attempt) * 1000;
-            console.log(`[Mentor] Erro ${resposta.status}. Tentativa ${attempt} em ${backoff}ms...`);
+            const backoff = Math.pow(2, attempt) * 1500; // Backoff um pouco maior
+            console.warn(`[Mentor] Erro ${resposta.status}. Tentativa ${attempt} em ${backoff}ms...`);
             await new Promise(r => setTimeout(r, backoff));
           } catch (e) {
             const isTimeout = e instanceof Error && e.name === 'AbortError';
             if (isTimeout) console.error(`[Mentor] Timeout na tentativa ${attempt + 1}`);
+            else console.error(`[Mentor] Erro de rede na tentativa ${attempt + 1}:`, e);
             
             if (attempt === MAX_RETRIES) throw e;
             attempt++;
-            await new Promise(r => setTimeout(r, 1000));
+            await new Promise(r => setTimeout(r, 2000));
           }
         }
 
