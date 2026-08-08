@@ -57,11 +57,12 @@ export const Route = createFileRoute("/api/mentor")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // PASSO 3 — ROTA AUTENTICADA (Usando supabaseAdmin para bypass de RLS se necessário, mas validando sessão)
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        // PASSO 3 — ROTA AUTENTICADA
         const { data: { session } } = await supabase.auth.getSession();
         
-        if (!session?.user) {
+        const currentUser = session?.user;
+        
+        if (!currentUser) {
           return json({ erro: "Você precisa estar logado para usar o Mentor." }, 401);
         }
 
@@ -90,13 +91,13 @@ export const Route = createFileRoute("/api/mentor")({
 
         // PASSO 2 — LIMITES
         const ip = request.headers.get("x-forwarded-for") || "unknown";
-        const limitCheck = await checkAiLimits(session.user.id, ip);
+        const limitCheck = await checkAiLimits(currentUser.id, ip);
         if (!limitCheck.allowed) {
           return json({ erro: limitCheck.reason }, 429);
         }
 
         // PASSO 1 & 4 — GRAVAR INÍCIO
-        await trackAiUsageStart(session.user.id, requestId, "/api/mentor", ip);
+        await trackAiUsageStart(currentUser.id, requestId, "/api/mentor", ip);
 
         const chave = process.env["LOVABLE_API_KEY"];
         if (!chave) {
@@ -236,10 +237,9 @@ export const Route = createFileRoute("/api/mentor")({
         let acumuladoParaSalvar = "";
         const salvarRespostaMentor = async (texto: string) => {
           if (!texto) return;
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session?.user?.id) {
+          if (currentUser?.id) {
             await (supabase.from("mentor_messages") as any).insert({
-              user_id: session.user.id,
+              user_id: currentUser.id,
               role: "assistant",
               content: texto
             });
