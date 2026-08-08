@@ -15,7 +15,7 @@ type Tela = "computador" | "celular";
 function Palco({ tela }: { tela: Tela }) {
   const arquivo =
     tela === "computador"
-      ? "/videos/plataforma-desktop.mp4"
+      ? plataformaDesktopAsset.url
       : "/videos/plataforma-mobile.mp4";
 
   return (
