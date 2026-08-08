@@ -205,11 +205,11 @@ export function Planos() {
 
               {/* Lista em coluna única: em duas colunas os itens de altura
                   diferente desalinhavam as linhas de baixo. */}
-              <ul className="mt-7 flex-1 divide-y divide-white/6 border-y border-white/6">
+              <ul className="mt-6 flex-1 space-y-2.5">
                 {vitalicio.inclui.map((item: string) => (
                   <li
                     key={item}
-                    className="flex items-center gap-3 py-3 text-[0.92rem] text-bone/90"
+                    className="flex gap-3 text-[0.86rem] text-bone/80"
                   >
                     <Marca ok />
                     {item}
