@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Monitor, Smartphone, Play } from "lucide-react";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
+import plataformaDesktopAsset from "@/assets/plataforma-desktop.mov.asset.json";
 import { cn } from "@/lib/utils";
 
 type Tela = "computador" | "celular";
@@ -14,7 +15,7 @@ type Tela = "computador" | "celular";
 function Palco({ tela }: { tela: Tela }) {
   const arquivo =
     tela === "computador"
-      ? "/videos/plataforma-desktop.mp4"
+      ? plataformaDesktopAsset.url
       : "/videos/plataforma-mobile.mp4";
 
   return (
@@ -51,7 +52,7 @@ function Palco({ tela }: { tela: Tela }) {
           playsInline
           preload="none"
         >
-          <source src={arquivo} type="video/mp4" />
+          <source src={arquivo} type={tela === "computador" ? "video/quicktime" : "video/mp4"} />
         </video>
       </div>
     </div>
