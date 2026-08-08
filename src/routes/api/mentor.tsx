@@ -267,16 +267,8 @@ export const Route = createFileRoute("/api/mentor")({
           }
         });
 
-        const salvarRespostaMentor = async (texto: string) => {
-          if (!texto) return;
-          if (currentUser?.id) {
-            await (supabase.from("mentor_messages") as any).insert({
-              user_id: currentUser.id,
-              role: "assistant",
-              content: texto
-            });
-          }
-        };
+
+
  
         return new Response(corpoStream, {
           headers: {
