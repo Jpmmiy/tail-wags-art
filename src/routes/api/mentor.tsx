@@ -247,7 +247,6 @@ export const Route = createFileRoute("/api/mentor")({
           }
         });
 
-        let acumuladoParaSalvar = "";
         const salvarRespostaMentor = async (texto: string) => {
           if (!texto) return;
           if (currentUser?.id) {
@@ -258,8 +257,8 @@ export const Route = createFileRoute("/api/mentor")({
             });
           }
         };
-
-        return new Response(corpo, {
+ 
+        return new Response(corpoStream, {
           headers: {
             "Content-Type": "text/plain; charset=utf-8",
             "Cache-Control": "no-store",
