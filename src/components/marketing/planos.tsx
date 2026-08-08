@@ -191,7 +191,7 @@ export function Planos() {
                     <span className="font-display text-[1.5rem] text-stone">
                       R$
                     </span>
-                    <span className="metal-text font-display text-[4.2rem] font-semibold leading-none tracking-[-0.04em] sm:text-[4.8rem]">
+                    <span className="metal-text font-display text-[3.8rem] font-semibold leading-none tracking-[-0.04em] sm:text-[4.2rem]">
                       {vitalicio.preco}
                     </span>
                   </p>
