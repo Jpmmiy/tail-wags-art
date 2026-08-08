@@ -50,9 +50,10 @@ function Palco({ tela }: { tela: Tela }) {
           muted
           loop
           playsInline
-          preload="none"
+          preload="auto"
         >
-          <source src={arquivo} type={tela === "computador" ? "video/quicktime" : "video/mp4"} />
+          <source src={arquivo} type="video/mp4" />
+          <source src={arquivo} type="video/quicktime" />
         </video>
       </div>
     </div>
