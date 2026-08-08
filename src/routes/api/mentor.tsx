@@ -237,10 +237,9 @@ export const Route = createFileRoute("/api/mentor")({
         let acumuladoParaSalvar = "";
         const salvarRespostaMentor = async (texto: string) => {
           if (!texto) return;
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session?.user?.id) {
+          if (currentUser?.id) {
             await (supabase.from("mentor_messages") as any).insert({
-              user_id: session.user.id,
+              user_id: currentUser.id,
               role: "assistant",
               content: texto
             });
