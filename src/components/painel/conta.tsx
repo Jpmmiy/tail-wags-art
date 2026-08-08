@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   User,
   Camera,
@@ -171,6 +171,14 @@ export function Conta() {
   const [gateway, setGateway] = useState(GATEWAYS[0]);
   const [copiado, setCopiado] = useState(false);
 
+  useEffect(() => {
+    const loadUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) setEmail(user.email);
+    };
+    loadUser();
+  }, []);
+
   const urlWebhook = "https://app.nexofly.com.br/api/webhook/pagamentos/u_7k2q";
 
   const isAdmin = email === "andreyhenriquev4@gmail.com";
@@ -214,13 +222,6 @@ export function Conta() {
 
       {aba === "perfil" && (
         <div className="space-y-5 motion-safe:animate-rise">
-          <useEffect(() => {
-            const loadUser = async () => {
-              const { data: { user } } = await supabase.auth.getUser();
-              if (user?.email) setEmail(user.email);
-            };
-            loadUser();
-          }, []);
           <Cartao titulo="Foto e nome">
             <div className="flex flex-wrap items-center gap-5">
               <div className="relative">
