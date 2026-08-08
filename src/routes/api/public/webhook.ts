@@ -106,7 +106,11 @@ export const Route = createFileRoute('/api/public/webhook')({
             if (userId) {
               const tier = isApproved ? 'vitalicio' : 'free';
               
-              // Atualiza o Tier no perfil do usuário
+              // Atualiza o Tier e o timer do presente no perfil do usuário
+              await supabaseAdmin.auth.admin.updateUserById(userId, {
+                user_metadata: { initial_login_timer_start: Date.now() }
+              });
+              
               await supabaseAdmin.from('profiles').update({
                 tier: tier,
                 updated_at: new Date().toISOString()
