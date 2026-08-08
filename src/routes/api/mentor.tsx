@@ -97,7 +97,7 @@ export const Route = createFileRoute("/api/mentor")({
         }
 
         // PASSO 1 & 4 — GRAVAR INÍCIO
-        await trackAiUsageStart(session.user.id, requestId, "/api/mentor", ip);
+        await trackAiUsageStart(currentUser.id, requestId, "/api/mentor", ip);
 
         const chave = process.env["LOVABLE_API_KEY"];
         if (!chave) {
