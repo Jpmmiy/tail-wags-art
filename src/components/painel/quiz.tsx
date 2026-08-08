@@ -733,7 +733,7 @@ export function Quiz() {
           </div>
 
           <button onClick={() => avancar()} className="metal-pill w-full py-5 rounded-2xl text-black font-bold text-xl hover:scale-[1.02] transition-all shadow-2xl shadow-chrome/20">
-            Gerar minha estratégia
+            Gerar meu vídeo e minha estratégia
           </button>
         </div>
       )}
