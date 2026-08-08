@@ -70,7 +70,7 @@ function Portfolio() {
         ))}
       </ul>
 
-      
+      <GeradorPortfolio />
     </div>
   );
 }
