@@ -90,8 +90,8 @@ function Progresso({ passo }: { passo: number }) {
 
 export function Quiz() {
   const [passo, setPasso] = useState(-1);
-  const [objetivoVideoTipo, setObjetivoVideoTipo] = useState<"institucional" | "dinamico" | "cinematografico">("dinamico");
-  const [possuiDrone, setPossuiDrone] = useState<boolean>(false);
+  const [objetivoVideoTipo, setObjetivoVideoTipo] = useState<"institucional" | "dinamico" | "cinematografico">(() => (typeof window !== 'undefined' ? localStorage.getItem("nexo_objetivoVideoTipo") : null) as any || "dinamico");
+  const [possuiDrone, setPossuiDrone] = useState<boolean>(() => typeof window !== 'undefined' ? localStorage.getItem("nexo_possuiDrone") === "true" : false);
   const [objetivo, setObjetivo] = useState<"site" | "video" | "completo" | null>(null);
   const [modalidade, setModalidade] = useState<Modalidade | null>(null);
   const [escolhido, setEscolhido] = useState<ImovelEncontrado | null>(null);
@@ -110,15 +110,23 @@ export function Quiz() {
   const [atualizadoHa, setAtualizadoHa] = useState<number | null>(null);
   const [totalVarridos, setTotalVarridos] = useState(0);
 
-  const [estilo, setEstilo] = useState("aconchegante");
-  const [publico, setPublico] = useState("casais");
-  const [comodos, setComodos] = useState<string[]>(["Sala", "Quarto principal"]);
-  const [entregaveis, setEntregaveis] = useState<string[]>(["video", "abordagem"]);
-  const [diaria, setDiaria] = useState("250");
-  const [valorImobiliario, setValorImobiliario] = useState("450000");
+  const [estilo, setEstilo] = useState(() => typeof window !== 'undefined' ? localStorage.getItem("nexo_estilo") || "aconchegante" : "aconchegante");
+  const [publico, setPublico] = useState(() => typeof window !== 'undefined' ? localStorage.getItem("nexo_publico") || "casais" : "casais");
+  const [comodos, setComodos] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return ["Sala", "Quarto principal"];
+    const saved = localStorage.getItem("nexo_comodos");
+    return saved ? JSON.parse(saved) : ["Sala", "Quarto principal"];
+  });
+  const [entregaveis, setEntregaveis] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return ["video", "abordagem"];
+    const saved = localStorage.getItem("nexo_entregaveis");
+    return saved ? JSON.parse(saved) : ["video", "abordagem"];
+  });
+  const [diaria, setDiaria] = useState(() => typeof window !== 'undefined' ? localStorage.getItem("nexo_diaria") || "250" : "250");
+  const [valorImobiliario, setValorImobiliario] = useState(() => typeof window !== 'undefined' ? localStorage.getItem("nexo_valorImobiliario") || "450000" : "450000");
   const [gerando, setGerando] = useState(false);
   const [aba, setAba] = useState("video");
-  const [videoVertical, setVideoVertical] = useState(true);
+  const [videoVertical, setVideoVertical] = useState(() => typeof window !== 'undefined' ? localStorage.getItem("nexo_videoVertical") !== "false" : true);
   const [gerados, setGerados] = useState<string[]>([]);
   const [propostaAberta, setPropostaAberta] = useState(false);
   const [projetoCarregado, setProjetoCarregado] = useState<any>(null);
@@ -253,6 +261,19 @@ export function Quiz() {
   }, []);
 
 
+  // Persistência local imediata para campos de personalização
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem("nexo_estilo", estilo);
+    localStorage.setItem("nexo_publico", publico);
+    localStorage.setItem("nexo_comodos", JSON.stringify(comodos));
+    localStorage.setItem("nexo_entregaveis", JSON.stringify(entregaveis));
+    localStorage.setItem("nexo_diaria", diaria);
+    localStorage.setItem("nexo_valorImobiliario", valorImobiliario);
+    localStorage.setItem("nexo_objetivoVideoTipo", objetivoVideoTipo);
+    localStorage.setItem("nexo_possuiDrone", String(possuiDrone));
+    localStorage.setItem("nexo_videoVertical", String(videoVertical));
+  }, [estilo, publico, comodos, entregaveis, diaria, valorImobiliario, objetivoVideoTipo, possuiDrone, videoVertical]);
 
   const autosave = async (step: number, status: any = 'rascunho') => {
     // Se for o passo de geração (agora passo 2, indo para fechamento)
