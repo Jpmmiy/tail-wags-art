@@ -65,7 +65,7 @@ function Faturamento({ d, protocoloAtivo, overrides }: { d: Painel; protocoloAti
     {
       icone: CircleCheck,
       rotulo: "Entregas concluídas",
-      valor: String(d.entregas),
+      valor: (protocoloAtivo && overrides.projetosConcluidos) ? overrides.projetosConcluidos : String(d.entregas),
       nota: d.entregas ? "No mês corrente" : "Comece pela primeira",
     },
     {
