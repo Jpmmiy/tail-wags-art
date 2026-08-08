@@ -32,15 +32,15 @@ function Obrigado() {
 
   return (
     <div className="bg-[#08090B] min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Glow Effects */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
+      {/* Glow Effects - Usando a cor Chrome da Nexofly */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-chrome/10 blur-[120px] rounded-full pointer-events-none" />
       
       <div className="w-full max-w-[480px] bg-[#0F1115] border border-white/5 rounded-[32px] p-8 md:p-10 relative z-10 shadow-2xl">
         <div className="flex flex-col items-center text-center">
-          {/* Success Icon */}
-          <div className="w-16 h-16 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center mb-8 relative">
-            <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping opacity-20" />
-            <Check className="w-8 h-8 text-blue-500" />
+          {/* Success Icon - Usando Chrome */}
+          <div className="w-16 h-16 rounded-full bg-chrome/10 border border-chrome/20 flex items-center justify-center mb-8 relative">
+            <div className="absolute inset-0 rounded-full bg-chrome/20 animate-ping opacity-20" />
+            <Check className="w-8 h-8 text-chrome" />
           </div>
 
           <h1 className="text-bone text-4xl font-bold tracking-tight mb-3">
@@ -59,7 +59,7 @@ function Obrigado() {
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                  <Mail className="w-4 h-4 text-stone/30 group-focus-within:text-blue-500 transition-colors" />
+                  <Mail className="w-4 h-4 text-stone/30 group-focus-within:text-chrome transition-colors" />
                 </div>
                 <div className="w-full h-14 bg-black/40 border border-white/5 rounded-2xl flex items-center px-12 text-stone/80 text-[15px] font-medium italic">
                   use o e-mail que você usou na compra
@@ -74,7 +74,7 @@ function Obrigado() {
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                  <Lock className="w-4 h-4 text-stone/30 group-focus-within:text-blue-500 transition-colors" />
+                  <Lock className="w-4 h-4 text-stone/30 group-focus-within:text-chrome transition-colors" />
                 </div>
                 <div className="w-full h-14 bg-black/40 border border-white/5 rounded-2xl flex items-center px-12 text-bone text-lg font-mono tracking-widest">
                   {password}
@@ -97,9 +97,9 @@ function Obrigado() {
           <div className="w-full mt-10">
             <a
               href="/painel"
-              className="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]"
+              className="w-full h-14 bg-chrome hover:bg-chrome/90 text-[#08090B] rounded-2xl flex items-center justify-center gap-2 text-[15px] font-bold shadow-lg shadow-chrome/20 transition-all active:scale-[0.98]"
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-4 h-4 text-[#08090B]/70" />
               Entrar na plataforma
               <ArrowRight className="w-4 h-4" />
             </a>
