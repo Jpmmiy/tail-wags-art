@@ -384,7 +384,7 @@ export function Quiz() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-display font-semibold text-bone">Fluxo de Vídeos</h3>
-                  <p className="text-sm text-stone mt-1">Roteiros profissionais para Airbnb e handoff direto para Google Flow.</p>
+                  <p className="text-sm text-stone mt-1">Crie vídeos para corretores de imóveis, ou junte imóvel e venda no mesmo pacote.</p>
                 </div>
                 <ChevronRight className="size-6 text-stone group-hover:text-chrome transition-colors" />
               </div>
