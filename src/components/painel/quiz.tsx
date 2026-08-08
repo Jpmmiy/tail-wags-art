@@ -384,7 +384,7 @@ export function Quiz() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-display font-semibold text-bone">Fluxo de Vídeos</h3>
-                  <p className="text-sm text-stone mt-1">Crie vídeos para corretores de imóveis, ou junte imóvel e venda no mesmo pacote.</p>
+                  <p className="text-sm text-stone mt-1">Crie vídeos cinematográficos usando apenas as fotos do imóvel.</p>
                 </div>
                 <ChevronRight className="size-6 text-stone group-hover:text-chrome transition-colors" />
               </div>
