@@ -130,6 +130,25 @@ export const Route = createFileRoute("/api/mentor")({
           );
         }
 
+        // Guarda a pergunta atual do usuário para o histórico persistente.
+        const ultima = mensagens[mensagens.length - 1];
+        if (ultima.role === "user" && currentUser?.id) {
+          await (supabase.from("mentor_messages") as any).insert({
+            user_id: currentUser.id,
+            role: "user",
+            content: ultima.content,
+          });
+        }
+
+        const salvarRespostaMentor = async (texto: string) => {
+          if (!texto || !currentUser?.id) return;
+          await (supabase.from("mentor_messages") as any).insert({
+            user_id: currentUser.id,
+            role: "assistant",
+            content: texto,
+          });
+        };
+
         const MAX_RETRIES = 3; // Aumentado para 3 tentativas
         let attempt = 0;
         let resposta: Response | null = null;
