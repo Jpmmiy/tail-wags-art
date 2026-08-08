@@ -192,10 +192,6 @@ export const Route = createFileRoute("/api/mentor")({
           return json({ erro: "A IA não conseguiu responder no tempo limite." }, 504);
         }
 
-        const leitor = resposta.body.getReader();
-        const decoder = new TextDecoder();
-        const encoder = new TextEncoder();
-        let resto = "";
 
         const corpoStream = new ReadableStream<Uint8Array>({
           async start(controlador) {
