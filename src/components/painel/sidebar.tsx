@@ -35,7 +35,6 @@ const GRUPOS = [
     itens: [
       { href: "/painel/creditos", rotulo: "Créditos infinitos", icone: Infinito },
       { href: "/painel/mentor", rotulo: "Mentor Nexofly", icone: Bot },
-      { href: "/painel/membros", rotulo: "Área de membros", icone: GraduationCap },
     ],
   },
   {
